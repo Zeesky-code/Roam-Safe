@@ -2,7 +2,11 @@ package com.zainab.globeTrotter.controller;
 
 import com.zainab.globeTrotter.model.ItineraryItem;
 import com.zainab.globeTrotter.repository.ItemRepository;
+import com.zainab.globeTrotter.service.ItineraryService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,22 +15,31 @@ import java.util.List;
 public class ItineraryController {
 
     @Autowired
-    private ItemRepository repo;
+    private ItineraryService service;
 
     @PostMapping("/addItem")
-    public String saveItem(@RequestBody ItineraryItem item){
-        repo.save(item);
-        return "Itinerary Item Added Successfully";
+    public ResponseEntity<ItineraryItem> createItineraryItem(@RequestBody ItineraryItem item){
+        ItineraryItem i = service.saveItineraryItem(item);
+        return new ResponseEntity<>(i, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/updateItem")
+    public ResponseEntity<ItineraryItem> updateItineraryItem(@RequestBody ItineraryItem item){
+        ItineraryItem i = service.updateItineraryItem(item);
+        return new ResponseEntity<>(i, HttpStatus.CREATED);
     }
 
     @GetMapping("/findAllItems")
-    public List<ItineraryItem> getItineraryItems(){
-        return repo.findAll();
+    public ResponseEntity<List<ItineraryItem>> getItineraryItems(){
+        List<ItineraryItem> students = service.getItineraryItems();
+        return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteItem(@PathVariable int id){
-        repo.deleteById(String.valueOf(id));
-        return "Itinerary Item Deleted Successfully";
+
+
+    @DeleteMapping("/student")
+    public ResponseEntity<String> deleteItineraryItem(@RequestParam(name = "id") String id) {
+        String message = service.deleteItineraryItem(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
