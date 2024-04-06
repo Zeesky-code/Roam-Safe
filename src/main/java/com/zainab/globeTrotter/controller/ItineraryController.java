@@ -37,7 +37,7 @@ public class ItineraryController {
 
 
 
-    @DeleteMapping("/student")
+    @DeleteMapping("/deleteItem")
     public ResponseEntity<String> deleteItineraryItem(@RequestParam(name = "id") String id) {
         String message = service.deleteItineraryItem(id);
         return new ResponseEntity<>(message, HttpStatus.OK);
