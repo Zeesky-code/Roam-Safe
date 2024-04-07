@@ -23,4 +23,7 @@ public class DestinationService {
         repo.deleteById(new ObjectId(id));
         return "Destination Deleted Successfully";
     }
+    public Destination getDestinationByName(String name) {
+        return repo.findByName(name);
+    }
 }
