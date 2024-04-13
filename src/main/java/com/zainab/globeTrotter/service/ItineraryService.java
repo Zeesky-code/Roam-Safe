@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItineraryService {
@@ -20,15 +21,14 @@ public class ItineraryService {
     public List<ItineraryItem> getItineraryItems(){
         return repo.findAll();
     }
-    public ItineraryItem saveItineraryItem(ItineraryItem item){
+
+    public ItineraryItem saveItineraryItem(ItineraryItem item) {
         Destination destination = item.getDestination();
-        Destination existingDestination = destinationService.getDestinationByName(destination.getName());
-        if(existingDestination == null){
-            destination = destinationService.saveDestination(destination);
-            item.setDestination(destination);
-        }
+        Optional<Destination> existingDestination = Optional.ofNullable(destinationService.getDestinationByName(destination.getName()));
+        item.setDestination(existingDestination.orElseGet(() -> destinationService.saveDestination(destination)));
         return repo.save(item);
     }
+
 
     public ItineraryItem updateItineraryItem(ItineraryItem item){
         return repo.save(item);
