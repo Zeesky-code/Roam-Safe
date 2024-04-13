@@ -1,10 +1,8 @@
-package com.zainab.globeTrotter.repository;
+package com.zainab.globeTrotter.destination;
 
-import com.zainab.globeTrotter.model.Destination;
+import com.zainab.globeTrotter.destination.Destination;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import java.util.Optional;
 
 public interface DestinationRepository extends MongoRepository<Destination, ObjectId> {
     Destination findByName(String name);

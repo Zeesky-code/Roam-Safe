@@ -1,8 +1,9 @@
-package com.zainab.globeTrotter.service;
+package com.zainab.globeTrotter.itinerary;
 
-import com.zainab.globeTrotter.model.Destination;
-import com.zainab.globeTrotter.model.ItineraryItem;
-import com.zainab.globeTrotter.repository.ItemRepository;
+import com.zainab.globeTrotter.destination.Destination;
+import com.zainab.globeTrotter.destination.DestinationService;
+import com.zainab.globeTrotter.itinerary.ItineraryItem;
+import com.zainab.globeTrotter.itinerary.ItemRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

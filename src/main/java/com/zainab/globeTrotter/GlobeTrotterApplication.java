@@ -1,6 +1,6 @@
 package com.zainab.globeTrotter;
 
-import com.zainab.globeTrotter.repository.ItemRepository;
+import com.zainab.globeTrotter.itinerary.ItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

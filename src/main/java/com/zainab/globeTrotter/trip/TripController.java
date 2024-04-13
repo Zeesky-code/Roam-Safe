@@ -1,7 +1,5 @@
-package com.zainab.globeTrotter.controller;
+package com.zainab.globeTrotter.trip;
 
-import com.zainab.globeTrotter.model.Trip;
-import com.zainab.globeTrotter.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

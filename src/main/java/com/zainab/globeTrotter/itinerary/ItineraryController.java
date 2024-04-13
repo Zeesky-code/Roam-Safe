@@ -1,9 +1,5 @@
-package com.zainab.globeTrotter.controller;
+package com.zainab.globeTrotter.itinerary;
 
-import com.zainab.globeTrotter.model.ItineraryItem;
-import com.zainab.globeTrotter.repository.ItemRepository;
-import com.zainab.globeTrotter.service.ItineraryService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

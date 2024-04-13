@@ -1,6 +1,6 @@
-package com.zainab.globeTrotter.repository;
+package com.zainab.globeTrotter.trip;
 
-import com.zainab.globeTrotter.model.Trip;
+import com.zainab.globeTrotter.trip.Trip;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

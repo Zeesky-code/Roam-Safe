@@ -1,4 +1,4 @@
-package com.zainab.globeTrotter.model;
+package com.zainab.globeTrotter.destination;
 
 import lombok.Getter;
 import lombok.Setter;

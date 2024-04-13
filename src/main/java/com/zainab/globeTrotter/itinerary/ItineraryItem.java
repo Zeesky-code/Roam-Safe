@@ -1,5 +1,6 @@
-package com.zainab.globeTrotter.model;
+package com.zainab.globeTrotter.itinerary;
 
+import com.zainab.globeTrotter.destination.Destination;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
