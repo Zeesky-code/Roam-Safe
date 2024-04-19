@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Globe Trotter</title>
+    <title>Create Your Trip</title>
     <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/style.css}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,9 +21,20 @@
 
 <main class="main">
     <div class="container">
-        <p class="hero-text">Pack Your Bags, We've Got the Plan.</p>
-        <p class="subtext">Trip planner designed for vacations, workations, and everyday adventures.</p>
-        <a href="/createTrip" class="btn" id="createTrip">Create a new trip</a>
+        <h1>Featured Trips</h1>
+        <div th:each="trip : ${featuredTrips}">
+            <div class="trip-card">
+                <img th:src="${trip.destinations[0].images[0]}" alt="Trip Image">
+                <h3><a th:href="@{/trip/{id}(id=${trip.id})}">
+                    <p th:text="${trip.name}"></p>
+                </a></h3>
+                <p class="destinations">Destinations:
+                    <th:block th:each="destination : ${trip.destinations}">
+                        <span th:text="${destination.name} ">, </span>
+                    </th:block>
+                 </p>
+            </div>
+        </div>
     </div>
 </main>
 </body>

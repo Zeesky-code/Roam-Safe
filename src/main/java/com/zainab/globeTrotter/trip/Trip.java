@@ -18,11 +18,17 @@ public class Trip {
     private String name;
     private List<Destination> destinations;
     private List<ItineraryItem> itinerary;
+    private boolean isFeatured;
+
+    public Trip(){
+
+    }
 
     public Trip(String name,  List<Destination> destinations ,List<ItineraryItem> itinerary){
         this.name = name;
         this.destinations = destinations;
         this.itinerary = itinerary;
+        this.isFeatured = false;
     }
 
     public String getName() {
@@ -54,5 +60,13 @@ public class Trip {
 
     public void removeItineraryItem(ItineraryItem itineraryItem){
         this.itinerary.remove(itineraryItem);
+    }
+
+    public boolean IsFeatured() {
+        return isFeatured;
+    }
+
+    public void setFeatured(boolean featured) {
+        isFeatured = featured;
     }
 }

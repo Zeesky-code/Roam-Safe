@@ -73,3 +73,24 @@ h1 {
     font-size: 2em;
     color: #666;
 }
+
+trip-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 30%;
+}
+.trip-card img {
+    width: 30%;
+    height: 50%;
+}
+.trip-card h3 {
+    margin-top: 0;
+}
+.trip-card .destinations {
+    font-size: 0.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

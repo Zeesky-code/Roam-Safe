@@ -66,4 +66,8 @@ public class TripService {
     public Trip updateTrip( Trip updatedTrip) {
         return tripRepository.save(updatedTrip);
     }
+    public List<Trip> findFeaturedTrips() {
+        return tripRepository.findByIsFeatured(true);
+    }
+
 }
