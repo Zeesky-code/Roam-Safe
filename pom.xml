@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.zainab</groupId>
 	<artifactId>globeTrotter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>globeTrotter</name>
 	<description>A web application to assist tourists in planning and organizing their trips.</description>
 	<properties>
