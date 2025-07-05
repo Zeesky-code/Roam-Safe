@@ -1,30 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    	<title>Roam Safe</title>
-    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/style.css}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <title>RoamSafe – Travel Aware</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body>
-<header class="header">
     <div class="container">
-        		<h1>Roam Safe</h1>
-        <div class="cta">
-            <a href="/featuredTrips" class="btn">Featured Trips</a>
-            <a href="#" class="btn">Sign in</a>
-        </div>
-    </div>
-</header>
+        <h1>RoamSafe</h1>
+        <p>Your smart travel companion helping you avoid scams worldwide.</p>
 
-<main class="main">
-    <div class="container">
-        <p class="hero-text">Pack Your Bags, We've Got the Plan.</p>
-        <p class="subtext">Trip planner designed for vacations, workations, and everyday adventures.</p>
-        <a href="/createTrip" class="btn" id="createTrip">Create a new trip</a>
+        <div class="buttons">
+            <button onclick="document.getElementById('report-form').scrollIntoView({behavior:'smooth'})">Report a Scam</button>
+            <button onclick="document.getElementById('subscribe-form').scrollIntoView({behavior:'smooth'})">Join Waitlist</button>
+        </div>
+
+        <section id="report-form" class="form-section">
+            <h2>Report a Scam</h2>
+            <form method="post" action="/report">
+                <input type="text" name="location" placeholder="City" required />
+                <textarea name="description" placeholder="Describe the scam..." required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+
+        <section id="subscribe-form" class="form-section">
+            <h2>Stay in the loop</h2>
+            <form method="post" action="/subscribe">
+                <input type="email" name="email" placeholder="you@example.com" required />
+                <button type="submit">Join Waitlist</button>
+            </form>
+        </section>
+
+        <footer>
+            <p>Built by Zainab – <a href="https://x.com/Zeeskylaw" target="_blank">Twitter</a> | <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Support</a></p>
+        </footer>
     </div>
-</main>
 </body>
 </html>
