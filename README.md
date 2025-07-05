@@ -1,5 +1,5 @@
-# Globe-Trotter
-This project builds a trip planner application using Spring Boot for backend development, Thymeleaf for templating, and MongoDB for data persistence. It allows users to manage trip details, including destinations, itineraries, and other travel information. It is serving as a practical application of the concepts I am learning in my web server programming course, this 2023/24 Spring semester.
+# Roam Safe
+A web-based platform that protects travelers and international students from common scams by providing verified warnings, community-reported incidents, and smart safety tips — starting with cities like Istanbul. Built using Spring Boot for backend development, Thymeleaf for templating, and MongoDB for data persistence. This project serves as a practical application of the concepts I am learning in my web server programming course, this 2023/24 Spring semester.
 
 ## Technologies Used
 1. Spring Boot: Provides a streamlined framework for efficient backend development.
@@ -32,6 +32,6 @@ The app will run on the default port (usually 8080). You can verify this in the 
 I intend to implement the following functionalities as I learn more.
 
 1. Implement user authentication and authorization for secure access.
-2. Integrate with external services like travel booking platforms or weather APIs.
-
-The project is currently being hosted on AWS Elastic BeanStalk here(http://globetrotter.eu-north-1.elasticbeanstalk.com/).
+2. Add more cities and expand the safety database.
+3. Integrate with local law enforcement APIs for real-time incident reporting.
+4. Develop a mobile app for on-the-go safety alerts.

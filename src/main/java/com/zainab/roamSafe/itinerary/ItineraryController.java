@@ -1,4 +1,4 @@
-package com.zainab.globeTrotter.itinerary;
+package com.zainab.roamSafe.itinerary;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

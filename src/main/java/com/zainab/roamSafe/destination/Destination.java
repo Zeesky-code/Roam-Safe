@@ -1,4 +1,4 @@
-package com.zainab.globeTrotter.destination;
+package com.zainab.roamSafe.destination;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.zainab.globeTrotter.itinerary;
+package com.zainab.roamSafe.itinerary;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

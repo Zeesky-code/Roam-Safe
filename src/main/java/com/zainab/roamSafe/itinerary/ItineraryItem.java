@@ -1,6 +1,6 @@
-package com.zainab.globeTrotter.itinerary;
+package com.zainab.roamSafe.itinerary;
 
-import com.zainab.globeTrotter.destination.Destination;
+import com.zainab.roamSafe.destination.Destination;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

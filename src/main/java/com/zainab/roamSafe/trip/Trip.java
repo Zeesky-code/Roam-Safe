@@ -1,7 +1,7 @@
-package com.zainab.globeTrotter.trip;
+package com.zainab.roamSafe.trip;
 
-import com.zainab.globeTrotter.destination.Destination;
-import com.zainab.globeTrotter.itinerary.ItineraryItem;
+import com.zainab.roamSafe.destination.Destination;
+import com.zainab.roamSafe.itinerary.ItineraryItem;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;

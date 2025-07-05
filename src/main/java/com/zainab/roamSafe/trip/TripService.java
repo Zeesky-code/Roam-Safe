@@ -1,11 +1,11 @@
-package com.zainab.globeTrotter.trip;
+package com.zainab.roamSafe.trip;
 
-import com.zainab.globeTrotter.destination.Destination;
-import com.zainab.globeTrotter.destination.DestinationRepository;
-import com.zainab.globeTrotter.destination.DestinationService;
-import com.zainab.globeTrotter.itinerary.ItemRepository;
-import com.zainab.globeTrotter.itinerary.ItineraryItem;
-import com.zainab.globeTrotter.itinerary.ItineraryService;
+import com.zainab.roamSafe.destination.Destination;
+import com.zainab.roamSafe.destination.DestinationRepository;
+import com.zainab.roamSafe.destination.DestinationService;
+import com.zainab.roamSafe.itinerary.ItemRepository;
+import com.zainab.roamSafe.itinerary.ItineraryItem;
+import com.zainab.roamSafe.itinerary.ItineraryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
