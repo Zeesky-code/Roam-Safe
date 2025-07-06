@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: roamsafe
+    env: java
+    region: frankfurt
+    branch: main  # or master — change if needed
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/roamSafe-1.0.0.jar
+    plan: free
+    autoDeploy: true
