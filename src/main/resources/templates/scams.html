@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scam Search - RoamSafe</title>
+  <link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().getTime()})}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header class="navbar">
+    <nav>
+      <a href="/" class="logo">RoamSafe</a>
+      <a href="/" class="back-link">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main class="scams-page">
+    <h1>🕵️ Search Travel Scams</h1>
+    <p>Type a city name to find common scams reported by travelers.</p>
+
+    <div class="search-bar">
+      <input type="text" id="city-input" placeholder="e.g. Istanbul">
+      <button onclick="fetchScams()">🔍 Search</button>
+    </div>
+
+    <div id="scam-results" class="results"></div>
+  </main>
+
+  <script th:src="@{/js/scams.js}"></script>
+</body>
+</html>

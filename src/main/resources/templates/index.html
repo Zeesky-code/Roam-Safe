@@ -3,12 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>RoamSafe - Travel Smarter</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().getTime()})}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <section class="hero">
+    <header class="navbar">
+        <nav>
+            <a href="/" class="logo">RoamSafe</a>
+            <div class="nav-links">
+                <a href="/scams">🕵️ Scam Alerts</a>
+                <a href="#waitlist">✨ Join Waitlist</a>
+            </div>
+        </nav>
+    </header>
+    <section class="hero">
     <div class="floating-elements">
       <div class="floating-shape"></div>
       <div class="floating-shape"></div>
@@ -16,6 +25,7 @@
     </div>
 
     <div class="content">
+      <p class="preheading">⚠️ Scam awareness for travelers</p>
       <h1>RoamSafe ✈️</h1>
       <p class="tagline">You book the trip, we block the traps. Stay one step ahead of scams before you land.</p>
 
@@ -45,7 +55,7 @@
       <img src="https://illustrations.popsy.co/blue/traveling-with-a-suitcase.svg" alt="Woman with suitcase at airport">
     </div>
   </section>
-
+  
   <!-- Attribution for Popsy illustrations -->
   <div class="attribution">
     <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>
