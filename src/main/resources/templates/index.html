@@ -19,6 +19,17 @@
       <h1>RoamSafe ✈️</h1>
       <p class="tagline">You book the trip, we block the traps. Stay one step ahead of scams before you land.</p>
 
+      <!-- Success/Error Messages -->
+      <div th:if="${success}" class="notification success">
+        <span th:text="${success}"></span>
+        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
+      
+      <div th:if="${error}" class="notification error">
+        <span th:text="${error}"></span>
+        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
+
       <form class="waitlist-form" method="post" action="/waitlist">
         <input type="email" name="email" placeholder="Join the waitlist" required>
         <button type="submit">✨ Notify Me First</button>
