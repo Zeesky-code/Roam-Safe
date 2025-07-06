@@ -1,41 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>RoamSafe – Travel Aware</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>RoamSafe - Travel Smarter</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="container">
-        <h1>RoamSafe</h1>
-        <p>Your smart travel companion helping you avoid scams worldwide.</p>
-
-        <div class="buttons">
-            <button onclick="document.getElementById('report-form').scrollIntoView({behavior:'smooth'})">Report a Scam</button>
-            <button onclick="document.getElementById('subscribe-form').scrollIntoView({behavior:'smooth'})">Join Waitlist</button>
-        </div>
-
-        <section id="report-form" class="form-section">
-            <h2>Report a Scam</h2>
-            <form method="post" action="/report">
-                <input type="text" name="location" placeholder="City" required />
-                <textarea name="description" placeholder="Describe the scam..." required></textarea>
-                <button type="submit">Submit</button>
-            </form>
-        </section>
-
-        <section id="subscribe-form" class="form-section">
-            <h2>Stay in the loop</h2>
-            <form method="post" action="/subscribe">
-                <input type="email" name="email" placeholder="you@example.com" required />
-                <button type="submit">Join Waitlist</button>
-            </form>
-        </section>
-
-        <footer>
-            <p>Built by Zainab – <a href="https://x.com/Zeeskylaw" target="_blank">Twitter</a> | <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Support</a></p>
-        </footer>
+  <section class="hero">
+    <div class="floating-elements">
+      <div class="floating-shape"></div>
+      <div class="floating-shape"></div>
+      <div class="floating-shape"></div>
     </div>
+
+    <div class="content">
+      <h1>RoamSafe ✈️</h1>
+      <p class="tagline">You book the trip, we block the traps. Stay one step ahead of scams before you land.</p>
+
+      <form class="waitlist-form" method="post" action="/waitlist">
+        <input type="email" name="email" placeholder="Join the waitlist" required>
+        <button type="submit">✨ Notify Me First</button>
+      </form>
+
+      <div class="social">
+        <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
+        <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Buy me a juice 🧃</a>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <img src="https://illustrations.popsy.co/blue/traveling-with-a-suitcase.svg" alt="Woman with suitcase at airport">
+    </div>
+  </section>
+
+  <!-- Attribution for Popsy illustrations -->
+  <div class="attribution">
+    <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>
+  </div>
 </body>
 </html>
