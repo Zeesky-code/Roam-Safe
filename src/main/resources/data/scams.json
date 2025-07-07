@@ -1,0 +1,252 @@
+{
+  "scams": [
+    {
+      "id": 1,
+      "name": "Fake Police",
+      "category": "Street Scams",
+      "cities": ["Prague", "Budapest", "Barcelona"],
+      "description": "Fake police officers ask to see your passport and wallet to 'check for counterfeit money' then steal cash",
+      "prevention": "Real police will show proper ID. Ask to go to the police station if questioned"
+    },
+    {
+      "id": 2,
+      "name": "Friendship Bracelet",
+      "category": "Street Scams", 
+      "cities": ["Paris", "Rome", "Barcelona"],
+      "description": "Someone approaches you to tie a 'friendship bracelet' on your wrist, then demands payment",
+      "prevention": "Keep your hands in your pockets and walk away quickly"
+    },
+    {
+      "id": 3,
+      "name": "Petition Signing",
+      "category": "Street Scams",
+      "cities": ["Paris", "Rome", "Barcelona", "Prague"],
+      "description": "People ask you to sign a petition while accomplices pickpocket you",
+      "prevention": "Never sign anything from strangers on the street"
+    },
+    {
+      "id": 4,
+      "name": "ATM Helper",
+      "category": "Money Scams",
+      "cities": ["Bangkok", "Manila", "Ho Chi Minh City"],
+      "description": "Someone offers to help you use an ATM, then steals your card details or cash",
+      "prevention": "Only use ATMs inside banks or hotels. Never accept help from strangers"
+    },
+    {
+      "id": 5,
+      "name": "Fake Taxi",
+      "category": "Transportation",
+      "cities": ["Moscow", "Istanbul", "Bangkok", "Manila"],
+      "description": "Unlicensed taxis charge extremely high rates or take you to wrong destinations",
+      "prevention": "Use official taxi apps or pre-arranged transportation. Check meter is running"
+    },
+    {
+      "id": 6,
+      "name": "Overpriced SIM Cards",
+      "category": "Money Scams",
+      "cities": ["Bangkok", "Manila", "Istanbul"],
+      "description": "Airport vendors sell SIM cards at 5-10x normal price to tourists",
+      "prevention": "Buy SIM cards from official telecom stores in the city, not at airports"
+    },
+    {
+      "id": 7,
+      "name": "Slow Count",
+      "category": "Money Scams",
+      "cities": ["Moscow", "Prague", "Budapest"],
+      "description": "Cashiers count change very slowly hoping you'll leave without all your money",
+      "prevention": "Always count your change before leaving. Don't be rushed"
+    },
+    {
+      "id": 8,
+      "name": "Fake Train Tickets",
+      "category": "Transportation",
+      "cities": ["Prague", "Budapest", "Warsaw"],
+      "description": "People sell fake or expired train tickets near stations",
+      "prevention": "Only buy tickets from official ticket offices or machines"
+    },
+    {
+      "id": 9,
+      "name": "Distraction Theft",
+      "category": "Street Scams",
+      "cities": ["Barcelona", "Rome", "Paris"],
+      "description": "Someone spills something on you or creates a distraction while accomplices steal your belongings",
+      "prevention": "Be aware of your surroundings. If someone approaches unexpectedly, protect your valuables"
+    },
+    {
+      "id": 10,
+      "name": "Gem Scam",
+      "category": "Shopping Scams",
+      "cities": ["Bangkok", "Istanbul", "Marrakech"],
+      "description": "Sellers claim you can buy gems cheaply and resell them for profit in your home country",
+      "prevention": "Never buy expensive items from street vendors or unlicensed shops"
+    },
+    {
+      "id": 11,
+      "name": "Carpet Scam",
+      "category": "Shopping Scams",
+      "cities": ["Istanbul", "Marrakech", "Cairo"],
+      "description": "Sellers use high-pressure tactics and fake backstories to sell overpriced carpets",
+      "prevention": "Research prices beforehand. Never feel pressured to buy immediately"
+    },
+    {
+      "id": 12,
+      "name": "Tea/Coffee Invitation",
+      "category": "Social Scams",
+      "cities": ["Istanbul", "Marrakech", "Cairo"],
+      "description": "Friendly locals invite you for tea, then present you with an enormous bill",
+      "prevention": "Be cautious of unsolicited invitations. Always ask about prices upfront"
+    },
+    {
+      "id": 13,
+      "name": "Wrong Change",
+      "category": "Money Scams",
+      "cities": ["All destinations"],
+      "description": "Vendors give incorrect change, hoping tourists won't notice or are too polite to complain",
+      "prevention": "Always count your change immediately. Know the local currency denominations"
+    },
+    {
+      "id": 14,
+      "name": "Fake WiFi Networks",
+      "category": "Technology Scams",
+      "cities": ["All destinations"],
+      "description": "Criminals set up fake WiFi hotspots to steal personal information and passwords",
+      "prevention": "Only use official hotel/restaurant WiFi. Avoid networks with generic names"
+    },
+    {
+      "id": 15,
+      "name": "Overcharging Tourists",
+      "category": "Money Scams",
+      "cities": ["All destinations"],
+      "description": "Restaurants and shops charge tourists higher prices than locals",
+      "prevention": "Check prices beforehand. Ask for menus with prices. Learn basic local numbers"
+    },
+    {
+      "id": 16,
+      "name": "Fake Travel Insurance",
+      "category": "Documentation Scams",
+      "cities": ["All destinations"],
+      "description": "Scammers sell fake travel insurance policies that provide no coverage",
+      "prevention": "Only buy insurance from reputable companies. Verify coverage details"
+    },
+    {
+      "id": 17,
+      "name": "Pickpocketing",
+      "category": "Street Scams",
+      "cities": ["Barcelona", "Rome", "Paris", "Prague", "Bangkok"],
+      "description": "Thieves steal from pockets, bags, or purses in crowded areas",
+      "prevention": "Keep valuables in front pockets or money belts. Stay alert in crowds"
+    },
+    {
+      "id": 18,
+      "name": "Fake Tickets",
+      "category": "Entertainment Scams",
+      "cities": ["All major cities"],
+      "description": "Scammers sell fake tickets to popular attractions, shows, or events",
+      "prevention": "Buy tickets only from official sources or authorized vendors"
+    },
+    {
+      "id": 19,
+      "name": "Fake Charity",
+      "category": "Social Scams",
+      "cities": ["All destinations"],
+      "description": "People approach tourists asking for donations to fake charities",
+      "prevention": "Research charities before donating. Don't give money to street solicitors"
+    },
+    {
+      "id": 20,
+      "name": "Rental Car Damage",
+      "category": "Transportation",
+      "cities": ["All destinations"],
+      "description": "Car rental companies charge for pre-existing damage they claim you caused",
+      "prevention": "Document all damage before driving. Take photos from all angles"
+    }
+  ],
+  "cities": [
+    {
+      "city": "Istanbul",
+      "country": "Turkey"
+    },
+    {
+      "city": "Bangkok",
+      "country": "Thailand"
+    },
+    {
+      "city": "Barcelona",
+      "country": "Spain"
+    },
+    {
+      "city": "Rome",
+      "country": "Italy"
+    },
+    {
+      "city": "Paris",
+      "country": "France"
+    },
+    {
+      "city": "Prague",
+      "country": "Czech Republic"
+    },
+    {
+      "city": "Budapest",
+      "country": "Hungary"
+    },
+    {
+      "city": "Manila",
+      "country": "Philippines"
+    },
+    {
+      "city": "Moscow",
+      "country": "Russia"
+    },
+    {
+      "city": "Ho Chi Minh City",
+      "country": "Vietnam"
+    },
+    {
+      "city": "Marrakech",
+      "country": "Morocco"
+    },
+    {
+      "city": "Cairo",
+      "country": "Egypt"
+    },
+    {
+      "city": "Warsaw",
+      "country": "Poland"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Street Scams",
+      "description": "Scams that happen on the street involving direct interaction"
+    },
+    {
+      "name": "Money Scams", 
+      "description": "Scams involving currency, payments, or financial transactions"
+    },
+    {
+      "name": "Transportation",
+      "description": "Scams related to taxis, trains, buses, and rental vehicles"
+    },
+    {
+      "name": "Shopping Scams",
+      "description": "Scams involving purchases of goods or services"
+    },
+    {
+      "name": "Social Scams",
+      "description": "Scams that use social interaction and friendship"
+    },
+    {
+      "name": "Technology Scams",
+      "description": "Scams involving digital devices, WiFi, or online services"
+    },
+    {
+      "name": "Documentation Scams",
+      "description": "Scams involving fake documents, tickets, or official papers"
+    },
+    {
+      "name": "Entertainment Scams",
+      "description": "Scams related to events, shows, and attractions"
+    }
+  ]
+}

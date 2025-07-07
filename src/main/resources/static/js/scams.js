@@ -12,12 +12,15 @@ async function fetchScams() {
       } else {
         resultsDiv.innerHTML = "<ul>" + scams.map(s => `
           <div class="scam-card">
-            <h4>${s.title}</h4>
-            <p>${s.description}</p>
+            <h4>${s.name}</h4>
+            <p><strong>Description:</strong> ${s.description}</p>
+            <p><strong>Prevention:</strong> ${s.prevention}</p>
+            <p><strong>Category:</strong> ${s.category ? s.category.name : 'N/A'}</p>
           </div>
         `).join('')  + "</ul>";
       }
     } catch (e) {
+      console.error('Error fetching scams:', e);
       resultsDiv.innerHTML = "<p>Failed to load scams.</p>";
     }
   }
