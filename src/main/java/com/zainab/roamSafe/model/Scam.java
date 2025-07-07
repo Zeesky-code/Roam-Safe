@@ -2,6 +2,7 @@ package com.zainab.roamSafe.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
@@ -22,6 +23,7 @@ public class Scam {
     
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category category;
     
     @ManyToMany
@@ -30,6 +32,7 @@ public class Scam {
         joinColumns = @JoinColumn(name = "scam_id"),
         inverseJoinColumns = @JoinColumn(name = "city_id")
     )
+    @JsonIgnore
     private List<City> cities;
     
     public Scam() {}
@@ -57,4 +60,16 @@ public class Scam {
     
     public List<City> getCities() { return cities; }
     public void setCities(List<City> cities) { this.cities = cities; }
+    
+    // Custom getters for JSON serialization
+    public String getCategoryName() {
+        return category != null ? category.getName() : null;
+    }
+    
+    public List<String> getCityNames() {
+        if (cities == null) return null;
+        return cities.stream()
+                    .map(City::getName)
+                    .toList();
+    }
 }

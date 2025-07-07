@@ -10,14 +10,19 @@ async function fetchScams() {
       if (scams.length === 0) {
         resultsDiv.innerHTML = "<p>No scams found for this city.</p>";
       } else {
-        resultsDiv.innerHTML = "<ul>" + scams.map(s => `
-          <div class="scam-card">
-            <h4>${s.name}</h4>
-            <p><strong>Description:</strong> ${s.description}</p>
-            <p><strong>Prevention:</strong> ${s.prevention}</p>
-            <p><strong>Category:</strong> ${s.category ? s.category.name : 'N/A'}</p>
+        resultsDiv.innerHTML = `
+          <h3>Found ${scams.length} scam(s) for ${city}:</h3>
+          <div class="scams-grid">
+            ${scams.map(s => `
+              <div class="scam-card">
+                <h4>${s.name}</h4>
+                <p><strong>Description:</strong> ${s.description}</p>
+                <p><strong>Prevention:</strong> ${s.prevention}</p>
+                <p><strong>Category:</strong> ${s.categoryName || 'N/A'}</p>
+              </div>
+            `).join('')}
           </div>
-        `).join('')  + "</ul>";
+        `;
       }
     } catch (e) {
       console.error('Error fetching scams:', e);
