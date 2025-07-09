@@ -1,32 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Scam Search - RoamSafe</title>
-  <link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.createNow().getTime()})}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scam Search – RoamSafe</title>
+  <link rel="stylesheet" th:href="@{/css/scams.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <header class="navbar">
-    <nav>
-      <a href="/" class="logo">RoamSafe</a>
-      <a href="/" class="back-link">← Back to Home</a>
-    </nav>
+  <header class="nav">
+    <a href="/" class="logo">RoamSafe</a>
+    <div class="nav-actions">
+      <a href="/scams" class="nav-link">🕵️ Scam Alerts</a>
+      <a href="/" class="nav-link">✨ Join Waitlist</a>
+    </div>
   </header>
 
-  <main class="scams-page">
-    <h1>🕵️ Search Travel Scams</h1>
-    <p>Type a city name to find common scams reported by travelers.</p>
-
-    <div class="search-bar">
-      <input type="text" id="city-input" placeholder="e.g. Istanbul">
-      <button onclick="fetchScams()">🔍 Search</button>
-    </div>
-
-    <div id="scam-results" class="results"></div>
+  <main class="scams-container">
+    <section class="scams-hero">
+      <div class="scams-illustration">
+        <!-- You can replace this with an actual SVG illustration -->
+        <img src="https://illustrations.popsy.co/blue/searching-location-on-the-phone.svg" alt="Illustration" />
+      </div>
+      <div class="scams-content">
+        <p class="preheading">🧭 Community-Reported Travel Scams</p>
+        <h1>Find Scams by City</h1>
+        <p class="description">
+          Planning a trip? Enter a city to uncover scams reported by other travelers and stay ahead of the traps.
+        </p>
+        <div class="search-box">
+          <input id="city-input" type="text" placeholder="e.g. Istanbul" />
+          <button onclick="fetchScams()">🔍 Search</button>
+        </div>
+        <div id="scam-results" class="results"></div>
+      </div>
+    </section>
   </main>
 
-  <script th:src="@{/js/scams.js}"></script>
+  <footer class="footer">
+    <p>Made with 💙 by @Zeeskylaw — <a href="#">Buy me a juice 🧃</a></p>
+  </footer>
+
+  <script src="/js/scams.js"></script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 # Roam Safe
-A web-based platform that protects travelers and international students from common scams by providing verified warnings, community-reported incidents, and smart safety tips — starting with cities like Istanbul. Built using Spring Boot for backend development, Thymeleaf for templating, and MongoDB for data persistence. This project serves as a practical application of the concepts I am learning in my web server programming course, this 2023/24 Spring semester.
+A web-based platform that protects travelers and international students from common scams by providing verified warnings, community-reported incidents, and smart safety tips — starting with cities like Istanbul. Built using Spring Boot for backend development, Thymeleaf for templating, and PostgreSQL for data persistence. This project serves as a practical application of the concepts I am learning in my web server programming course, this 2023/24 Spring semester.
 
 ## Technologies Used
 1. Spring Boot: Provides a streamlined framework for efficient backend development.
 2. Thymeleaf: Offers a dynamic templating engine for crafting a user-friendly interface.
-3. MongoDB: Functions as a flexible NoSQL database for storing and managing trip data.
+3. PostgreSQL: Functions as a robust relational database for storing and managing trip data.
 
 ## Benefits for Learning:
 This project offers me hands-on experience with knowledge on:
@@ -17,13 +17,13 @@ This project offers me hands-on experience with knowledge on:
 ## Prerequisites:
 1. Java 11 or later
 2. Maven build tool
-3. MongoDB installed on your local machine
+3. PostgreSQL installed on your local machine
 
 ## Installation:
 
 1. Clone this repository.
 2. Navigate to the project directory in your terminal.
-3. Update `application.properties` with your MongoDB connection details (host, port, database name).
+3. Update `application.properties` with your PostgreSQL connection details (host, port, database name).
 4. Run `mvn clean install`.
 The app will run on the default port (usually 8080). You can verify this in the console output.
 
