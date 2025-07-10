@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RoamSafe - Travel Smarter</title>
+  <title>Submit a Scam | RoamSafe</title>
   <link rel="stylesheet" th:href="@{/css/style.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +14,11 @@
             <div class="nav-links">
                 <a href="/scams">🕵️ Scam Alerts</a>
                 <a href="/submit">🛡️ Submit Scam</a>
-                <a href="#waitlist">✨ Join Waitlist</a>
+                <a href="/#waitlist">✨ Join Waitlist</a>
             </div>
         </nav>
     </header>
+    
     <section class="hero">
     <div class="floating-elements">
       <div class="floating-shape"></div>
@@ -26,25 +27,22 @@
     </div>
 
     <div class="content">
-      <p class="preheading">⚠️ Scam awareness for travelers</p>
-      <h1>RoamSafe ✈️</h1>
-      <p class="tagline">You book the trip, we block the traps. Stay one step ahead of scams before you land.</p>
+      <p class="preheading">🛡️ Community-driven safety</p>
+      <h1>Submit a Scam</h1>
+      <p class="tagline">Help other travelers stay safe by reporting scams you've encountered. Your reports make our community stronger.</p>
 
-      <!-- Success/Error Messages -->
-      <div th:if="${success}" class="notification success">
-        <span th:text="${success}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
-      </div>
-      
-      <div th:if="${error}" class="notification error">
-        <span th:text="${error}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
-      </div>
-
-      <form class="waitlist-form" method="post" action="/waitlist">
-        <input type="email" name="email" placeholder="Join the waitlist" required>
-        <button type="submit">✨ Notify Me First</button>
+      <form class="waitlist-form" th:action="@{/submit}" th:object="${submittedScam}" method="post">
+        <input type="text" th:field="*{name}" placeholder="Scam Title" required />
+        <textarea th:field="*{description}" placeholder="Describe the scam..." required style="resize: vertical; min-height: 100px;"></textarea>
+        <textarea th:field="*{prevention}" placeholder="How can someone avoid it?" style="resize: vertical; min-height: 80px;"></textarea>
+        <input type="text" th:field="*{city}" placeholder="City name" required />
+        <button type="submit">🚨 Submit Report</button>
       </form>
+
+      <div th:if="${success}" class="notification success">
+        <span>✅ Thank you! We'll review your report shortly.</span>
+        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
 
       <div class="social">
         <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
@@ -53,7 +51,7 @@
     </div>
 
     <div class="hero-image">
-      <img src="https://illustrations.popsy.co/blue/traveling-with-a-suitcase.svg" alt="Woman with suitcase at airport">
+      <img src="https://illustrations.popsy.co/blue/security-shield.svg" alt="Security Shield">
     </div>
   </section>
   

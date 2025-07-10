@@ -106,7 +106,8 @@
     margin-bottom: 2rem;
   }
   
-  .waitlist-form input {
+  .waitlist-form input,
+  .waitlist-form textarea {
     padding: 16px 20px;
     font-size: 1rem;
     border: 2px solid #e2e8f0;
@@ -115,13 +116,16 @@
     color: #1e293b;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    font-family: 'Inter', system-ui, sans-serif;
   }
   
-  .waitlist-form input::placeholder {
+  .waitlist-form input::placeholder,
+  .waitlist-form textarea::placeholder {
     color: #64748b;
   }
   
-  .waitlist-form input:focus {
+  .waitlist-form input:focus,
+  .waitlist-form textarea:focus {
     outline: none;
     border-color: #3b82f6;
     background: white;
