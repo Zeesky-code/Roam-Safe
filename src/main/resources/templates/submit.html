@@ -8,53 +8,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <header class="navbar">
-        <nav>
-            <a href="/" class="logo">RoamSafe</a>
-            <div class="nav-links">
-                <a href="/scams">🕵️ Scam Alerts</a>
-                <a href="/submit">🛡️ Submit Scam</a>
-                <a href="/#waitlist">✨ Join Waitlist</a>
-            </div>
-        </nav>
-    </header>
-    
-    <section class="hero">
-    <div class="floating-elements">
-      <div class="floating-shape"></div>
-      <div class="floating-shape"></div>
-      <div class="floating-shape"></div>
-    </div>
-
-    <div class="content">
-      <p class="preheading">🛡️ Community-driven safety</p>
-      <h1>Submit a Scam</h1>
-      <p class="tagline">Help other travelers stay safe by reporting scams you've encountered. Your reports make our community stronger.</p>
-
-      <form class="waitlist-form" th:action="@{/submit}" th:object="${submittedScam}" method="post">
-        <input type="text" th:field="*{name}" placeholder="Scam Title" required />
-        <textarea th:field="*{description}" placeholder="Describe the scam..." required style="resize: vertical; min-height: 100px;"></textarea>
-        <textarea th:field="*{prevention}" placeholder="How can someone avoid it?" style="resize: vertical; min-height: 80px;"></textarea>
-        <input type="text" th:field="*{city}" placeholder="City name" required />
-        <button type="submit">🚨 Submit Report</button>
-      </form>
-
-      <div th:if="${success}" class="notification success">
-        <span>✅ Thank you! We'll review your report shortly.</span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+  <header class="navbar">
+    <nav>
+      <a href="/" class="logo">RoamSafe</a>
+      <div class="nav-links">
+        <a href="/scams">🕵️ Scam Alerts</a>
+        <a href="/submit">🛡️ Submit Scam</a>
+        <a href="/#waitlist">✨ Join Waitlist</a>
       </div>
+    </nav>
+  </header>
 
-      <div class="social">
-        <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
-        <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Buy me a juice 🧃</a>
+  <main class="scams-page">
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center;">
+      
+      <div class="desktop-only" style="flex: 1 1 300px; text-align: center;">
+        <img src="https://illustrations.popsy.co/blue/cute-bunny.svg" alt="Security Shield" style="max-width: 90%; height: auto; filter: drop-shadow(0 20px 40px rgba(59, 130, 246, 0.15)); animation: float 6s ease-in-out infinite;">
+      </div>
+      
+
+      <!-- Form Content -->
+      <div style="flex: 1 1 350px; max-width: 600px;">
+        <p class="preheading">🛡️ Community-driven safety</p>
+        <h1>Submit a Scam</h1>
+        <p class="tagline">Help other travelers stay safe by reporting scams you've encountered. Your reports make our community stronger.</p>
+
+        <form class="waitlist-form" th:action="@{/submit}" th:object="${submittedScam}" method="post">
+          <input type="text" th:field="*{name}" placeholder="Scam Title" required />
+          <textarea th:field="*{description}" placeholder="Describe the scam..." required style="resize: vertical; min-height: 100px;"></textarea>
+          <textarea th:field="*{prevention}" placeholder="How can someone avoid it?" style="resize: vertical; min-height: 80px;"></textarea>
+          <input type="text" th:field="*{city}" placeholder="City name" required />
+          <button type="submit">🚨 Submit Report</button>
+        </form>
+
+        <div th:if="${success}" class="notification success">
+          <span>✅ Thank you! We'll review your report shortly.</span>
+          <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+
+        <div class="social">
+          <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
+          <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Buy me a juice 🧃</a>
+        </div>
       </div>
     </div>
+  </main>
 
-    <div class="hero-image">
-      <img src="https://illustrations.popsy.co/blue/security-shield.svg" alt="Security Shield">
-    </div>
-  </section>
-  
   <!-- Attribution for Popsy illustrations -->
   <div class="attribution">
     <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>

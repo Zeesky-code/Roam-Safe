@@ -731,3 +731,9 @@
       font-size: 1.4rem;
     }
   }
+  /* Hide elements with class 'desktop-only' on small screens */
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none !important;
+    }
+  }
