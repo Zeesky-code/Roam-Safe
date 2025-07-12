@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Analytics | RoamSafe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="navbar">
+  <nav>
+    <a href="/" class="logo">RoamSafe</a>
+    <div class="nav-links">
+      <a href="/admin/submissions">📝 Submissions</a>
+      <a href="/admin/analytics">📊 Analytics</a>
+    </div>
+  </nav>
+</header>
+
+<main class="scams-page">
+  <h1>📊 Admin Analytics Dashboard</h1>
+  <p class="tagline">Monitor scam report trends across cities and time. These insights help you verify trends and stay ahead of emerging scam tactics.</p>
+
+  <!-- STAT CARDS -->
+  <div class="scams-grid">
+    <div class="scam-card">
+      <h4>Total Reports</h4>
+      <p class="stat-number" th:text="${total}">0</p>
+    </div>
+    <div class="scam-card">
+      <h4>Approved Reports</h4>
+      <p class="stat-number" th:text="${approved}">0</p>
+    </div>
+    <div class="scam-card">
+      <h4>Pending Review</h4>
+      <p class="stat-number" th:text="${pending}">0</p>
+    </div>
+  </div>
+
+  <!-- TOP CITIES -->
+  <div class="analytics-section" style="margin-top: 3rem;">
+    <h3>🌍 Top 5 Cities With Most Reports</h3>
+    <table class="analytics-table">
+      <thead>
+        <tr>
+          <th>City</th>
+          <th>Report Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="city : ${topCities}">
+          <td th:text="${city[0]}">City Name</td>
+          <td th:text="${city[1]}">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PLACEHOLDER: Add more analytics here -->
+  <div class="analytics-section" style="margin-top: 3rem;">
+    <h3>🧠 Common Scam Terms</h3>
+    <p style="color: #64748b;">Coming soon: NLP-based keyword frequency for rapid scam type detection.</p>
+  </div>
+
+  <!-- (Optional) CHART PLACEHOLDER -->
+  <!--
+  <div class="analytics-section">
+    <canvas id="scamChart" width="400" height="200"></canvas>
+  </div>
+  -->
+
+</main>
+
+<style>
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin-top: 0.5rem;
+  }
+
+  .analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    margin-top: 1rem;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .analytics-table th,
+  .analytics-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .analytics-table th {
+    background: #f1f5f9;
+    font-weight: 600;
+  }
+
+  .analytics-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .analytics-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+</style>
+</body>
+</html>

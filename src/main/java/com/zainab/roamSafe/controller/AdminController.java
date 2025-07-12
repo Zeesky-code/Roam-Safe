@@ -3,6 +3,7 @@ package com.zainab.roamSafe.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,12 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.zainab.roamSafe.model.SubmittedScam;
 import com.zainab.roamSafe.repository.SubmittedScamRepository;
+import com.zainab.roamSafe.service.ScamService;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final SubmittedScamRepository submittedScamRepository;
+    @Autowired
+    private ScamService scamService;
 
     public AdminController(SubmittedScamRepository submittedScamRepository) {
         this.submittedScamRepository = submittedScamRepository;
@@ -39,4 +43,13 @@ public class AdminController {
         });
         return "redirect:/admin/submissions";
     }
+    @GetMapping("/analytics")
+    public String analytics(Model model) {
+        model.addAttribute("total", scamService.getTotalScams());
+        model.addAttribute("approved", scamService.getApprovedScams());
+        model.addAttribute("pending", scamService.getPendingScams());
+        model.addAttribute("topCities", scamService.getTopCities(5));
+        return "analytics";
+    }
+
 }

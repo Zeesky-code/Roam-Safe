@@ -8,4 +8,5 @@ import com.zainab.roamSafe.model.SubmittedScam;
 
 public interface SubmittedScamRepository extends JpaRepository<SubmittedScam, Long> {
     List<SubmittedScam> findByReviewedFalse();
+    long countByReviewed(boolean reviewed);
 }
