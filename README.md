@@ -1,37 +1,102 @@
-# Roam Safe
-A web-based platform that protects travelers and international students from common scams by providing verified warnings, community-reported incidents, and smart safety tips — starting with cities like Istanbul. Built using Spring Boot for backend development, Thymeleaf for templating, and PostgreSQL for data persistence. This project serves as a practical application of the concepts I am learning in my web server programming course, this 2023/24 Spring semester.
+# 🌍 RoamSafe
 
-## Technologies Used
-1. Spring Boot: Provides a streamlined framework for efficient backend development.
-2. Thymeleaf: Offers a dynamic templating engine for crafting a user-friendly interface.
-3. PostgreSQL: Functions as a robust relational database for storing and managing trip data.
+**RoamSafe** is a community-powered platform that helps **travelers** and **international students** stay safe by sharing verified scam alerts, recent incidents, and safety tips — starting with cities like **Istanbul**.
 
-## Benefits for Learning:
-This project offers me hands-on experience with knowledge on:
+Built with `Spring Boot`, `Thymeleaf`, and `PostgreSQL`, RoamSafe is a hands-on project from my **Web Server Programming** course (Spring 2023/24), and continues to evolve into a real-world application for public good.
 
-1. Building RESTful APIs with Spring Boot
-2. Designing user interfaces with Thymeleaf templates
-3. Implementing data persistence using MongoDB
+---
+
+## 🚀 Features
+
+- 🕵️ Submit scam reports (location + description)
+- 📍 **Auto-detect user location** and pre-fill city search
+- ✅ Admin review for quality control
+- 📊 Analytics dashboard (in development)
+- 🔄 Data pipeline that scrapes Reddit, uses Gemini API, and stores structured scams in PostgreSQL
+- 🔐 Upcoming: authentication and user dashboards
+
+---
+
+## 🛠️ Technologies Used
+
+- **Java + Spring Boot** – Backend logic and routing
+- **Thymeleaf** – Server-side rendering
+- **PostgreSQL** – Relational database
+- **Reddit + Gemini API** – External data ingestion
+- **Browser Geolocation API** – Auto-detect user location
+- **OpenStreetMap Nominatim** – Reverse geocoding for city detection
+- **Chart.js (planned)** – Scam trend visualization
+
+---
+
+## 🎓 Learning Outcomes
+
+This project supports my learning by helping me:
+
+- Build RESTful web apps using Spring Boot
+- Use Thymeleaf for interactive forms and templating
+- Design and connect to PostgreSQL databases
+- Automate data collection and structuring with Python
+- Think critically about usability, safety, and ethics
+
+---
+
+## 🧰 Prerequisites
+
+- Java 11 or later
+- Maven
+- PostgreSQL (running locally or via Docker)
+
+---
+
+## 📦 Installation
+
+1. Clone this repository:
+
+```bash
+git clone https://github.com/yourusername/roamsafe.git
+cd roamsafe
+
+2. Configure your database in src/main/resources/application.properties:
+
+```bash
+spring.datasource.url=jdbc:postgresql://localhost:5432/yourdbname
+spring.datasource.username=yourusername
+spring.datasource.password=yourpassword
+```
+
+3. Install dependencies and run the project:
+```bash
+mvn clean install
+mvn spring-boot:run
+Then visit: http://localhost:8080
+```
+
+##  🌱 Roadmap
+ Basic form + scam submission flow
+
+ Server-side validations and success feedback
+
+ Reddit scraping → Gemini AI → PostgreSQL pipeline
+
+ Add user authentication (Spring Security)
+
+ Global city filtering and search
+
+ Public dashboard with charts
+
+ Deploy on Fly.io or Railway
+
+## 🧠 Want to Contribute?
+Open an issue or send a pull request! All ideas welcome — especially if you're interested in:
+
+Data scraping
+
+NLP structuring
+
+UI/UX
+
+Mapping tools (Leaflet.js, Mapbox, etc.)
 
 
-## Prerequisites:
-1. Java 11 or later
-2. Maven build tool
-3. PostgreSQL installed on your local machine
-
-## Installation:
-
-1. Clone this repository.
-2. Navigate to the project directory in your terminal.
-3. Update `application.properties` with your PostgreSQL connection details (host, port, database name).
-4. Run `mvn clean install`.
-The app will run on the default port (usually 8080). You can verify this in the console output.
-
-
-## Further Development:
-I intend to implement the following functionalities as I learn more.
-
-1. Implement user authentication and authorization for secure access.
-2. Add more cities and expand the safety database.
-3. Integrate with local law enforcement APIs for real-time incident reporting.
-4. Develop a mobile app for on-the-go safety alerts.
+“Travel far. Stay safe. Help others do the same.”
