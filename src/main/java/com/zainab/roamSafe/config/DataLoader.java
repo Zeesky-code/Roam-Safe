@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zainab.roamSafe.model.Scam;
 import com.zainab.roamSafe.model.Category;
 import com.zainab.roamSafe.model.City;
+import com.zainab.roamSafe.model.SafetyZone;
 import com.zainab.roamSafe.repository.ScamRepository;
 import com.zainab.roamSafe.repository.CategoryRepository;
 import com.zainab.roamSafe.repository.CityRepository;
@@ -18,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -30,13 +34,27 @@ public class DataLoader implements CommandLineRunner {
     
     @Autowired
     private CityRepository cityRepository;
+    
+    // Pattern to remove accents and special characters
+    private static final Pattern ACCENT_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    
+    /**
+     * Normalize text by removing accents and converting to lowercase
+     */
+    private String normalizeText(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return text;
+        }
+        // Remove accents and convert to lowercase
+        String normalized = Normalizer.normalize(text.trim(), Normalizer.Form.NFD);
+        normalized = ACCENT_PATTERN.matcher(normalized).replaceAll("");
+        return normalized.toLowerCase();
+    }
 
     @Override
     public void run(String... args) throws Exception {
-        // Only load if database is empty
-        if (scamRepository.count() == 0) {
-            loadDataFromJson();
-        }
+        // Always load/update data from JSON
+        loadDataFromJson();
     }
 
     private void loadDataFromJson() {
@@ -44,6 +62,12 @@ public class DataLoader implements CommandLineRunner {
             ObjectMapper mapper = new ObjectMapper();
             ClassPathResource resource = new ClassPathResource("data/scams.json");
             JsonNode rootNode = mapper.readTree(resource.getInputStream());
+            
+            // Clear existing data
+            System.out.println("Clearing existing data...");
+            scamRepository.deleteAll();
+            categoryRepository.deleteAll();
+            cityRepository.deleteAll();
             
             // Load categories first
             Map<String, Category> categoryMap = loadCategories(rootNode);
@@ -71,9 +95,15 @@ public class DataLoader implements CommandLineRunner {
                 String name = categoryNode.get("name").asText();
                 String description = categoryNode.get("description").asText();
                 
-                Category category = new Category(name, description);
-                category = categoryRepository.save(category);
-                categoryMap.put(name, category);
+                // Check if category already exists
+                Category existingCategory = categoryRepository.findByName(name);
+                if (existingCategory != null) {
+                    categoryMap.put(name, existingCategory);
+                } else {
+                    Category category = new Category(name, description);
+                    category = categoryRepository.save(category);
+                    categoryMap.put(name, category);
+                }
             }
         }
         
@@ -89,10 +119,19 @@ public class DataLoader implements CommandLineRunner {
             for (JsonNode cityNode : citiesNode) {
                 String name = cityNode.get("city").asText();
                 String country = cityNode.get("country").asText();
+                // Normalize city and country names
+                String normName = normalizeText(name);
+                String normCountry = normalizeText(country);
                 
-                City city = new City(name, country);
-                city = cityRepository.save(city);
-                cityMap.put(name, city);
+                // Check if city already exists (using normalized name)
+                City existingCity = cityRepository.findByNameAndCountry(name.trim(), country.trim());
+                if (existingCity != null) {
+                    cityMap.put(normName, existingCity);
+                } else {
+                    City city = new City(name.trim(), country.trim()); // Store original names
+                    city = cityRepository.save(city);
+                    cityMap.put(normName, city);
+                }
             }
         }
         
@@ -129,7 +168,9 @@ public class DataLoader implements CommandLineRunner {
                             // Add all cities for generic scams
                             cities.addAll(cityMap.values());
                         } else {
-                            City city = cityMap.get(cityName);
+                            // Normalize city name for lookup
+                            String normCityName = normalizeText(cityName);
+                            City city = cityMap.get(normCityName);
                             if (city != null) {
                                 cities.add(city);
                             }
@@ -138,10 +179,37 @@ public class DataLoader implements CommandLineRunner {
                 }
                 scam.setCities(cities);
                 
+                // Set safety zone fields
+                if (scamNode.has("safetyZone")) {
+                    String safetyZoneStr = scamNode.get("safetyZone").asText();
+                    try {
+                        SafetyZone safetyZone = SafetyZone.valueOf(safetyZoneStr);
+                        scam.setSafetyZone(safetyZone);
+                    } catch (IllegalArgumentException e) {
+                        scam.setSafetyZone(SafetyZone.UNKNOWN);
+                    }
+                }
+                
+                if (scamNode.has("incidentType")) {
+                    scam.setIncidentType(scamNode.get("incidentType").asText());
+                }
+                
+                if (scamNode.has("safetyRating")) {
+                    scam.setSafetyRating(scamNode.get("safetyRating").asInt());
+                }
+                
+                if (scamNode.has("isNightTimeIncident")) {
+                    scam.setIsNightTimeIncident(scamNode.get("isNightTimeIncident").asBoolean());
+                }
+                
+                if (scamNode.has("additionalDetails")) {
+                    scam.setAdditionalDetails(scamNode.get("additionalDetails").asText());
+                }
+                
                 scamRepository.save(scam);
             }
         }
         
-        System.out.println("Loaded scams with relationships");
+        System.out.println("Loaded scams with relationships and safety zone data");
     }
 } 

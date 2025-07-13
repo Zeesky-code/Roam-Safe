@@ -13,6 +13,8 @@ import java.util.List;
 public interface CityRepository extends JpaRepository<City, Long> {
     City findByName(String name);
     
+    City findByNameAndCountry(String name, String country);
+    
     @Query("SELECT s FROM Scam s JOIN s.cities c WHERE LOWER(c.name) = LOWER(:cityName)")
     List<Scam> findScamsByCityName(@Param("cityName") String cityName);
 }

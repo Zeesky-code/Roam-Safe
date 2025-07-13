@@ -11,7 +11,17 @@
       <div class="nav-links">
         <a href="/scams" class="nav-link">🛡️ Safety Intelligence</a>
         <a href="/submit" class="nav-link">📝 Submit Report</a>
-        <a href="/#waitlist" class="nav-link">✨ Join Waitlist</a>
+        
+        <!-- Show different links based on authentication status -->
+        <th:block th:if="${session.user != null}">
+          <a href="/dashboard" class="nav-link">👤 Dashboard</a>
+          <a href="/logout" class="nav-link">🚪 Logout</a>
+        </th:block>
+        
+        <th:block th:unless="${session.user != null}">
+          <a href="/login" class="nav-link">🔐 Login</a>
+          <a href="/register" class="nav-link">✨ Sign Up</a>
+        </th:block>
       </div>
     </nav>
   </header>
