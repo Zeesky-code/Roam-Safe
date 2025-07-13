@@ -2,22 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Submit a Scam | RoamSafe</title>
+  <title>Submit Safety Report | RoamSafe | Help Fellow Travelers</title>
   <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <header class="navbar">
-    <nav>
-      <a href="/" class="logo">RoamSafe</a>
-      <div class="nav-links">
-        <a href="/scams">🕵️ Scam Alerts</a>
-        <a href="/submit">🛡️ Submit Scam</a>
-        <a href="/#waitlist">✨ Join Waitlist</a>
-      </div>
-    </nav>
-  </header>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
 
   <main class="scams-page">
     <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center;">
@@ -29,16 +20,16 @@
 
       <!-- Form Content -->
       <div style="flex: 1 1 350px; max-width: 600px;">
-        <p class="preheading">🛡️ Community-driven safety</p>
-        <h1>Submit a Scam</h1>
-        <p class="tagline">Help other travelers stay safe by reporting scams you've encountered. Your reports make our community stronger.</p>
+        <p class="preheading">🛡️ Community-driven safety intelligence</p>
+        <h1>Submit Safety Report</h1>
+        <p class="tagline">Help fellow travelers stay safe by sharing your safety experiences. Your reports create a safer travel community for everyone.</p>
 
         <form class="waitlist-form" th:action="@{/submit}" th:object="${submittedScam}" method="post">
-          <input type="text" th:field="*{name}" placeholder="Scam Title" required />
-          <textarea th:field="*{description}" placeholder="Describe the scam..." required style="resize: vertical; min-height: 100px;"></textarea>
-          <textarea th:field="*{prevention}" placeholder="How can someone avoid it?" style="resize: vertical; min-height: 80px;"></textarea>
+          <input type="text" th:field="*{name}" placeholder="Safety Report Title" required />
+          <textarea th:field="*{description}" placeholder="Describe the safety concern or positive experience..." required style="resize: vertical; min-height: 100px;"></textarea>
+          <textarea th:field="*{prevention}" placeholder="Safety tips or recommendations for others?" style="resize: vertical; min-height: 80px;"></textarea>
           <input type="text" th:field="*{city}" placeholder="City name" required />
-          <button type="submit">🚨 Submit Report</button>
+          <button type="submit">🛡️ Submit Safety Report</button>
         </form>
 
         <div th:if="${success}" class="notification success">

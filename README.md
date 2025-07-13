@@ -1,19 +1,21 @@
 # 🌍 RoamSafe
 
-**RoamSafe** is a community-powered platform that helps **travelers** and **international students** stay safe by sharing verified scam alerts, recent incidents, and safety tips — starting with cities like **Istanbul**.
+**RoamSafe** is a travel intelligence platform designed specifically for **solo female travelers**. We provide real-time safety data, neighborhood ratings, and community-reported safety insights to help women make informed travel decisions.
 
-Built with `Spring Boot`, `Thymeleaf`, and `PostgreSQL`, RoamSafe is a hands-on project from my **Web Server Programming** course (Spring 2023/24), and continues to evolve into a real-world application for public good.
+Built with `Spring Boot`, `Thymeleaf`, and `PostgreSQL`, RoamSafe evolved from a course project into a comprehensive safety platform addressing the growing need for reliable travel safety information.
 
 ---
 
 ## 🚀 Features
 
-- 🕵️ Submit scam reports (location + description)
+- 🛡️ **Real-time safety intelligence** by city and neighborhood
 - 📍 **Auto-detect user location** and pre-fill city search
-- ✅ Admin review for quality control
-- 📊 Analytics dashboard (in development)
-- 🔄 Data pipeline that scrapes Reddit, uses Gemini API, and stores structured scams in PostgreSQL
-- 🔐 Upcoming: authentication and user dashboards
+- 🟢🟡🔴 **Safety zone ratings** (green/yellow/red areas)
+- 📝 **Community safety reports** (scams, harassment, positive experiences)
+- ✅ **Admin review system** for quality control
+- 📊 **Analytics dashboard** (in development)
+- 🔄 **Data pipeline** that scrapes Reddit, uses Gemini API, and stores structured safety data
+- 🔐 **Upcoming**: Premium subscriptions, 24/7 monitoring, hotel certifications
 
 ---
 

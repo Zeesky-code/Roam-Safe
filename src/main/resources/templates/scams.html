@@ -3,19 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scam Search – RoamSafe</title>
+  <title>Safety Intelligence by City - RoamSafe | Real-time Travel Safety Data</title>
   <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <header class="nav">
-    <a href="/" class="logo">RoamSafe</a>
-    <div class="nav-actions">
-      <a href="/scams" class="nav-link">🕵️ Scam Alerts</a>
-      <a href="/submit" class="nav-link">🛡️ Submit Scam</a>
-      <a href="/" class="nav-link">✨ Join Waitlist</a>
-    </div>
-  </header>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
 
   <main class="scams-container">
     <section class="scams-hero">
@@ -24,10 +17,10 @@
         <img src="https://illustrations.popsy.co/blue/searching-location-on-the-phone.svg" alt="Illustration" />
       </div>
       <div class="scams-content">
-        <p class="preheading">🧭 Community-Reported Travel Scams</p>
-        <h1>Find Scams by City</h1>
+        <p class="preheading">🛡️ Real-time Safety Intelligence</p>
+        <h1>Safety Intelligence by City</h1>
         <p class="description">
-          Planning a trip? Enter a city to uncover scams reported by other travelers and stay ahead of the traps.
+          Get real-time safety data from fellow travelers. Find safe neighborhoods, avoid risky areas, and make informed travel decisions.
         </p>
         <div class="search-box">
           <input id="city-input" name="city" placeholder="e.g. Istanbul" />
@@ -38,9 +31,7 @@
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Made with 💙 by @Zeeskylaw — <a href="#">Buy me a juice 🧃</a></p>
-  </footer>
+  <div th:replace="~{fragments/footer :: footer}"></div>
 
   <script src="/js/scams.js"></script>
 </body>

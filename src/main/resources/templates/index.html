@@ -2,22 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RoamSafe - Travel Smarter</title>
+  <title>RoamSafe - Travel Intelligence for Solo Women | Real-time Safety Data</title>
   <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Get real-time safety intelligence for solo female travelers. Community-reported safety data, neighborhood ratings, and scam alerts. Stop wondering if destinations are safe for women.">
+  <meta name="keywords" content="solo female travel, women travel safety, travel safety, female traveler safety, safe travel destinations, women solo travel, travel intelligence, safety ratings">
+  <meta name="author" content="RoamSafe">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://roamsafe.onrender.com/">
+  <meta property="og:title" content="RoamSafe - Travel Intelligence for Solo Women">
+  <meta property="og:description" content="Get real-time safety intelligence for solo female travelers. Community-reported safety data and neighborhood ratings.">
+  <meta property="og:image" content="https://roamsafe.onrender.com/images/og-image.jpg">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://roamsafe.onrender.com/">
+  <meta property="twitter:title" content="RoamSafe - Travel Intelligence for Solo Women">
+  <meta property="twitter:description" content="Get real-time safety intelligence for solo female travelers. Community-reported safety data and neighborhood ratings.">
+  <meta property="twitter:image" content="https://roamsafe.onrender.com/images/twitter-image.jpg">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://roamsafe.onrender.com/">
 </head>
 <body>
-    <header class="navbar">
-        <nav>
-            <a href="/" class="logo">RoamSafe</a>
-            <div class="nav-links">
-                <a href="/scams">🕵️ Scam Alerts</a>
-                <a href="/submit">🛡️ Submit Scam</a>
-                <a href="#waitlist">✨ Join Waitlist</a>
-            </div>
-        </nav>
-    </header>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
     <section class="hero">
     <div class="floating-elements">
       <div class="floating-shape"></div>
@@ -26,9 +40,9 @@
     </div>
 
     <div class="content">
-      <p class="preheading">⚠️ Scam awareness for travelers</p>
+      <p class="preheading">🛡️ Travel Intelligence for Solo Women</p>
       <h1>RoamSafe ✈️</h1>
-      <p class="tagline">You book the trip, we block the traps. Stay one step ahead of scams before you land.</p>
+      <p class="tagline">Stop googling "is X safe for women" - get real-time safety intelligence from fellow travelers.</p>
 
       <!-- Success/Error Messages -->
       <div th:if="${success}" class="notification success">
@@ -61,5 +75,7 @@
   <div class="attribution">
     <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>
   </div>
+  
+  <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
