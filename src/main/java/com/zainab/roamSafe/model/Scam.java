@@ -35,6 +35,22 @@ public class Scam {
     @JsonIgnore
     private List<City> cities;
     
+    // Safety Zone Fields
+    @Enumerated(EnumType.STRING)
+    private SafetyZone safetyZone = SafetyZone.UNKNOWN;
+    
+    private String neighborhood;
+    
+    @Column(columnDefinition = "TEXT")
+    private String incidentType; // SCAM, HARASSMENT, THEFT, POSITIVE
+    
+    private Integer safetyRating; // 1-5 scale
+    
+    private Boolean isNightTimeIncident = false;
+    
+    @Column(columnDefinition = "TEXT")
+    private String additionalDetails;
+    
     public Scam() {}
     
     public Scam(String name, String description, String prevention) {
@@ -72,4 +88,23 @@ public class Scam {
                     .map(City::getName)
                     .toList();
     }
+    
+    // Safety Zone Getters and Setters
+    public SafetyZone getSafetyZone() { return safetyZone; }
+    public void setSafetyZone(SafetyZone safetyZone) { this.safetyZone = safetyZone; }
+    
+    public String getNeighborhood() { return neighborhood; }
+    public void setNeighborhood(String neighborhood) { this.neighborhood = neighborhood; }
+    
+    public String getIncidentType() { return incidentType; }
+    public void setIncidentType(String incidentType) { this.incidentType = incidentType; }
+    
+    public Integer getSafetyRating() { return safetyRating; }
+    public void setSafetyRating(Integer safetyRating) { this.safetyRating = safetyRating; }
+    
+    public Boolean getIsNightTimeIncident() { return isNightTimeIncident; }
+    public void setIsNightTimeIncident(Boolean isNightTimeIncident) { this.isNightTimeIncident = isNightTimeIncident; }
+    
+    public String getAdditionalDetails() { return additionalDetails; }
+    public void setAdditionalDetails(String additionalDetails) { this.additionalDetails = additionalDetails; }
 }

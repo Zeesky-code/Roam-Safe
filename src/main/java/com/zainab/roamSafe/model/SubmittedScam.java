@@ -23,6 +23,17 @@ public class SubmittedScam {
     private String prevention;
 
     private String city;
+    
+    // Safety Zone Fields
+    private String neighborhood;
+    
+    private String incidentType; // SCAM, HARASSMENT, THEFT, POSITIVE
+    
+    private Integer safetyRating; // 1-5 scale
+    
+    private Boolean isNightTimeIncident = false;
+    
+    private String safetyZone; // GREEN, YELLOW, RED
 
     private boolean reviewed = false;
 
@@ -86,5 +97,46 @@ public class SubmittedScam {
 
     public void setSubmittedAt(LocalDateTime submittedAt) {
         this.submittedAt = submittedAt;
+    }
+    
+    // Safety Zone Getters and Setters
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public String getIncidentType() {
+        return incidentType;
+    }
+
+    public void setIncidentType(String incidentType) {
+        this.incidentType = incidentType;
+    }
+
+    public Integer getSafetyRating() {
+        return safetyRating;
+    }
+
+    public void setSafetyRating(Integer safetyRating) {
+        this.safetyRating = safetyRating;
+    }
+
+    public Boolean getIsNightTimeIncident() {
+        return isNightTimeIncident;
+    }
+
+    public void setIsNightTimeIncident(Boolean isNightTimeIncident) {
+        this.isNightTimeIncident = isNightTimeIncident;
+    }
+
+    public String getSafetyZone() {
+        return safetyZone;
+    }
+
+    public void setSafetyZone(String safetyZone) {
+        this.safetyZone = safetyZone;
     }
 }
