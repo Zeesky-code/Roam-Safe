@@ -26,6 +26,28 @@
           <input id="city-input" name="city" placeholder="e.g. Istanbul" />
           <button onclick="fetchScams()">🔍 Search</button>
         </div>
+        
+        <div class="filter-options">
+          <select id="safety-zone-filter">
+            <option value="">All Safety Zones</option>
+            <option value="GREEN">🟢 Green - Safe</option>
+            <option value="YELLOW">🟡 Yellow - Caution</option>
+            <option value="RED">🔴 Red - Avoid</option>
+          </select>
+          
+          <select id="incident-type-filter">
+            <option value="">All Incident Types</option>
+            <option value="SCAM">🚨 Scam/Fraud</option>
+            <option value="HARASSMENT">⚠️ Harassment</option>
+            <option value="THEFT">💰 Theft/Robbery</option>
+            <option value="POSITIVE">✅ Positive Experience</option>
+          </select>
+          
+          <label class="checkbox-filter">
+            <input type="checkbox" id="night-time-filter" />
+            Night time incidents only
+          </label>
+        </div>
         <div id="scam-results" class="results"></div>
       </div>
     </section>

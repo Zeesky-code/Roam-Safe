@@ -403,6 +403,61 @@ h1 {
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
 }
 
+/* Filter Options */
+.filter-options {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-options select {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.filter-options select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.checkbox-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.checkbox-filter:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.checkbox-filter input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
 .results {
   max-width: 1200px;
   margin: 0 auto;
@@ -454,6 +509,71 @@ h1 {
 .scam-card strong {
   color: #374151;
   font-weight: 600;
+}
+
+/* Enhanced Card Styles for Safety Zone System */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  flex: 1;
+}
+
+.safety-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.safety-badge.green {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.safety-badge.yellow {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.safety-badge.red {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.safety-badge.unknown {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6b7280;
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+/* Card color coding based on safety zone */
+.scam-card.green {
+  border-left: 4px solid #10b981;
+}
+
+.scam-card.yellow {
+  border-left: 4px solid #f59e0b;
+}
+
+.scam-card.red {
+  border-left: 4px solid #ef4444;
+}
+
+.scam-card.unknown {
+  border-left: 4px solid #9ca3af;
 }
 
 .scams-grid h3 {
