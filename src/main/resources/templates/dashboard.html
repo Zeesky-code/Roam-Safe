@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - RoamSafe</title>
+  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+  <main class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Welcome, <span th:text="${user.firstName}">User</span>! ✨</h1>
+      <p>Manage your RoamSafe account and preferences</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="notification success">
+      <span th:text="${success}"></span>
+      <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+    </div>
+    
+    <div th:if="${error}" class="notification error">
+      <span th:text="${error}"></span>
+      <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Profile Card -->
+      <div class="dashboard-card">
+        <h3>👤 Profile Information</h3>
+        <div class="profile-info">
+          <p><strong>Name:</strong> <span th:text="${user.fullName}">User Name</span></p>
+          <p><strong>Email:</strong> <span th:text="${user.email}">user@example.com</span></p>
+          <p><strong>Member since:</strong> <span th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Jan 01, 2024</span></p>
+          <p><strong>Last login:</strong> 
+            <span th:if="${user.lastLoginAt}" th:text="${#temporals.format(user.lastLoginAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2024 12:00</span>
+            <span th:unless="${user.lastLoginAt}">First time login</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Preferences Card -->
+      <div class="dashboard-card">
+        <h3>⚙️ Preferences</h3>
+        <form th:action="@{/dashboard/preferences}" method="post" class="preferences-form">
+          <div class="form-group">
+            <label for="preferredCity">Preferred City</label>
+            <input type="text" id="preferredCity" name="preferredCity" th:value="${user.preferredCity}" placeholder="e.g., London, Paris" />
+          </div>
+          
+          <div class="form-group">
+            <label for="notificationPreferences">Notification Preferences</label>
+            <select id="notificationPreferences" name="notificationPreferences">
+              <option value="email" th:selected="${user.notificationPreferences == 'email'}">Email notifications</option>
+              <option value="push" th:selected="${user.notificationPreferences == 'push'}">Push notifications</option>
+              <option value="none" th:selected="${user.notificationPreferences == 'none'}">No notifications</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-secondary">Update Preferences</button>
+        </form>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="dashboard-card">
+        <h3>🚀 Quick Actions</h3>
+        <div class="quick-actions">
+          <a href="/scams" class="action-link">
+            <span>🔍</span>
+            <div>
+              <strong>Browse Safety Data</strong>
+              <small>View safety incidents by city</small>
+            </div>
+          </a>
+          
+          <a href="/submit" class="action-link">
+            <span>📝</span>
+            <div>
+              <strong>Submit Report</strong>
+              <small>Share a safety experience</small>
+            </div>
+          </a>
+          
+          <a href="/dashboard/password" class="action-link">
+            <span>🔐</span>
+            <div>
+              <strong>Change Password</strong>
+              <small>Update your account security</small>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Account Actions Card -->
+      <div class="dashboard-card">
+        <h3>⚡ Account Actions</h3>
+        <div class="account-actions">
+          <a href="/logout" class="btn-outline" onclick="return confirm('Are you sure you want to log out?')">
+            Logout
+          </a>
+          <button class="btn-danger" onclick="showDeleteAccountModal()">
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Account Modal -->
+  <div id="deleteAccountModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Delete Account</h3>
+      <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+      <form th:action="@{/dashboard/delete}" method="post" class="delete-form">
+        <div class="form-group">
+          <label for="confirmPassword">Enter your password to confirm:</label>
+          <input type="password" id="confirmPassword" name="password" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" onclick="hideDeleteAccountModal()">Cancel</button>
+          <button type="submit" class="btn-danger">Delete Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <script>
+    function showDeleteAccountModal() {
+      document.getElementById('deleteAccountModal').style.display = 'flex';
+    }
+    
+    function hideDeleteAccountModal() {
+      document.getElementById('deleteAccountModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('deleteAccountModal');
+      if (event.target === modal) {
+        hideDeleteAccountModal();
+      }
+    }
+  </script>
+</body>
+</html> 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Safety Intelligence by City - RoamSafe | Real-time Travel Safety Data</title>
+  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+  <main class="scams-container">
+    <section class="scams-hero">
+      <div class="scams-illustration">
+        <!-- You can replace this with an actual SVG illustration -->
+        <img src="https://illustrations.popsy.co/blue/searching-location-on-the-phone.svg" alt="Illustration" />
+      </div>
+      <div class="scams-content">
+        <p class="preheading">🛡️ Real-time Safety Intelligence</p>
+        <h1>Safety Intelligence by City</h1>
+        <p class="description">
+          Get real-time safety data from fellow travelers. Find safe neighborhoods, avoid risky areas, and make informed travel decisions.
+        </p>
+        <div class="search-box">
+          <input id="city-input" name="city" placeholder="e.g. Istanbul" th:value="${selectedCity}" />
+          <button onclick="fetchScams()">🔍 Search</button>
+        </div>
+        
+        <!-- Filter Options -->
+        <div th:if="${scams != null}" class="filter-options">
+          <select id="safety-zone-filter">
+            <option value="">All Safety Zones</option>
+            <option value="GREEN">🟢 Green - Safe</option>
+            <option value="YELLOW">🟡 Yellow - Caution</option>
+            <option value="RED">🔴 Red - Avoid</option>
+          </select>
+          
+          <select id="incident-type-filter">
+            <option value="">All Incident Types</option>
+            <option value="SCAM">🚨 Scam/Fraud</option>
+            <option value="HARASSMENT">⚠️ Harassment</option>
+            <option value="THEFT">💰 Theft/Robbery</option>
+            <option value="POSITIVE">✅ Positive Experience</option>
+          </select>
+          
+          <label class="checkbox-filter">
+            <input type="checkbox" id="night-time-filter" />
+            Night time incidents only
+          </label>
+        </div>
+        
+        <!-- Search Results -->
+        <div th:if="${scams != null}" class="search-results">
+          <div th:if="${showLoginPrompt}" class="login-prompt">
+            <div class="prompt-content">
+              <h3>🔒 Premium Access Required</h3>
+              <p>You're viewing <span th:text="${totalScams}">0</span> safety reports for <span th:text="${selectedCity}">city</span>. 
+                 Sign in to see all reports and unlock premium features!</p>
+              <div class="prompt-actions">
+                <a href="/login" class="btn btn-primary">Sign In</a>
+                <a href="/register" class="btn btn-secondary">Create Account</a>
+              </div>
+            </div>
+          </div>
+          
+          <div th:if="${scams.empty}" class="no-results">
+            <p>No safety reports found for <span th:text="${selectedCity}">city</span>.</p>
+            <p>Be the first to share your experience!</p>
+            <a href="/submit" class="btn btn-primary">Submit Report</a>
+          </div>
+          
+          <div th:if="${!scams.empty}" class="scams-grid">
+            <h3 th:text="'Found ' + ${scams.size()} + ' safety report(s) for ' + ${selectedCity} + ':'">Results</h3>
+            <div th:each="scam : ${scams}" class="scam-card" th:classappend="${scam.safetyZone != null ? scam.safetyZone.name().toLowerCase() : ''}">
+              <div class="card-header">
+                <h4 th:text="${scam.name}">Scam Name</h4>
+                <span th:if="${scam.safetyZone != null}" class="safety-badge" th:classappend="${scam.safetyZone.name().toLowerCase()}" 
+                      th:text="${scam.safetyZone.name() == 'GREEN' ? '🟢 GREEN' : (scam.safetyZone.name() == 'YELLOW' ? '🟡 YELLOW' : '🔴 RED')}">Safety Zone</span>
+              </div>
+              <p><strong>Description:</strong> <span th:text="${scam.description}">Description</span></p>
+              <p th:if="${scam.neighborhood != null and scam.neighborhood != ''}"><strong>Area:</strong> <span th:text="${scam.neighborhood}">Neighborhood</span></p>
+              <p th:if="${scam.incidentType != null}"><strong>Type:</strong> 
+                <span th:text="${scam.incidentType == 'SCAM' ? '🚨 SCAM' : (scam.incidentType == 'HARASSMENT' ? '⚠️ HARASSMENT' : (scam.incidentType == 'THEFT' ? '💰 THEFT' : '✅ POSITIVE'))}">Type</span>
+              </p>
+              <p th:if="${scam.safetyRating != null}"><strong>Safety Rating:</strong> 
+                <span th:text="${'⭐'.repeat(scam.safetyRating)} + ' (' + ${scam.safetyRating} + '/5)'">Rating</span>
+              </p>
+              <p th:if="${scam.isNightTimeIncident}"><strong>⚠️ Night Time Incident</strong></p>
+              <p><strong>Prevention:</strong> <span th:text="${scam.prevention}">Prevention</span></p>
+              <p><strong>Category:</strong> <span th:text="${scam.categoryName != null ? scam.categoryName : 'N/A'}">Category</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <script src="/js/scams.js"></script>
+</body>
+</html>

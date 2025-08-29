@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Submitted Scams</title>
+  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">RoamSafe</a>
+    <h1>Admin Panel</h1>
+  </header>
+
+  <main class="admin-container">
+    <h2>📥 Submitted Scams</h2>
+
+    <div th:if="${submissions.isEmpty()}">
+      <p>No new submissions 🎉</p>
+    </div>
+
+    <div th:each="scam : ${submissions}" class="scam-card">
+      <h3 th:text="${scam.name}"></h3>
+      <p><strong>City:</strong> <span th:text="${scam.city}"></span></p>
+      <p><strong>Description:</strong> <span th:text="${scam.description}"></span></p>
+      <p><strong>Prevention:</strong> <span th:text="${scam.prevention}"></span></p>
+
+      <form th:action="@{'/admin/submissions/' + ${scam.id} + '/review'}" method="post">
+        <button type="submit">✅ Mark as Reviewed</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

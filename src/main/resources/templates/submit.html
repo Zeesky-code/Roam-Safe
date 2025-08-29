@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Safety Report | RoamSafe | Help Fellow Travelers</title>
+  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+  <main class="scams-page">
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center;">
+      
+      <div class="desktop-only" style="flex: 1 1 300px; text-align: center;">
+        <img src="https://illustrations.popsy.co/blue/cute-bunny.svg" alt="Security Shield" style="max-width: 90%; height: auto; filter: drop-shadow(0 20px 40px rgba(59, 130, 246, 0.15)); animation: float 6s ease-in-out infinite;">
+      </div>
+      
+
+      <!-- Form Content -->
+      <div style="flex: 1 1 350px; max-width: 600px;">
+        <p class="preheading">🛡️ Community-driven safety intelligence</p>
+        <h1>Submit Safety Report</h1>
+        <p class="tagline">Help fellow travelers stay safe by sharing your safety experiences. Your reports create a safer travel community for everyone.</p>
+
+                  <form class="waitlist-form" th:action="@{/submit}" th:object="${submittedScam}" method="post">
+            <input type="text" th:field="*{name}" placeholder="Safety Report Title" required />
+            
+            <select th:field="*{incidentType}" required>
+              <option value="">Select incident type</option>
+              <option value="SCAM">🚨 Scam/Fraud</option>
+              <option value="HARASSMENT">⚠️ Harassment</option>
+              <option value="THEFT">💰 Theft/Robbery</option>
+              <option value="POSITIVE">✅ Positive Experience</option>
+            </select>
+            
+            <textarea th:field="*{description}" placeholder="Describe the safety concern or positive experience..." required style="resize: vertical; min-height: 100px;"></textarea>
+            
+            <input type="text" th:field="*{neighborhood}" placeholder="Neighborhood/Area (optional)" />
+            
+            <select th:field="*{safetyRating}" required>
+              <option value="">Safety rating (1-5)</option>
+              <option value="1">1 - Very Unsafe</option>
+              <option value="2">2 - Unsafe</option>
+              <option value="3">3 - Neutral</option>
+              <option value="4">4 - Safe</option>
+              <option value="5">5 - Very Safe</option>
+            </select>
+            
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" th:field="*{isNightTimeIncident}" />
+                This happened at night (after sunset)
+              </label>
+            </div>
+            
+            <select th:field="*{safetyZone}" required>
+              <option value="">Safety zone rating</option>
+              <option value="GREEN">🟢 Green - Safe (walked alone at midnight, felt safe)</option>
+              <option value="YELLOW">🟡 Yellow - Caution (daylight only, busy streets preferred)</option>
+              <option value="RED">🔴 Red - Avoid (multiple harassment reports, avoid completely)</option>
+            </select>
+            
+            <textarea th:field="*{prevention}" placeholder="Safety tips or recommendations for others?" style="resize: vertical; min-height: 80px;"></textarea>
+            
+            <input type="text" th:field="*{city}" placeholder="City name" required />
+            
+            <button type="submit">🛡️ Submit Safety Report</button>
+          </form>
+
+        <div th:if="${success}" class="notification success">
+          <span>✅ Thank you! We'll review your report shortly.</span>
+          <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+
+        <div class="social">
+          <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
+          <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Buy me a juice 🧃</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Attribution for Popsy illustrations -->
+  <div class="attribution">
+    <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>
+  </div>
+</body>
+</html>

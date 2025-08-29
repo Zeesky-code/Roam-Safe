@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - RoamSafe</title>
+  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to your RoamSafe account</p>
+      </div>
+
+      <!-- Success/Error Messages -->
+      <div th:if="${success}" class="notification success">
+        <span th:text="${success}"></span>
+        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
+      
+      <div th:if="${error}" class="notification error">
+        <span th:text="${error}"></span>
+        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
+
+      <form th:action="@{/login}" th:object="${loginRequest}" method="post" class="auth-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" th:field="*{email}" placeholder="Enter your email" required />
+          <span th:if="${#fields.hasErrors('email')}" class="error-message" th:errors="*{email}"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" th:field="*{password}" placeholder="Enter your password" required />
+          <span th:if="${#fields.hasErrors('password')}" class="error-message" th:errors="*{password}"></span>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" th:field="*{rememberMe}" />
+            Remember me
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Don't have an account? <a th:href="@{/register}">Sign up</a></p>
+        <p><a href="/">← Back to home</a></p>
+      </div>
+    </div>
+  </main>
+
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html> 

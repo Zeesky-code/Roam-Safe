@@ -1,0 +1,252 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to bottom, #f9fafb, #e5effa);
+    color: #1e293b;
+    min-height: 100vh;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 5vw;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6, #10b981, #0ea5e9);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-decoration: none;
+  }
+  
+  .nav-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #1e293b;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background: #e2e8f0;
+  }
+  
+  .scams-container {
+    padding: 4rem 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .scams-hero {
+    display: flex;
+    gap: 3rem;
+    max-width: 1200px;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .scams-illustration img {
+    max-width: 400px;
+    width: 100%;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .scams-content {
+    flex: 1;
+    max-width: 600px;
+  }
+  
+  .preheading {
+    color: #0ea5e9;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+  
+  h1 {
+    font-size: 2.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6, #10b981);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  
+  .description {
+    color: #475569;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .search-box {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .search-box input {
+    flex: 1 1 240px;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  }
+  
+  .search-box input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+  
+  .search-box button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transition: transform 0.2s ease;
+  }
+  
+  .search-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  }
+  
+  .results {
+    margin-top: 2.5rem;
+  }
+  
+  .scam-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+  .scams-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1200px;
+    width: 100%;
+    align-items: start;
+    min-height: 600px; /* FIXED HEIGHT */
+  }
+  
+  .scams-illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    position: sticky;
+    top: 6rem;
+  }
+  
+  .scams-illustration img {
+    max-width: 360px;
+    width: 100%;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .results {
+    max-height: 420px;  /* Prevents overflow */
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-top: 1.5rem;
+    scroll-behavior: smooth;
+  }
+  
+  /* Optional: Custom scrollbar for better UX */
+  .results::-webkit-scrollbar {
+    width: 8px;
+  }
+  .results::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 8px;
+  }
+  .results::-webkit-scrollbar-track {
+    background: #e2e8f0;
+  }
+  
+  .scam-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .scam-card h4 {
+    color: #dc2626;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .scam-card p {
+    color: #475569;
+    margin: 0.25rem 0;
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+  .footer a {
+    color: #0ea5e9;
+    text-decoration: none;
+  }
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .scams-hero {
+      flex-direction: column;
+      text-align: center;
+    }
+    .scams-illustration {
+      order: 2;
+    }
+    .scams-content {
+      order: 1;
+    }
+  }
+  
