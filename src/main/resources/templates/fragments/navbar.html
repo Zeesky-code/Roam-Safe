@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
-    <nav th:fragment="navbar" class="navbar">
+    <nav th:fragment="navbar" class="glass-nav">
         <div class="logo">
             <a href="/">RoamSafe</a>
         </div>
-        <div class="menu">
-            <a href="/scams">Scams</a>
-            <a href="/submit">Report</a>
-            <a href="/login" class="btn-login">Login</a>
+        <div class="nav-links">
+            <a href="/scams" class="nav-link">Intelligence</a>
+            <a href="/submit" class="nav-link">Report Incident</a>
+            <a href="/login" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">Sign In</a>
         </div>
     </nav>
 </body>
+
 </html>

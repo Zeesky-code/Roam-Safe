@@ -1,89 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
-  <title>RoamSafe - Travel Intelligence for Solo Women | Real-time Safety Data</title>
-  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO Meta Tags -->
-  <meta name="description"
-    content="Get real-time safety intelligence for solo female travelers. Community-reported safety data, neighborhood ratings, and scam alerts. Stop wondering if destinations are safe for women.">
-  <meta name="keywords"
-    content="solo female travel, women travel safety, travel safety, female traveler safety, safe travel destinations, women solo travel, travel intelligence, safety ratings">
-  <meta name="author" content="RoamSafe">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://roamsafe.onrender.com/">
-  <meta property="og:title" content="RoamSafe - Travel Intelligence for Solo Women">
-  <meta property="og:description"
-    content="Get real-time safety intelligence for solo female travelers. Community-reported safety data and neighborhood ratings.">
-  <meta property="og:image" content="https://roamsafe.onrender.com/images/og-image.jpg">
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://roamsafe.onrender.com/">
-  <meta property="twitter:title" content="RoamSafe - Travel Intelligence for Solo Women">
-  <meta property="twitter:description"
-    content="Get real-time safety intelligence for solo female travelers. Community-reported safety data and neighborhood ratings.">
-  <meta property="twitter:image" content="https://roamsafe.onrender.com/images/twitter-image.jpg">
-
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://roamsafe.onrender.com/">
+  <title>RoamSafe - Travel with Peace of Mind</title>
+  <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
 </head>
 
 <body>
-  <div th:replace="~{fragments/navbar :: navbar}"></div>
-  <section class="hero">
-    <div class="floating-elements">
-      <div class="floating-shape"></div>
-      <div class="floating-shape"></div>
-      <div class="floating-shape"></div>
+
+  <!-- Minimal Nav -->
+  <nav class="nav-container">
+    <div class="logo">
+      <span style="color: var(--primary-dark);">ROAM</span>SAFE
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/scams" class="nav-link">Destinations</a>
+      <a href="/submit" class="nav-link">Report</a>
+    </div>
+    <a href="/login" class="btn-black">Sign In</a>
+  </nav>
+
+  <!-- Floating Hero Section -->
+  <div class="hero-wrapper">
+    <div class="hero-card">
+      <div class="hero-content-left">
+        <div class="step-badge">
+          <div class="step-number">1</div>
+          <div class="step-text">ELEVATE YOUR SAFETY</div>
+        </div>
+
+        <h1>Experience<br>The Magic Of<br>Safe Travel!</h1>
+
+        <p style="margin-top: 1.5rem; max-width: 400px;">
+          Discover scam alerts, safety ratings, and real traveler experiences for thousands of cities.
+        </p>
+
+        <!-- Search Pill -->
+        <form action="/scams" method="get">
+          <div class="search-pill-container">
+            <input type="text" name="city" class="search-input" placeholder="Where do you want to go?">
+            <button type="submit" class="btn-search">Explore</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Image (CSS Background) -->
+      <div class="hero-image-right"></div>
+
+      <!-- Floating Info Card -->
+      <div class="floating-info-card">
+        <div class="avatar-group">
+          <div class="avatar"
+            style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64');">
+          </div>
+          <div class="avatar"
+            style="background-image: url('https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64');">
+          </div>
+          <div class="avatar"
+            style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=64');">
+          </div>
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem;">Verified Reports</div>
+          <div style="font-size: 0.8rem; color: #888;">Updated 12m ago</div>
+        </div>
+        <div style="margin-left: auto; color: var(--primary-blue);">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partners / Trust Strip -->
+  <div class="partners-strip">
+    <h4 style="text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem;">Trusted Data Sources</h4>
+  </div>
+
+  <!-- Popular Destinations Preview -->
+  <section class="destinations-section">
+    <div class="dest-header">
+      <div>
+        <h2>Popular Destinations</h2>
+        <p>Unleash your wanderlust with confidence.</p>
+      </div>
+      <div>
+        <!-- Arrow buttons could go here -->
+      </div>
     </div>
 
-    <div class="content">
-      <p class="preheading">🛡️ Travel Intelligence for Solo Women</p>
-      <h1>RoamSafe ✈️</h1>
-      <p class="tagline">Stop googling "is X safe for women" - get real-time safety intelligence from fellow travelers.
-      </p>
-
-      <!-- Success/Error Messages -->
-      <div th:if="${success}" class="notification success">
-        <span th:text="${success}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+    <div class="card-grid">
+      <!-- Static Example Card 1 -->
+      <div class="dest-card">
+        <div class="card-image"
+          style="background-image: url('https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600');">
+          <div class="rating-pill">★ 4.8</div>
+        </div>
+        <div class="card-content">
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Istanbul, Turkey</h3>
+          <div style="display: flex; gap: 8px; font-size: 0.9rem; color: #666;">
+            <span>📍 Beyoğlu</span>
+            <span>•</span>
+            <span>Safety Index: High</span>
+          </div>
+        </div>
       </div>
 
-      <div th:if="${error}" class="notification error">
-        <span th:text="${error}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+      <!-- Static Example Card 2 -->
+      <div class="dest-card">
+        <div class="card-image"
+          style="background-image: url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600');">
+          <div class="rating-pill">★ 4.2</div>
+        </div>
+        <div class="card-content">
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Paris, France</h3>
+          <div style="display: flex; gap: 8px; font-size: 0.9rem; color: #666;">
+            <span>📍 Montmartre</span>
+            <span>•</span>
+            <span>Pickpocket Alert</span>
+          </div>
+        </div>
       </div>
 
-      <form class="waitlist-form" method="post" action="/waitlist">
-        <input type="email" name="email" placeholder="Join the waitlist" required>
-        <button type="submit">✨ Notify Me First</button>
-      </form>
-
-      <div class="social">
-        <a href="https://x.com/Zeeskylaw" target="_blank">@Zeeskylaw</a> &nbsp;•&nbsp;
-        <a href="https://buymeacoffee.com/zeeskylaw" target="_blank">Buy me a juice 🧃</a>
+      <!-- Static Example Card 3 -->
+      <div class="dest-card">
+        <div class="card-image"
+          style="background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600');">
+          <div class="rating-pill">★ 4.9</div>
+        </div>
+        <div class="card-content">
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Bali, Indonesia</h3>
+          <div style="display: flex; gap: 8px; font-size: 0.9rem; color: #666;">
+            <span>📍 Ubud</span>
+            <span>•</span>
+            <span>Solo Friendly</span>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="hero-image">
-      <img src="https://illustrations.popsy.co/blue/traveling-with-a-suitcase.svg" alt="Woman with suitcase at airport">
     </div>
   </section>
 
-  <!-- Attribution for Popsy illustrations -->
-  <div class="attribution">
-    <a href="https://popsy.co" target="_blank">Illustrations by Popsy</a>
-  </div>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 RoamSafe. Experience the Magic of Safe Flight.</p>
+  </footer>
 
-  <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 
 </html>
