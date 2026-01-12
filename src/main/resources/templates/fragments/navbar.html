@@ -1,29 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <!-- This is a fragment, no head content needed -->
-</head>
 <body>
-  <!-- Navbar Fragment -->
-  <header class="navbar" th:fragment="navbar">
-    <nav>
-      <a href="/" class="logo">RoamSafe</a>
-      <div class="nav-links">
-        <a href="/scams" class="nav-link">🛡️ Safety Intelligence</a>
-        <a href="/submit" class="nav-link">📝 Submit Report</a>
-        
-        <!-- Show different links based on authentication status -->
-        <th:block th:if="${session.user != null}">
-          <a href="/dashboard" class="nav-link">👤 Dashboard</a>
-          <a href="/logout" class="nav-link">🚪 Logout</a>
-        </th:block>
-        
-        <th:block th:unless="${session.user != null}">
-          <a href="/login" class="nav-link">🔐 Login</a>
-          <a href="/register" class="nav-link">✨ Sign Up</a>
-        </th:block>
-      </div>
+    <nav th:fragment="navbar" class="navbar">
+        <div class="logo">
+            <a href="/">RoamSafe</a>
+        </div>
+        <div class="menu">
+            <a href="/scams">Scams</a>
+            <a href="/submit">Report</a>
+            <a href="/login" class="btn-login">Login</a>
+        </div>
     </nav>
-  </header>
 </body>
-</html> 
+</html>

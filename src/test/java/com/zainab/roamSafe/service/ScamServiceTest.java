@@ -2,7 +2,7 @@ package com.zainab.roamSafe.service;
 
 import com.zainab.roamSafe.repository.ScamRepository;
 import com.zainab.roamSafe.repository.SubmittedScamRepository;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -69,10 +69,9 @@ class ScamServiceTest {
     void testGetTopCities() {
         // Given
         List<Object[]> mockTopCities = Arrays.asList(
-            new Object[]{"Istanbul", 45L},
-            new Object[]{"Paris", 32L},
-            new Object[]{"London", 28L}
-        );
+                new Object[] { "Istanbul", 45L },
+                new Object[] { "Paris", 32L },
+                new Object[] { "London", 28L });
         when(scamRepository.findTopCities(any(PageRequest.class))).thenReturn(mockTopCities);
 
         // When
@@ -92,9 +91,8 @@ class ScamServiceTest {
     void testGetTopCitiesWithLimit() {
         // Given
         List<Object[]> mockTopCities = Arrays.asList(
-            new Object[]{"Istanbul", 45L},
-            new Object[]{"Paris", 32L}
-        );
+                new Object[] { "Istanbul", 45L },
+                new Object[] { "Paris", 32L });
         when(scamRepository.findTopCities(PageRequest.of(0, 2))).thenReturn(mockTopCities);
 
         // When

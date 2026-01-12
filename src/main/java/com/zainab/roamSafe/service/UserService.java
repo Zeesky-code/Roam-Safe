@@ -14,27 +14,27 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
+
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    
+
     public boolean registerUser(RegisterRequest request) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
             return false;
         }
-        
+
         // Validate password confirmation
         if (!request.isPasswordMatching()) {
             return false;
         }
-        
+
         // Create new user
         User user = new User();
         user.setEmail(request.getEmail().toLowerCase());
@@ -44,7 +44,7 @@ public class UserService {
         user.setRole(UserRole.USER);
         user.setEnabled(true);
         user.setCreatedAt(LocalDateTime.now());
-        
+
         try {
             userRepository.save(user);
             return true;
@@ -53,10 +53,10 @@ public class UserService {
             return false;
         }
     }
-    
+
     public Optional<User> authenticateUser(LoginRequest request) {
         Optional<User> userOpt = userRepository.findByEmailAndEnabledTrue(request.getEmail().toLowerCase());
-        
+
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -66,15 +66,17 @@ public class UserService {
                 return Optional.of(user);
             }
         }
-        
+
         return Optional.empty();
     }
-    
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email.toLowerCase());
     }
-    
+
     public boolean updateUserPreferences(Long userId, String preferredCity, String notificationPreferences) {
+        if (userId == null)
+            return false;
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -85,8 +87,10 @@ public class UserService {
         }
         return false;
     }
-    
+
     public boolean changePassword(Long userId, String currentPassword, String newPassword) {
+        if (userId == null)
+            return false;
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -98,8 +102,10 @@ public class UserService {
         }
         return false;
     }
-    
+
     public boolean deleteAccount(Long userId, String password) {
+        if (userId == null)
+            return false;
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -110,4 +116,4 @@ public class UserService {
         }
         return false;
     }
-} 
+}

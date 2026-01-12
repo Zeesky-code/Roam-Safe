@@ -37,3 +37,8 @@ scripts/
 # Environment variables
 .env
 *.env
+
+.DS_Store
+
+*.log
+app.pid

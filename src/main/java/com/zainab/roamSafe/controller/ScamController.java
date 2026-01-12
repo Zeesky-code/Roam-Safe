@@ -3,7 +3,7 @@ package com.zainab.roamSafe.controller;
 import java.util.List;
 import com.zainab.roamSafe.model.Scam;
 import com.zainab.roamSafe.repository.ScamRepository;
-import com.zainab.roamSafe.model.City;
+
 import com.zainab.roamSafe.repository.CityRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,35 +21,33 @@ public class ScamController {
 
     @Autowired
     private ScamRepository scamRepository;
-    
+
     @Autowired
     private CityRepository cityRepository;
 
-
-
     @GetMapping
-    public String showScamsPage(@RequestParam(required = false) String city, 
-                               Model model, 
-                               HttpSession session) {
+    public String showScamsPage(@RequestParam(required = false) String city,
+            Model model,
+            HttpSession session) {
         if (city != null && !city.isEmpty()) {
             List<Scam> scams = scamRepository.findByCityName(city);
-            
+
             // Check if user is logged in
             User user = (User) session.getAttribute("user");
             boolean isLoggedIn = user != null;
-            
+
             if (!isLoggedIn && scams.size() > 3) {
                 // Show only first 3 scams for non-logged-in users
                 scams = scams.subList(0, 3);
                 model.addAttribute("showLoginPrompt", true);
                 model.addAttribute("totalScams", scamRepository.findByCityName(city).size());
             }
-            
+
             model.addAttribute("scams", scams);
             model.addAttribute("selectedCity", city);
             model.addAttribute("isLoggedIn", isLoggedIn);
         }
-        
+
         return "scams";
     }
 }
