@@ -34,19 +34,52 @@ public class ScamReport {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private String name; // Title of the report
+
+    private String neighborhood;
+
+    @Enumerated(EnumType.STRING)
+    private SafetyZone safetyZone;
+
+    private Integer safetyRating; // 1-5
+
+    private Boolean isNightTimeIncident;
+
     public ScamReport() {
         this.createdAt = LocalDateTime.now();
     }
 
-    public ScamReport(String city, String description, String scamType, Integer severityScore, String preventionTips,
-            String location) {
+    // Simplified constructor for basic report submission (backward compatible)
+    public ScamReport(String city, String description, String scamType, Integer severityScore,
+            String preventionTips, String location) {
         this();
         this.city = city;
+        this.name = scamType + " in " + city; // Auto-generate a name
         this.description = description;
         this.scamType = scamType;
         this.severityScore = severityScore;
         this.preventionTips = preventionTips;
-        this.location = location;
+        this.neighborhood = location;
+        this.safetyZone = SafetyZone.YELLOW; // Default to medium caution
+        this.safetyRating = 3; // Default middle rating
+        this.isNightTimeIncident = false;
+    }
+
+    public ScamReport(String city, String name, String description, String scamType, Integer severityScore,
+            String preventionTips,
+            String neighborhood, SafetyZone safetyZone, Integer safetyRating, Boolean isNightTimeIncident) {
+        this();
+        this.city = city;
+        this.name = name;
+        this.description = description;
+        this.scamType = scamType;
+        this.severityScore = severityScore;
+        this.preventionTips = preventionTips;
+        this.neighborhood = neighborhood;
+        this.safetyZone = safetyZone;
+        this.safetyRating = safetyRating;
+        this.isNightTimeIncident = isNightTimeIncident;
     }
 
     // Getters and Setters
@@ -59,12 +92,28 @@ public class ScamReport {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getCity() {
         return city;
     }
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
     }
 
     public String getDescription() {
@@ -100,11 +149,36 @@ public class ScamReport {
     }
 
     public String getLocation() {
-        return location;
+        return neighborhood; // Map location to neighborhood for backward compatibility if needed, or keep
+                             // separate
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        this.neighborhood = location;
+    }
+
+    public SafetyZone getSafetyZone() {
+        return safetyZone;
+    }
+
+    public void setSafetyZone(SafetyZone safetyZone) {
+        this.safetyZone = safetyZone;
+    }
+
+    public Integer getSafetyRating() {
+        return safetyRating;
+    }
+
+    public void setSafetyRating(Integer safetyRating) {
+        this.safetyRating = safetyRating;
+    }
+
+    public Boolean getIsNightTimeIncident() {
+        return isNightTimeIncident;
+    }
+
+    public void setIsNightTimeIncident(Boolean nightTimeIncident) {
+        isNightTimeIncident = nightTimeIncident;
     }
 
     public ScamReportStatus getStatus() {
