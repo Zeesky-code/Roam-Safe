@@ -42,3 +42,4 @@ scripts/
 
 *.log
 app.pid
+run_dev.sh

@@ -12,8 +12,11 @@ import java.util.List;
 @Repository
 public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
 
-    // Find approved reports for a city
+    // Find approved reports for a city (paginated for API)
     Page<ScamReport> findByCityIgnoreCaseAndStatus(String city, ScamReportStatus status, Pageable pageable);
+
+    // Find approved reports for a city (list for web UI)
+    List<ScamReport> findByCityIgnoreCaseAndStatusOrderBySeverityScoreDesc(String city, ScamReportStatus status);
 
     // Find all pending reports for moderation
     List<ScamReport> findByStatusOrderByCreatedAtDesc(ScamReportStatus status);
