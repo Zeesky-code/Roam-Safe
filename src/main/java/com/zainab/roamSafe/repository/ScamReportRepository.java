@@ -19,5 +19,9 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
     List<ScamReport> findByCityIgnoreCaseAndStatusOrderBySeverityScoreDesc(String city, ScamReportStatus status);
 
     // Find all pending reports for moderation
+    // Find all reports by status
+    List<ScamReport> findByStatus(ScamReportStatus status);
+
+    // Find all pending reports for moderation
     List<ScamReport> findByStatusOrderByCreatedAtDesc(ScamReportStatus status);
 }

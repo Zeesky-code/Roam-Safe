@@ -11,38 +11,40 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.zainab.roamSafe.model.SubmittedScam;
-import com.zainab.roamSafe.repository.SubmittedScamRepository;
+import com.zainab.roamSafe.model.ScamReport;
+import com.zainab.roamSafe.model.ScamReportStatus;
+import com.zainab.roamSafe.repository.ScamReportRepository;
 import com.zainab.roamSafe.service.ScamService;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final SubmittedScamRepository submittedScamRepository;
+    private final ScamReportRepository scamReportRepository;
     @Autowired
     private ScamService scamService;
 
-    public AdminController(SubmittedScamRepository submittedScamRepository) {
-        this.submittedScamRepository = submittedScamRepository;
+    public AdminController(ScamReportRepository scamReportRepository) {
+        this.scamReportRepository = scamReportRepository;
     }
 
     @GetMapping("/submissions")
     public String viewSubmissions(Model model) {
-        List<SubmittedScam> unreviewed = submittedScamRepository.findByReviewedFalse();
+        List<ScamReport> unreviewed = scamReportRepository.findByStatus(ScamReportStatus.PENDING);
         model.addAttribute("submissions", unreviewed);
         return "admin-submissions";
     }
 
     @PostMapping("/submissions/{id}/review")
     public String markAsReviewed(@PathVariable Long id) {
-        Optional<SubmittedScam> optional = submittedScamRepository.findById(id);
-        optional.ifPresent(sub -> {
-            sub.setReviewed(true);
-            submittedScamRepository.save(sub);
+        Optional<ScamReport> optional = scamReportRepository.findById(id);
+        optional.ifPresent(report -> {
+            report.setStatus(ScamReportStatus.APPROVED);
+            scamReportRepository.save(report);
         });
         return "redirect:/admin/submissions";
     }
+
     @GetMapping("/analytics")
     public String analytics(Model model) {
         model.addAttribute("total", scamService.getTotalScams());

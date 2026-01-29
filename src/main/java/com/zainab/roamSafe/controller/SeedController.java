@@ -14,12 +14,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.zainab.roamSafe.service.NewsIngestionService;
+
 @RestController
 @RequestMapping("/api/admin/seed")
 public class SeedController {
 
         @Autowired
         private ScamReportRepository scamReportRepository;
+
+        @Autowired
+        private NewsIngestionService newsIngestionService;
 
         @org.springframework.web.bind.annotation.GetMapping
         public ResponseEntity<String> seedDatabase() {
@@ -163,10 +168,15 @@ public class SeedController {
                 return ResponseEntity.ok("Bulk import successful: " + entities.size() + " reports imported.");
         }
 
-        @DeleteMapping("/clear")
         public ResponseEntity<String> clearDatabase() {
                 long count = scamReportRepository.count();
                 scamReportRepository.deleteAll();
                 return ResponseEntity.ok("Database cleared. Removed " + count + " entries.");
+        }
+
+        @PostMapping("/trigger-pipeline")
+        public ResponseEntity<String> triggerPipeline() {
+                newsIngestionService.ingestFreshScamData();
+                return ResponseEntity.ok("Intelligence pipeline triggered. Check logs for new alerts.");
         }
 }

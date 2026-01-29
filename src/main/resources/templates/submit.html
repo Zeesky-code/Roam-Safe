@@ -37,7 +37,7 @@
         <p>Help fellow travelers stay safe. Your report could save someone's trip.</p>
       </div>
 
-      <form class="modern-form" th:action="@{/submit}" th:object="${submittedScam}" method="post" style="width: 100%;">
+      <form class="modern-form" th:action="@{/submit}" th:object="${scamReport}" method="post" style="width: 100%;">
 
         <div class="form-group">
           <label class="form-label">Title</label>
@@ -55,7 +55,7 @@
 
         <div class="form-group">
           <label class="form-label">Incident Details</label>
-          <select th:field="*{incidentType}" class="modern-select" required>
+          <select th:field="*{scamType}" class="modern-select" required>
             <option value="">Select Type...</option>
             <option value="SCAM">🚨 Scam / Fraud</option>
             <option value="HARASSMENT">⚠️ Harassment</option>
@@ -90,7 +90,7 @@
         </div>
 
         <div class="form-group">
-          <textarea th:field="*{prevention}" class="modern-textarea" style="min-height: 80px;"
+          <textarea th:field="*{preventionTips}" class="modern-textarea" style="min-height: 80px;"
             placeholder="How can others avoid this? (Prevention tips)"></textarea>
         </div>
 

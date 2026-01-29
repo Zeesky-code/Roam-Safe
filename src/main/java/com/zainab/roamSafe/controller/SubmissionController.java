@@ -6,27 +6,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.zainab.roamSafe.model.SubmittedScam;
-import com.zainab.roamSafe.repository.SubmittedScamRepository;
+import com.zainab.roamSafe.model.ScamReport;
+import com.zainab.roamSafe.repository.ScamReportRepository;
 
 @Controller
 public class SubmissionController {
 
-    private final SubmittedScamRepository submittedScamRepository;
+    private final ScamReportRepository scamReportRepository;
 
-    public SubmissionController(SubmittedScamRepository submittedScamRepository) {
-        this.submittedScamRepository = submittedScamRepository;
+    public SubmissionController(ScamReportRepository scamReportRepository) {
+        this.scamReportRepository = scamReportRepository;
     }
 
     @GetMapping("/submit")
     public String showForm(Model model) {
-        model.addAttribute("submittedScam", new SubmittedScam());
+        model.addAttribute("scamReport", new ScamReport());
         return "submit";
     }
 
     @PostMapping("/submit")
-    public String handleSubmit(@ModelAttribute SubmittedScam submittedScam, Model model) {
-        submittedScamRepository.save(submittedScam);
+    public String handleSubmit(@ModelAttribute ScamReport scamReport, Model model) {
+        scamReportRepository.save(scamReport);
         model.addAttribute("success", true);
         return "submit";
     }
