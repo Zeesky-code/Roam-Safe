@@ -1,0 +1,4 @@
+# When you get a domain, replace ":80" with your domain name (e.g., example.com)
+:80 {
+    reverse_proxy app:8080
+}

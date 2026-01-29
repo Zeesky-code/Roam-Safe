@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: roamsafe-app
+    expose:
+      - "8080" # internal port only, not exposed to host directly
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_DRIVER=${DB_DRIVER}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_SHEETS_URL=${GOOGLE_SHEETS_URL}
+    restart: always
+
+  caddy:
+    image: caddy:latest
+    container_name: roamsafe-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:
