@@ -71,7 +71,8 @@ public class NewsIngestionService {
             report.setName(title);
             report.setDescription(description);
             report.setNeighborhood(location);
-            report.setScamType("SCAM");
+            report.setScamType("News Alert");
+            report.setCategory("News");
             report.setSafetyZone(zone);
             report.setSeverityScore(severity);
             report.setPreventionTips(prevention);

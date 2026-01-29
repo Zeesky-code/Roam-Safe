@@ -38,67 +38,68 @@ public class SeedController {
                                                 "A person picks up a gold ring from the ground and asks if you dropped it. They then demand money for 'finding' it.",
                                                 "RED",
                                                 "Avoid engaging with anyone picking up objects in front of you. Walk away immediately.",
-                                                "Seine River Banks", 2),
+                                                "Seine River Banks", 2, "Financial"),
 
                                 createReport("Paris", "Friendship Bracelet Scam",
                                                 "Men will try to tie a bracelet on your wrist and demand payment. They can be aggressive if you refuse.",
                                                 "RED", "Keep hands in pockets near Sacré-Cœur steps. Do not stop.",
-                                                "Sacré-Cœur Steps", 1),
+                                                "Sacré-Cœur Steps", 1, "Harassment"),
 
                                 createReport("Paris", "Metro Pickpockets",
                                                 "Crowded Line 1 trains are prime targets. Thieves create bottlenecks at doors.",
                                                 "YELLOW", "Wear your backpack on your front. Keep zippers locked.",
-                                                "Metro Line 1", 2),
+                                                "Metro Line 1", 2, "Theft"),
 
                                 createReport("Paris", "Safe Night Walk",
                                                 "The Marais district is generally lively and safe at night with many pedestrians.",
-                                                "GREEN", "Great area for solo dining and walking.", "Le Marais", 5),
+                                                "GREEN", "Great area for solo dining and walking.", "Le Marais", 5,
+                                                "Safe Area"),
 
                                 // --- ISTANBUL ---
                                 createReport("Istanbul", "Shoe Shine Scam",
                                                 "A cleaner drops their brush. If you pick it up, they offer a 'free' shine effectively and then demand exorbitant payment.",
                                                 "YELLOW", "Do not pick up dropped brushes. Just keep walking.",
-                                                "Galata Bridge", 3),
+                                                "Galata Bridge", 3, "Financial"),
 
                                 createReport("Istanbul", "Friendly 'Lira Exchange'",
                                                 "A 'tourist' asks for help exchanging coins, but gives you worthless currency from another country.",
                                                 "RED",
                                                 "Never exchange money on the street. Use official exchange offices.",
-                                                "Sultanahmet Square", 2),
+                                                "Sultanahmet Square", 2, "Financial"),
 
                                 createReport("Istanbul", "Safe Cafe Area",
                                                 "Moda seaside is full of families and students. Very safe and relaxed vibe.",
-                                                "GREEN", "Perfect for sunset walks.", "Kadikoy / Moda", 5),
+                                                "GREEN", "Perfect for sunset walks.", "Kadikoy / Moda", 5, "Safe Area"),
 
                                 // --- ROME ---
                                 createReport("Rome", "Fake Gladiator Photos",
                                                 "Men dressed as gladiators invite you for a photo and then aggressively demand 50 Euro.",
                                                 "RED", "Do not make eye contact. A firm 'No' works best.", "Colosseum",
-                                                2),
+                                                2, "Tourism"),
 
                                 // --- BALI ---
                                 createReport("Bali", "Money Changer Trick",
                                                 "Calculators are rigged or bills are palmed (dropped behind the counter) during counting.",
                                                 "RED",
                                                 "Only use authorized changers with glass booths (e.g. BMC). Count your money last.",
-                                                "Kuta / Seminyak", 2),
+                                                "Kuta / Seminyak", 2, "Financial"),
 
                                 createReport("Bali", "Scooter Bag Snatch",
                                                 "Thieves on bikes snatch purses from pedestrians or other riders.",
                                                 "YELLOW",
                                                 "Do not wear cross-body bags on the street side. Put bags under the scooter seat.",
-                                                "Canggu Shortcuts", 2),
+                                                "Canggu Shortcuts", 2, "Theft"),
 
                                 createReport("Bali", "Safe Coworking Hub",
                                                 "Area is full of digital nomads and security guards. Very safe day and night.",
-                                                "GREEN", "Community is very helpful.", "Pererenan", 5));
+                                                "GREEN", "Community is very helpful.", "Pererenan", 5, "Safe Area"));
 
                 scamReportRepository.saveAll(seedData);
                 return ResponseEntity.ok("Database seeded successfully with " + seedData.size() + " reports.");
         }
 
         private ScamReport createReport(String city, String name, String description, String zoneStr, String prevention,
-                        String neighborhood, int rating) {
+                        String neighborhood, int rating, String category) {
                 ScamReport report = new ScamReport();
                 report.setCity(city);
                 report.setName(name);
@@ -108,6 +109,7 @@ public class SeedController {
                 report.setSafetyZone(SafetyZone.valueOf(zoneStr)); // GREEN, YELLOW, RED
                 report.setSafetyRating(rating);
                 report.setScamType("SCAM"); // Default
+                report.setCategory(category);
                 report.setSeverityScore(zoneStr.equals("RED") ? 8 : (zoneStr.equals("YELLOW") ? 5 : 2));
                 report.setStatus(ScamReportStatus.APPROVED); // Auto-approve seed data
                 report.setIsNightTimeIncident(false);
@@ -139,6 +141,9 @@ public class SeedController {
                                 scamType = "Safe Area";
                         }
                         report.setScamType(scamType);
+
+                        // Default category for bulk import if not available
+                        report.setCategory("General");
 
                         report.setName(req.name() != null ? req.name() : scamType + " in " + req.city());
                         report.setDescription(req.description());

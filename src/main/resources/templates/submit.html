@@ -54,14 +54,23 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Incident Details</label>
-          <select th:field="*{scamType}" class="modern-select" required>
-            <option value="">Select Type...</option>
-            <option value="SCAM">🚨 Scam / Fraud</option>
-            <option value="HARASSMENT">⚠️ Harassment</option>
-            <option value="THEFT">💰 Theft</option>
-            <option value="POSITIVE">✅ Positive Experience</option>
-          </select>
+          <label class="form-label">Category & Type</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <select th:field="*{category}" class="modern-select" required>
+              <option value="">Select Category...</option>
+              <option value="Social">Social</option>
+              <option value="financial">Financial</option>
+              <option value="transportation">Transportation</option>
+              <option value="shopping">Shopping</option>
+              <option value="digital">Digital</option>
+              <option value="accommodation">Accommodation</option>
+              <option value="tourism">Tourism</option>
+              <option value="food_dining">Food & Dining</option>
+              <option value="general">General</option>
+            </select>
+            <input type="text" th:field="*{scamType}" class="modern-input" placeholder="Type (e.g. Gold Ring)"
+              required />
+          </div>
         </div>
 
         <div class="form-group">

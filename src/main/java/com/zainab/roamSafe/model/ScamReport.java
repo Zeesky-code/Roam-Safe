@@ -18,7 +18,10 @@ public class ScamReport {
     private String description;
 
     @Column(nullable = false)
-    private String scamType;
+    private String scamType; // Specific type e.g "Gold Ring Scam"
+
+    @Column(name = "category")
+    private String category; // High-level category e.g. "Social", "Transportation"
 
     @Column(nullable = false)
     private Integer severityScore; // 1-10
@@ -130,6 +133,14 @@ public class ScamReport {
 
     public void setScamType(String scamType) {
         this.scamType = scamType;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Integer getSeverityScore() {
