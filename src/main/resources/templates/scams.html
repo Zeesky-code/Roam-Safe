@@ -34,27 +34,32 @@
         <h2>Reports for <span th:text="${selectedCity != null ? selectedCity : 'Global'}">City</span></h2>
 
         <form action="/scams" method="get">
-          <div class="search-pill-container" style="margin-top: 1.5rem; box-shadow: none; border: 1px solid #eee;">
+          <div class="search-pill-container">
             <input type="text" name="city" class="search-input" placeholder="Analyze another city..."
               th:value="${selectedCity}">
             <button type="submit" class="btn-search">Search</button>
           </div>
         </form>
+
+        <!-- Filters - Now inside hero for visual unity -->
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap;">
+          <button class="btn-search" style="padding: 0.5rem 1rem; font-size: 0.8rem;">All Reports</button>
+          <button
+            style="padding: 0.5rem 1rem; font-size: 0.8rem; background: white; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer;">🟢
+            Safe</button>
+          <button
+            style="padding: 0.5rem 1rem; font-size: 0.8rem; background: white; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer;">🟡
+            Caution</button>
+          <button
+            style="padding: 0.5rem 1rem; font-size: 0.8rem; background: white; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer;">🔴
+            High Risk</button>
+        </div>
       </div>
-      <!-- Decorative circle or pattern instead of full image could go right -->
     </div>
   </div>
 
   <!-- Main Content -->
-  <section class="destinations-section" style="padding-top: 0;">
-
-    <!-- Filters -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 1rem;">
-      <button class="btn-black" style="padding: 0.5rem 1.25rem; font-size: 0.8rem;">All Reports</button>
-      <button class="btn-black" style="background: white; color: black; border: 1px solid #eee;">Safe Zones</button>
-      <button class="btn-black" style="background: white; color: black; border: 1px solid #eee;">Caution Areas</button>
-      <button class="btn-black" style="background: white; color: black; border: 1px solid #eee;">High Risk</button>
-    </div>
+  <section class="destinations-section" style="padding-top: 1rem;">
 
     <!-- Grid -->
     <div class="card-grid" th:if="${scams != null && !scams.empty}">
