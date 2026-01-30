@@ -1,9 +1,11 @@
 package com.zainab.roamSafe.controller;
 
 import com.zainab.roamSafe.dto.BulkScamReportRequest;
+import com.zainab.roamSafe.model.City;
 import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.model.SafetyZone;
+import com.zainab.roamSafe.repository.CityRepository;
 import com.zainab.roamSafe.repository.ScamReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ public class SeedController {
 
         @Autowired
         private ScamReportRepository scamReportRepository;
+
+        @Autowired
+        private CityRepository cityRepository;
 
         @Autowired
         private NewsIngestionService newsIngestionService;
@@ -100,6 +105,11 @@ public class SeedController {
 
         private ScamReport createReport(String city, String name, String description, String zoneStr, String prevention,
                         String neighborhood, int rating, String category) {
+                // Ensure city exists
+                if (cityRepository.findByName(city) == null) {
+                        cityRepository.save(new City(city, "Unknown")); // Default country to Unknown for now
+                }
+
                 ScamReport report = new ScamReport();
                 report.setCity(city);
                 report.setName(name);
@@ -132,6 +142,11 @@ public class SeedController {
                 List<ScamReport> entities = new ArrayList<>();
 
                 for (BulkScamReportRequest req : reports) {
+                        // Ensure city exists
+                        if (cityRepository.findByName(req.city()) == null) {
+                                cityRepository.save(new City(req.city(), "Unknown"));
+                        }
+
                         ScamReport report = new ScamReport();
                         report.setCity(req.city());
 
@@ -173,9 +188,11 @@ public class SeedController {
                 return ResponseEntity.ok("Bulk import successful: " + entities.size() + " reports imported.");
         }
 
+        @PostMapping("/clear")
         public ResponseEntity<String> clearDatabase() {
                 long count = scamReportRepository.count();
                 scamReportRepository.deleteAll();
+                cityRepository.deleteAll(); // Also clear cities to keep it clean
                 return ResponseEntity.ok("Database cleared. Removed " + count + " entries.");
         }
 
