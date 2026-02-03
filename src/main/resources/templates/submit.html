@@ -2,124 +2,139 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Submit Report - RoamSafe</title>
+
+  <!-- Custom Theme -->
   <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
 
-  <!-- Minimal Nav -->
-  <nav class="nav-container">
-    <div class="logo">
-      <span style="color: var(--primary-dark);">ROAM</span>SAFE
-    </div>
-    <div class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/scams" class="nav-link">Destinations</a>
-      <a href="/submit" class="nav-link">Report</a>
-    </div>
-    <a href="/login" class="btn-black">Sign In</a>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="hero-wrapper" style="margin-bottom: 4rem;">
-    <div class="hero-card"
-      style="background: white; flex-direction: column; align-items: center; padding: 4rem 2rem; min-height: auto;">
-
-      <div style="text-align: center; max-width: 600px; margin-bottom: 3rem;">
-        <div class="step-badge" style="justify-content: center;">
-          <div class="step-number">3</div>
-          <div class="step-text">COMMUNITY INTEL</div>
-        </div>
-        <h1>Share Your Story</h1>
-        <p>Help fellow travelers stay safe. Your report could save someone's trip.</p>
-      </div>
-
-      <form class="modern-form" th:action="@{/submit}" th:object="${scamReport}" method="post" style="width: 100%;">
-
-        <div class="form-group">
-          <label class="form-label">Title</label>
-          <input type="text" th:field="*{name}" class="modern-input" placeholder="e.g. 'Taxi Meter Scam at Airport'"
-            required />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Location</label>
-          <div style="display: flex; gap: 1rem;">
-            <input type="text" th:field="*{city}" class="modern-input" placeholder="City (e.g. Istanbul)" required />
-            <input type="text" th:field="*{neighborhood}" class="modern-input" placeholder="Area (Optional)" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Category & Type</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <select th:field="*{category}" class="modern-select" required>
-              <option value="">Select Category...</option>
-              <option value="Social">Social</option>
-              <option value="financial">Financial</option>
-              <option value="transportation">Transportation</option>
-              <option value="shopping">Shopping</option>
-              <option value="digital">Digital</option>
-              <option value="accommodation">Accommodation</option>
-              <option value="tourism">Tourism</option>
-              <option value="food_dining">Food & Dining</option>
-              <option value="general">General</option>
-            </select>
-            <input type="text" th:field="*{scamType}" class="modern-input" placeholder="Type (e.g. Gold Ring)"
-              required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <textarea th:field="*{description}" class="modern-textarea"
-            placeholder="What happened? Be specific about how it started..." required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Risk Level & Advice</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <select th:field="*{safetyZone}" class="modern-select" required>
-              <option value="">Zone Rating...</option>
-              <option value="GREEN">🟢 Safe</option>
-              <option value="YELLOW">🟡 Caution</option>
-              <option value="RED">🔴 Avoid</option>
-            </select>
-            <select th:field="*{safetyRating}" class="modern-select" required>
-              <option value="">1-5 Stars...</option>
-              <option value="1">1 - Dangerous</option>
-              <option value="2">2 - Unsafe</option>
-              <option value="3">3 - Neutral</option>
-              <option value="4">4 - Safe</option>
-              <option value="5">5 - Very Safe</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <textarea th:field="*{preventionTips}" class="modern-textarea" style="min-height: 80px;"
-            placeholder="How can others avoid this? (Prevention tips)"></textarea>
-        </div>
-
-        <label class="checkbox-wrapper">
-          <input type="checkbox" th:field="*{isNightTimeIncident}" />
-          <span style="font-size: 0.9rem; color: #555;">This happened at night</span>
-        </label>
-
-        <button type="submit" class="btn-search" style="width: 100%; margin-top: 1rem; font-size: 1.1rem;">Submit
-          Report</button>
-
-      </form>
-
-    </div>
+  <!-- LEFT SIDEBAR NAV -->
+  <div class="sidebar-left">
+    <div class="sidebar-logo">R</div>
+    <a href="/" class="nav-item" title="Home"><i data-lucide="map"></i></a>
+    <a href="/scams" class="nav-item" title="Destinations"><i data-lucide="compass"></i></a>
+    <a href="/submit" class="nav-item active" title="Report Scam"><i data-lucide="file-plus-2"></i></a>
+    <a href="#" class="nav-item" title="About"><i data-lucide="info"></i></a>
+    <div class="spacer"></div>
+    <a href="/login" class="nav-item" title="Sign In"><i data-lucide="log-in"></i></a>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 RoamSafe. Travel Smart.</p>
-  </footer>
+  <!-- MAIN CONTENT AREA -->
+  <div class="scams-layout">
+
+    <div style="max-width: 700px; margin: 0 auto; padding-top: 40px;">
+
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 40px;">
+        <div
+          style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: white; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 20px; color: var(--primary-accent);">
+          <i data-lucide="message-square-plus" style="width: 32px; height: 32px;"></i>
+        </div>
+        <h1 style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 10px;">Share Your Story</h1>
+        <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 500px; margin: 0 auto;">Help your fellow
+          travelers stay safe. Your detailed report could save someone's trip.</p>
+      </div>
+
+      <!-- Glass Form Card -->
+      <div class="glass-panel" style="padding: 40px;">
+
+        <form class="modern-form" th:action="@{/submit}" th:object="${scamReport}" method="post">
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" th:field="*{name}" class="modern-input" placeholder="e.g. 'Taxi Meter Scam at Airport'"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <input type="text" th:field="*{city}" class="modern-input" placeholder="City (e.g. Istanbul)" required />
+              <input type="text" th:field="*{neighborhood}" class="modern-input" placeholder="Area (Optional)" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category & Details</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <select th:field="*{category}" class="modern-select" required>
+                <option value="">Select Category...</option>
+                <option value="Social">Social</option>
+                <option value="financial">Financial</option>
+                <option value="transportation">Transportation</option>
+                <option value="shopping">Shopping</option>
+                <option value="digital">Digital</option>
+                <option value="accommodation">Accommodation</option>
+                <option value="tourism">Tourism</option>
+                <option value="food_dining">Food & Dining</option>
+                <option value="general">General</option>
+              </select>
+              <input type="text" th:field="*{scamType}" class="modern-input" placeholder="Type (e.g. Gold Ring)"
+                required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">What Happened?</label>
+            <textarea th:field="*{description}" class="modern-textarea"
+              placeholder="Start from the beginning. Be specific about how the scam started..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Risk Assessment</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <select th:field="*{safetyZone}" class="modern-select" required>
+                <option value="">Zone Rating...</option>
+                <option value="GREEN">🟢 Safe</option>
+                <option value="YELLOW">🟡 Caution</option>
+                <option value="RED">🔴 Avoid</option>
+              </select>
+              <select th:field="*{safetyRating}" class="modern-select" required>
+                <option value="">Safety Score (1-5)</option>
+                <option value="1">1 - Dangerous</option>
+                <option value="2">2 - Unsafe</option>
+                <option value="3">Neutral</option>
+                <option value="4">Safe</option>
+                <option value="5">Very Safe</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Prevention Tip</label>
+            <textarea th:field="*{preventionTips}" class="modern-textarea" style="min-height: 100px;"
+              placeholder="How can others recognize or avoid this?"></textarea>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px;">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" th:field="*{isNightTimeIncident}" />
+              <span style="font-size: 0.95rem; font-weight: 500; color: var(--text-secondary);">This happened at
+                night</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary" style="margin-top: 10px;">
+            <i data-lucide="send"></i> Submit Report
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+        lucide.createIcons();
+  </script>
 
 </body>
 

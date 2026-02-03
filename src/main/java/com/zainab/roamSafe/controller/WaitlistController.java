@@ -19,14 +19,9 @@ public class WaitlistController {
     @Autowired
     private WaitlistService waitlistService;
 
-    @GetMapping
-    public String home() {
-        return "index"; 
-    }
-
     @PostMapping("/waitlist")
-    public String addToWaitlist(@Valid @RequestParam("email") String email, 
-                               RedirectAttributes redirectAttributes) {
+    public String addToWaitlist(@Valid @RequestParam("email") String email,
+            RedirectAttributes redirectAttributes) {
         try {
             if (!isValidEmail(email)) {
                 redirectAttributes.addFlashAttribute("error", "Please enter a valid email address");
@@ -34,18 +29,19 @@ public class WaitlistController {
             }
 
             boolean success = waitlistService.addToWaitlist(email);
-            
+
             if (success) {
-                redirectAttributes.addFlashAttribute("success", "Thanks! You're on the waitlist. We'll notify you first! ✨");
+                redirectAttributes.addFlashAttribute("success",
+                        "Thanks! You're on the waitlist. We'll notify you first! ✨");
             } else {
                 redirectAttributes.addFlashAttribute("error", "You're already on our waitlist!");
             }
-            
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Something went wrong. Please try again.");
             e.printStackTrace();
         }
-        
+
         return "redirect:/";
     }
 
@@ -54,7 +50,7 @@ public class WaitlistController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> addToWaitlistAPI(@Valid @RequestBody WaitlistRequest request) {
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             if (!isValidEmail(request.getEmail())) {
                 response.put("success", false);
@@ -63,7 +59,7 @@ public class WaitlistController {
             }
 
             boolean success = waitlistService.addToWaitlist(request.getEmail());
-            
+
             if (success) {
                 response.put("success", true);
                 response.put("message", "Thanks! You're on the waitlist. We'll notify you first! ✨");
@@ -73,7 +69,7 @@ public class WaitlistController {
                 response.put("message", "You're already on our waitlist!");
                 return ResponseEntity.ok(response);
             }
-            
+
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Something went wrong. Please try again.");
@@ -97,7 +93,7 @@ public class WaitlistController {
     }
 
     private boolean isValidEmail(String email) {
-        return email != null && 
-               email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email != null &&
+                email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 }

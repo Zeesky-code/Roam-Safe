@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoamSafe - Your Travel Assistant</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Custom Theme -->
+  <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+
+  <!-- Icons (Lucide via UNPKG) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <!-- 1. MAP BACKGROUND -->
+  <div id="map-bg"></div>
+
+  <!-- 2. UI OVERLAY LAYER -->
+  <div class="ui-layer">
+
+    <!-- LEFT SIDEBAR NAV -->
+    <div class="sidebar-left interactive">
+      <div class="sidebar-logo">R</div>
+      <a href="/" class="nav-item active" title="Home"><i data-lucide="map"></i></a>
+      <a href="/scams" class="nav-item" title="Destinations"><i data-lucide="compass"></i></a>
+      <a href="/submit" class="nav-item" title="Report Scam"><i data-lucide="file-plus-2"></i></a>
+      <a href="#" class="nav-item" title="About"><i data-lucide="info"></i></a>
+      <div class="spacer"></div>
+      <a href="/login" class="nav-item" title="Sign In"><i data-lucide="log-in"></i></a>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-container interactive">
+      <form action="/scams" method="get" class="glass-pill">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" name="city" class="search-input" placeholder="Search cities (e.g., Paris, Rome)..."
+          autocomplete="off">
+        <button type="button" class="search-icon" style="background:none; border:none; cursor:pointer;"
+          onclick="toggleCard()">
+          <i data-lucide="sparkles" style="color: #d84315;"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- RIGHT SIDEBAR (FABs) -->
+    <div class="fab-container interactive">
+      <div class="fab">
+        <i data-lucide="heart"></i>
+        <div class="badge">3</div>
+      </div>
+      <div class="fab">
+        <i data-lucide="landmark"></i>
+      </div>
+      <div class="fab">
+        <i data-lucide="moon"></i>
+      </div>
+    </div>
+
+    <!-- GEMINI ANSWER CARD (Hidden by default) -->
+    <div id="gemini-card" class="gemini-card interactive">
+      <div class="card-header">
+        <i data-lucide="sparkles"></i>
+        <span>Gemini Answer</span>
+      </div>
+      <div class="card-body">
+        <p><strong>Good day. ☀️</strong></p>
+        <p style="margin-top:10px;">I am your Paris butler, at your service. It is my pleasure to assist you with
+          anything in the City of Light—recommendations, reservations, or simply the best croissant nearby. 🥐</p>
+        <p style="margin-top:10px; font-weight:600;">How may I be of help today?</p>
+      </div>
+    </div>
+
+    <!-- NEWS TICKER -->
+    <div class="news-ticker-container interactive">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <div class="ticker-content">
+        <div class="ticker-text" id="news-ticker-text">
+          Fetching latest security alerts and travel updates...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    // --- 1. INITIALIZE MAP ---
+    // Light, clean map style using CartoDB Positron
+    var map = L.map('map-bg', {
+      zoomControl: false, // We'll add custom if needed
+      attributionControl: false
+    }).setView([48.8566, 2.3522], 13); // Default to Paris
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20
+    }).addTo(map);
+
+    // --- 2. DATA VISUALIZATION LOGIC ---
+
+    // City Centers for Simulation (since we lack Lat/Lng in DB)
+    const cityCoords = {
+      "Paris": [48.8566, 2.3522],
+      "London": [51.5074, -0.1278],
+      "Rome": [41.9028, 12.4964],
+      "Barcelona": [41.3851, 2.1734],
+      "Istanbul": [41.0082, 28.9784],
+      "New York": [40.7128, -74.0060],
+      "Tokyo": [35.6762, 139.6503]
+    };
+
+    // Professional SVG Icons
+    function createRiskIcon(zone) {
+      let color = '#ef4444'; // Red
+      let iconKey = 'alert-triangle';
+
+      if (zone === 'GREEN' || zone === 'SAFE') {
+        color = '#10b981'; // Green
+        iconKey = 'shield-check';
+      } else if (zone === 'YELLOW' || zone === 'CAUTION') {
+        color = '#f59e0b'; // Yellow
+        iconKey = 'eye';
+      }
+
+      // Simple SVG Pin
+      const svgHtml = `
+            <div style="position: relative; width: 40px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                <div style="
+                    background: ${color}; 
+                    width: 36px; height: 36px; 
+                    border-radius: 50%; 
+                    border: 3px solid white; 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                    display: flex; align-items: center; justify-content: center;
+                    color: white;
+                ">
+                    <i data-lucide="${iconKey}" style="width: 18px; height: 18px;"></i>
+                </div>
+                <div style="
+                    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+                    width: 0; height: 0; 
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 10px solid ${color};
+                "></div>
+            </div>`;
+
+      return L.divIcon({
+        className: 'custom-pin',
+        html: svgHtml,
+        iconSize: [40, 50],
+        iconAnchor: [20, 50]
+      });
+    }
+
+    L.control.zoom({
+      position: 'bottomright'
+    }).addTo(map);
+
+    // --- 3. FETCH DATA & POPULATE MAP ---
+    async function loadScamData() {
+      try {
+        // Fetch reports (reusing the alerts feed endpoint for raw data)
+        const response = await fetch('/api/v1/alerts/feed', {
+          headers: {
+            'X-API-KEY': 'roamsafe-secret-key-123'
+          }
+        });
+        if (response.ok) {
+          const reports = await response.json();
+
+          // Populate Ticker
+          const headlines = reports.map(item => `[${item.city}] ${item.name}`).join('  •  ');
+          document.getElementById('news-ticker-text').textContent = headlines + '  •  ' + headlines;
+
+          // Populate Map Markers
+          reports.forEach(report => {
+            let center = cityCoords[report.city] || cityCoords["Paris"]; // Default to Paris if unknown
+
+            // Add random offset to simulate specific location (~1-3km radius)
+            const latOffset = (Math.random() - 0.5) * 0.04;
+            const lngOffset = (Math.random() - 0.5) * 0.04;
+
+            const marker = L.marker([center[0] + latOffset, center[1] + lngOffset], {
+              icon: createRiskIcon(report.safetyZone)
+            }).addTo(map);
+
+            // On Click: Show Details in the "Gemini Card"
+            marker.on('click', () => {
+              showScamDetails(report);
+            });
+          });
+
+          // Re-render icons for the new markers
+          lucide.createIcons();
+        }
+      } catch (e) {
+        console.error("Failed to load scam data", e);
+        // Fallback for demo if fetch fails
+        document.getElementById('news-ticker-text').textContent = "⚠️ Connectivity Issue: Unable to load live threat scores.";
+      }
+    }
+
+    // Show Scam Details in the Floating Card
+    function showScamDetails(report) {
+      const card = document.getElementById('gemini-card');
+      const content = card.querySelector('.card-body');
+
+      // Build cute content
+      card.querySelector('.card-header span').textContent = "Security Alert";
+      content.innerHTML = `
+                <h3 style="margin-bottom:8px; color: #d84315;">${report.name}</h3>
+                <div style="margin-bottom:12px;">
+                    <span style="background:#ffebee; color:#c62828; padding:2px 8px; border-radius:12px; font-size:0.8rem; font-weight:700;">${report.safetyZone}</span>
+                    <span style="color:#666; font-size:0.9rem;">📍 ${report.neighborhood || report.city}</span>
+                </div>
+                <p>${report.description}</p>
+                <div style="margin-top:12px; padding:10px; background:#f1f8e9; border-radius:12px; border-left: 4px solid #558b2f;">
+                    <strong>💡 Tip:</strong> ${report.preventionTips || "Stay vigilant and avoid this area at night."}
+                </div>
+            `;
+
+      card.classList.add('active');
+    }
+
+    // Initialize
+    loadScamData();
+
+    // --- 4. UI INTERACTION ---
+    function toggleCard() {
+      document.getElementById('gemini-card').classList.toggle('active');
+    }
+
+    // Initialize Icons
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
