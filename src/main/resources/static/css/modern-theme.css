@@ -1,5 +1,5 @@
-/* RoamSafe Cute Theme - Inspired by Paris Assistant */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+/* RoamSafe Professional Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     /* "Modern Indigo" Palette - Clean & Professional */
@@ -23,17 +23,23 @@
     --news-text: #f1f5f9;
     /* Slate 100 */
 
-    --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
-    --radius-pill: 50px;
-    --radius-card: 24px;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-strong: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 9999px;
+    /* Keep pill for buttons if desired, or switch to radius-md */
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Quicksand', sans-serif;
-    /* Rounded, friendly font */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -88,6 +94,7 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
+    /* Search pill remains pill for now, standard pattern */
     padding: 12px 24px;
     display: flex;
     align-items: center;
@@ -159,7 +166,7 @@ body {
 .nav-item {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -196,11 +203,11 @@ body {
 }
 
 .glass-panel {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -289,14 +296,14 @@ body {
     font-size: 0.85rem;
     letter-spacing: 0.05em;
     z-index: 2;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     margin: 4px;
-    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .live-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: white;
     border-radius: 50%;
     margin-right: 8px;
@@ -468,14 +475,15 @@ body {
 .btn-primary {
     background: var(--primary-accent);
     color: white;
-    padding: 16px;
+    padding: 14px 24px;
     border: none;
-    border-radius: var(--radius-pill);
-    font-size: 1.1rem;
-    font-weight: 700;
+    border-radius: var(--radius-md);
+    /* Stricter button radius */
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-soft);
     /* Indigo shadow */
     display: flex;
     justify-content: center;
@@ -612,8 +620,8 @@ input[type="checkbox"] {
 .btn-primary-lg {
     background: var(--primary-accent);
     color: white;
-    padding: 18px 32px;
-    border-radius: var(--radius-pill);
+    padding: 16px 32px;
+    border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: 800;
     font-size: 1.1rem;
@@ -632,8 +640,8 @@ input[type="checkbox"] {
 .btn-secondary-lg {
     background: white;
     color: var(--text-primary);
-    padding: 18px 32px;
-    border-radius: var(--radius-pill);
+    padding: 16px 32px;
+    border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: 700;
     font-size: 1.1rem;
@@ -860,4 +868,18 @@ input[type="checkbox"] {
         bottom: 70px;
         /* Above the bottom nav */
     }
+}
+/* DASHBOARD HERO IMAGE */
+.dashboard-img {
+    width: 100%;
+    max-width: 650px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-strong);
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.dashboard-img:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }

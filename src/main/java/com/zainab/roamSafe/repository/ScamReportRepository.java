@@ -23,5 +23,13 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
     List<ScamReport> findByStatus(ScamReportStatus status);
 
     // Find all pending reports for moderation
+    // Find all pending reports for moderation
     List<ScamReport> findByStatusOrderByCreatedAtDesc(ScamReportStatus status);
+
+    // Find top 5 recent reports
+    List<ScamReport> findTop5ByStatusOrderByCreatedAtDesc(ScamReportStatus status);
+
+    // Count reports by city and order by count descending
+    @org.springframework.data.jpa.repository.Query("SELECT s.city, COUNT(s) as reportCount FROM ScamReport s WHERE s.status = 'APPROVED' GROUP BY s.city ORDER BY reportCount DESC")
+    List<Object[]> findTopCities(Pageable pageable);
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.repository.ScamReportRepository;
 
@@ -30,8 +31,15 @@ public class ScamService {
     }
 
     public List<Object[]> getTopCities(int limit) {
-        // Mock implementation or use a custom query in repository if needed
-        // For now returning empty list to fix compilation
-        return new ArrayList<>();
+        return scamReportRepository.findTopCities(PageRequest.of(0, limit));
+    }
+
+    public List<ScamReport> getRecentReports(int limit) {
+        return scamReportRepository.findTop5ByStatusOrderByCreatedAtDesc(ScamReportStatus.APPROVED);
+    }
+
+    public List<ScamReport> getReportsByCity(String city) {
+        return scamReportRepository.findByCityIgnoreCaseAndStatusOrderBySeverityScoreDesc(city,
+                ScamReportStatus.APPROVED);
     }
 }
