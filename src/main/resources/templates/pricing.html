@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoamSafe Pro - Travel Smarter</title>
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- Navbar (Simplified) -->
+    <nav class="landing-nav">
+        <div class="logo">
+            <span style="color: var(--primary-accent);">ROAM</span>SAFE
+        </div>
+        <div class="nav-links-right">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/login" class="nav-link">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; text-align: center;">
+        <h1 style="font-size: 3rem; margin-bottom: 16px;">Upgrade Your Safety</h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 60px;">Get unlimited access to
+            real-time scam intelligence.</p>
+
+        <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+            <!-- Free Plan -->
+            <div class="glass-panel"
+                style="padding: 40px; width: 350px; text-align: left; border: 1px solid rgba(255,255,255,0.5);">
+                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Explorer</h3>
+                <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$0<span
+                        style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">/mo</span></div>
+                <ul style="list-style: none; margin-bottom: 40px;">
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> Access to Live Map</li>
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> View 3 Scam Reports/day</li>
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> Community Access</li>
+                </ul>
+                <a href="/login" class="btn-secondary-lg" style="width: 100%; justify-content: center;">Get Started</a>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="glass-panel"
+                style="padding: 40px; width: 350px; text-align: left; border: 2px solid var(--primary-accent); position: relative; transform: scale(1.05); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);">
+                <div
+                    style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-accent); color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                    MOST POPULAR</div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--primary-accent);">Traveler Pro</h3>
+                <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$5<span
+                        style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">/mo</span></div>
+                <ul style="list-style: none; margin-bottom: 40px;">
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> <strong>Unlimited</strong> Reports</li>
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> Real-time Email Alerts</li>
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> Verified User Badge</li>
+                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
+                            style="color: var(--primary-accent);"></i> Priority Support</li>
+                </ul>
+                <a href="/subscribe" class="btn-primary-lg" style="width: 100%; justify-content: center;">Upgrade
+                    Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
