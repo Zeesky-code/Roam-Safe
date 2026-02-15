@@ -7,67 +7,257 @@
     <title>RoamSafe Pro - Travel Smarter</title>
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .pricing-hero {
+            padding: 100px 20px 60px;
+            text-align: center;
+        }
+
+        .pricing-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary-accent), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pricing-hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            padding: 0 20px 80px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .plan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            width: 380px;
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--primary-accent);
+            position: relative;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-accent);
+            color: white;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 32px;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+        }
+
+        .plan-features li i {
+            width: 18px;
+            height: 18px;
+            color: var(--primary-accent);
+            flex-shrink: 0;
+        }
+
+        .plan-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .plan-btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .plan-btn-outline:hover {
+            border-color: var(--primary-accent);
+            color: var(--primary-accent);
+        }
+
+        .plan-btn-primary {
+            background: var(--primary-accent);
+            color: white;
+        }
+
+        .plan-btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .alert-banner {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-cancel {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        @media (max-width: 768px) {
+            .pricing-hero h1 {
+                font-size: 2rem;
+            }
+
+            .plan-card {
+                width: 100%;
+            }
+
+            .pricing-grid {
+                gap: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Navbar (Simplified) -->
+    <!-- Navbar -->
     <nav class="landing-nav">
         <div class="logo">
             <span style="color: var(--primary-accent);">ROAM</span>SAFE
         </div>
         <div class="nav-links-right">
             <a href="/" class="nav-link">Home</a>
-            <a href="/login" class="nav-link">Sign In</a>
+            <a href="/scams" class="nav-link">Directory</a>
+            <a th:if="${!isLoggedIn}" href="/login" class="nav-link">Sign In</a>
+            <a th:if="${isLoggedIn}" href="/dashboard" class="nav-link">Dashboard</a>
         </div>
     </nav>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; text-align: center;">
-        <h1 style="font-size: 3rem; margin-bottom: 16px;">Upgrade Your Safety</h1>
-        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 60px;">Get unlimited access to
-            real-time scam intelligence.</p>
-
-        <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
-            <!-- Free Plan -->
-            <div class="glass-panel"
-                style="padding: 40px; width: 350px; text-align: left; border: 1px solid rgba(255,255,255,0.5);">
-                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Explorer</h3>
-                <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$0<span
-                        style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">/mo</span></div>
-                <ul style="list-style: none; margin-bottom: 40px;">
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> Access to Live Map</li>
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> View 3 Scam Reports/day</li>
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> Community Access</li>
-                </ul>
-                <a href="/login" class="btn-secondary-lg" style="width: 100%; justify-content: center;">Get Started</a>
-            </div>
-
-            <!-- Pro Plan -->
-            <div class="glass-panel"
-                style="padding: 40px; width: 350px; text-align: left; border: 2px solid var(--primary-accent); position: relative; transform: scale(1.05); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);">
-                <div
-                    style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-accent); color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
-                    MOST POPULAR</div>
-                <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--primary-accent);">Traveler Pro</h3>
-                <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$5<span
-                        style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">/mo</span></div>
-                <ul style="list-style: none; margin-bottom: 40px;">
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> <strong>Unlimited</strong> Reports</li>
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> Real-time Email Alerts</li>
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> Verified User Badge</li>
-                    <li style="margin-bottom: 12px; display: flex; gap: 10px;"><i data-lucide="check"
-                            style="color: var(--primary-accent);"></i> Priority Support</li>
-                </ul>
-                <a href="/subscribe" class="btn-primary-lg" style="width: 100%; justify-content: center;">Upgrade
-                    Now</a>
-            </div>
-        </div>
+    <!-- Alerts -->
+    <div th:if="${successMessage}" class="alert-banner alert-success">
+        <i data-lucide="check-circle" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 6px;"></i>
+        <span th:text="${successMessage}"></span>
     </div>
+    <div th:if="${cancelMessage}" class="alert-banner alert-cancel">
+        <i data-lucide="x-circle" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 6px;"></i>
+        <span th:text="${cancelMessage}"></span>
+    </div>
+    <div th:if="${infoMessage}" class="alert-banner alert-info">
+        <i data-lucide="info" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 6px;"></i>
+        <span th:text="${infoMessage}"></span>
+    </div>
+
+    <!-- Hero -->
+    <section class="pricing-hero">
+        <h1>Upgrade Your Safety</h1>
+        <p>Get unlimited access to real-time scam intelligence for every destination.</p>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pricing-grid">
+        <!-- Free Plan -->
+        <div class="plan-card">
+            <div class="plan-name">Explorer</div>
+            <div class="plan-price">$0<span>/mo</span></div>
+            <ul class="plan-features">
+                <li><i data-lucide="check"></i> Access to Live Map</li>
+                <li><i data-lucide="check"></i> View 3 Reports per city</li>
+                <li><i data-lucide="check"></i> Community Access</li>
+            </ul>
+            <a th:if="${!isLoggedIn}" href="/register" class="plan-btn plan-btn-outline">Create Account</a>
+            <span th:if="${isLoggedIn && !isPro}" class="plan-btn plan-btn-outline"
+                style="opacity: 0.6; cursor: default;">Current Plan</span>
+            <span th:if="${isPro}" class="plan-btn plan-btn-outline" style="opacity: 0.4; cursor: default;">—</span>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="plan-card featured">
+            <div class="plan-badge">MOST POPULAR</div>
+            <div class="plan-name" style="color: var(--primary-accent);">Traveler Pro</div>
+            <div class="plan-price">$5<span>/mo</span></div>
+            <ul class="plan-features">
+                <li><i data-lucide="check"></i> <strong>Unlimited</strong> Reports</li>
+                <li><i data-lucide="check"></i> Real-time Email Alerts</li>
+                <li><i data-lucide="check"></i> Verified User Badge</li>
+                <li><i data-lucide="check"></i> Priority Support</li>
+            </ul>
+            <a th:if="${!isPro}" href="/subscribe" class="plan-btn plan-btn-primary">Upgrade Now</a>
+            <span th:if="${isPro}" class="plan-btn plan-btn-primary" style="opacity: 0.6; cursor: default;">Active
+                ✓</span>
+        </div>
+    </section>
 
     <script>
         lucide.createIcons();

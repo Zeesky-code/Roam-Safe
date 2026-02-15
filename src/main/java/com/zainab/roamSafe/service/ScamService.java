@@ -1,7 +1,6 @@
 package com.zainab.roamSafe.service;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

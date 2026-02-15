@@ -30,15 +30,13 @@ public class SecurityConfig {
                                                 .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/robots.txt",
                                                                 "/sitemap.xml")
                                                 .permitAll()
-                                                .requestMatchers("/api/admin/seed/**").permitAll() // Seeding remains
-                                                                                                   // open for demo
-                                                                                                   // convenience
+                                                .requestMatchers("/api/admin/seed/**").permitAll()
                                                 .requestMatchers("/scams", "/submit", "/waitlist", "/register",
-                                                                "/login", "/dashboard/**")
+                                                                "/login", "/dashboard/**", "/pricing", "/subscribe",
+                                                                "/map")
                                                 .permitAll()
 
-                                                // Public API (Protected by API Key via Filter, but Spring Security sees
-                                                // it as authenticated)
+                                                // Public API (Protected by API Key via Filter)
                                                 .requestMatchers("/api/v1/**").authenticated()
 
                                                 // Admin pages
@@ -53,7 +51,7 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl("/")
                                                 .permitAll())
                                 .csrf(csrf -> csrf
-                                                // Disable CSRF for APIs
+                                                // Disable CSRF for APIs and Stripe webhook
                                                 .ignoringRequestMatchers("/api/**"));
 
                 return http.build();

@@ -1,6 +1,5 @@
 package com.zainab.roamSafe.service;
 
-import com.zainab.roamSafe.dto.BulkScamReportRequest;
 import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.model.SafetyZone;
@@ -12,9 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class NewsIngestionService {

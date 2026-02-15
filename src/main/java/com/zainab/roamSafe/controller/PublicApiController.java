@@ -7,8 +7,6 @@ import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.repository.ScamReportRepository;
 import com.zainab.roamSafe.service.CitySummaryService;
 import com.zainab.roamSafe.service.SafetyScoreService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

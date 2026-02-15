@@ -42,6 +42,11 @@ public class ScamController {
                 scams = scams.subList(0, 3);
                 model.addAttribute("showLoginPrompt", true);
                 model.addAttribute("totalScams", totalScams);
+            } else if (isLoggedIn && !user.isPro() && scams.size() > 3) {
+                // Logged in but not Pro: show limited reports + upgrade prompt
+                scams = scams.subList(0, 3);
+                model.addAttribute("showUpgradePrompt", true);
+                model.addAttribute("totalScams", totalScams);
             }
 
             model.addAttribute("scams", scams);
