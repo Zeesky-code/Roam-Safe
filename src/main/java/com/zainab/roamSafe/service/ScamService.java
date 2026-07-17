@@ -37,6 +37,15 @@ public class ScamService {
         return scamReportRepository.findTop5ByStatusOrderByCreatedAtDesc(ScamReportStatus.APPROVED);
     }
 
+    /** Most recent approved reports, honouring {@code limit} (feed stream). */
+    public List<ScamReport> getRecentApproved(int limit) {
+        return scamReportRepository
+                .findByStatusOrderByCreatedAtDesc(ScamReportStatus.APPROVED)
+                .stream()
+                .limit(limit)
+                .toList();
+    }
+
     public List<ScamReport> getReportsByCity(String city) {
         return scamReportRepository.findByCityIgnoreCaseAndStatusOrderBySeverityScoreDesc(city,
                 ScamReportStatus.APPROVED);

@@ -106,7 +106,7 @@ public class SeedController {
         private ScamReport createReport(String city, String name, String description, String zoneStr, String prevention,
                         String neighborhood, int rating, String category) {
                 // Ensure city exists
-                if (cityRepository.findByName(city) == null) {
+                if (cityRepository.findFirstByName(city) == null) {
                         cityRepository.save(new City(city, "Unknown")); // Default country to Unknown for now
                 }
 
@@ -134,16 +134,11 @@ public class SeedController {
          */
         @PostMapping("/bulk")
         public ResponseEntity<String> bulkSeed(@RequestBody List<BulkScamReportRequest> reports) {
-                if (scamReportRepository.count() > 0) {
-                        return ResponseEntity.badRequest().body(
-                                        "Database is not empty. Skipping bulk seed. Please clear the database first.");
-                }
-
                 List<ScamReport> entities = new ArrayList<>();
 
                 for (BulkScamReportRequest req : reports) {
                         // Ensure city exists
-                        if (cityRepository.findByName(req.city()) == null) {
+                        if (cityRepository.findFirstByName(req.city()) == null) {
                                 cityRepository.save(new City(req.city(), "Unknown"));
                         }
 

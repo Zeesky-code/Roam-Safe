@@ -43,3 +43,7 @@ scripts/
 *.log
 app.pid
 run_dev.sh
+
+design_handoff_roamsafe/
+Screen design project.zip
+plan.md

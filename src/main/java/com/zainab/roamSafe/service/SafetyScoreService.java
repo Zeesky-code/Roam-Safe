@@ -28,8 +28,44 @@ public class SafetyScoreService {
         this.cityRepository = cityRepository;
     }
 
+    /** More weight to recent reports so the score tracks current conditions. */
+    private static double recencyWeight(LocalDateTime when) {
+        if (when == null) {
+            return 0.5;
+        }
+        long months = java.time.temporal.ChronoUnit.MONTHS.between(when, LocalDateTime.now());
+        if (months <= 3)
+            return 1.0;
+        if (months <= 6)
+            return 0.7;
+        if (months <= 12)
+            return 0.5;
+        return 0.3;
+    }
+
+    /** acc[0] += risk*weight; acc[1] += weight. */
+    private static void accumulate(double[] acc, double risk, double weight) {
+        acc[0] += risk * weight;
+        acc[1] += weight;
+    }
+
+    /** Weighted mean risk in 0..1 (0 when the bucket is empty). */
+    private static double weightedAverage(double[] acc) {
+        return acc[1] > 0 ? acc[0] / acc[1] : 0.0;
+    }
+
+    /**
+     * Map average risk (0..1) to a 1..100 safety score. The 0.85 slope keeps an
+     * all-severe city near 15 rather than 0, so the scale stays informative, and
+     * SafetyScore's @Min(1)/@Max(100) constraints are always satisfied.
+     */
+    private static int riskToScore(double avgRisk) {
+        int raw = (int) Math.round(100 - avgRisk * 85);
+        return Math.max(1, Math.min(100, raw));
+    }
+
     public SafetyScore getScoreForCity(String cityName) {
-        City city = cityRepository.findByName(cityName);
+        City city = cityRepository.findFirstByName(cityName);
         if (city == null) {
             return null;
         }
@@ -54,54 +90,43 @@ public class SafetyScoreService {
 
         int totalReports = reports.size();
         int recentReports = 0;
-        int sumSeverity = 0;
-        int financialSeverity = 0;
-        int physicalSeverity = 0;
-        int digitalSeverity = 0;
-        int financialCount = 0;
-        int physicalCount = 0;
-        int digitalCount = 0;
-
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
 
+        // Buckets of (weightedRisk, weight) accumulators per dimension.
+        double[] allRisk = new double[2]; // [sumRisk*weight, sumWeight]
+        double[] finRisk = new double[2];
+        double[] physRisk = new double[2];
+        double[] digRisk = new double[2];
+
         for (ScamReport report : reports) {
-            if (report.getCreatedAt().isAfter(sixMonthsAgo)) {
+            if (report.getCreatedAt() != null && report.getCreatedAt().isAfter(sixMonthsAgo)) {
                 recentReports++;
             }
-            sumSeverity += report.getSeverityScore();
+            double risk = report.getSeverityScore() / 10.0; // 0.1 .. 1.0
+            double weight = recencyWeight(report.getCreatedAt());
+            accumulate(allRisk, risk, weight);
 
             String cat = report.getCategory() != null ? report.getCategory().toLowerCase() : "";
             if (cat.contains("financial") || cat.contains("theft")) {
-                financialSeverity += report.getSeverityScore();
-                financialCount++;
+                accumulate(finRisk, risk, weight);
             } else if (cat.contains("harassment") || cat.contains("social") || cat.contains("tourism")) {
-                physicalSeverity += report.getSeverityScore();
-                physicalCount++;
+                accumulate(physRisk, risk, weight);
             } else if (cat.contains("digital")) {
-                digitalSeverity += report.getSeverityScore();
-                digitalCount++;
+                accumulate(digRisk, risk, weight);
             }
         }
 
-        // Simplified Scoring Algorithm
-        // 100 = Perfect Safety
-        // Deduct points based on volume and severity
-        // Base deduction per report: 2 points
-        // Extra deduction for severity > 5: severity points
-
-        int penalty = 0;
-        for (ScamReport report : reports) {
-            penalty += 2;
-            if (report.getSeverityScore() > 5) {
-                penalty += (report.getSeverityScore() - 5);
-            }
-        }
-
-        // Normalize scores
-        int overallScore = Math.max(0, 100 - penalty);
-        int financeScore = Math.max(0, 100 - (financialCount * 5 + financialSeverity));
-        int physicalScore = Math.max(0, 100 - (physicalCount * 5 + physicalSeverity));
-        int digitalScore = Math.max(0, 100 - (digitalCount * 5 + digitalSeverity));
+        // Recency-weighted AVERAGE severity (0..1), independent of report volume:
+        // a well-documented city no longer scores as dangerous just for having
+        // more reports. Volume is expressed through confidence instead. Mapping
+        // avg-risk → score with a 0.85 slope floors an all-severe city near 15
+        // rather than 0, keeping the scale meaningful.
+        int overallScore = riskToScore(weightedAverage(allRisk));
+        // Category sub-scores fall back to the overall figure when a category has
+        // no reports, so they're never a misleading "0 risk / perfectly safe".
+        int financeScore = finRisk[1] > 0 ? riskToScore(weightedAverage(finRisk)) : overallScore;
+        int physicalScore = physRisk[1] > 0 ? riskToScore(weightedAverage(physRisk)) : overallScore;
+        int digitalScore = digRisk[1] > 0 ? riskToScore(weightedAverage(digRisk)) : overallScore;
 
         SafetyScore score = safetyScoreRepository.findByCity(city).orElse(new SafetyScore());
         score.setCity(city);

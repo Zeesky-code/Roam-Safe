@@ -3,6 +3,7 @@ package com.zainab.roamSafe.controller;
 import java.util.List;
 import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.service.ScamService;
+import com.zainab.roamSafe.service.DestinationService;
 import com.zainab.roamSafe.model.User;
 
 import org.springframework.stereotype.Controller;
@@ -17,9 +18,11 @@ import jakarta.servlet.http.HttpSession;
 public class ScamController {
 
     private final ScamService scamService;
+    private final DestinationService destinationService;
 
-    public ScamController(ScamService scamService) {
+    public ScamController(ScamService scamService, DestinationService destinationService) {
         this.scamService = scamService;
+        this.destinationService = destinationService;
     }
 
     @GetMapping
@@ -27,40 +30,36 @@ public class ScamController {
             Model model,
             HttpSession session) {
 
-        // Always pass user login status
         User user = (User) session.getAttribute("user");
         boolean isLoggedIn = user != null;
+        boolean isPro = isLoggedIn && user.isPro();
         model.addAttribute("isLoggedIn", isLoggedIn);
+        model.addAttribute("isPro", isPro);
 
         if (city != null && !city.isEmpty()) {
-            List<ScamReport> scams = scamService.getReportsByCity(city);
+            // --- Destination report for one city ---
+            List<ScamReport> allScams = scamService.getReportsByCity(city);
+            int totalScams = allScams.size();
 
-            int totalScams = scams.size();
+            // Stats/score use the full list; the card list is paywalled.
+            model.addAttribute("destination", destinationService.build(city, allScams));
 
-            if (!isLoggedIn && scams.size() > 3) {
-                // Show only first 3 scams for non-logged-in users
-                scams = scams.subList(0, 3);
-                model.addAttribute("showLoginPrompt", true);
-                model.addAttribute("totalScams", totalScams);
-            } else if (isLoggedIn && !user.isPro() && scams.size() > 3) {
-                // Logged in but not Pro: show limited reports + upgrade prompt
-                scams = scams.subList(0, 3);
-                model.addAttribute("showUpgradePrompt", true);
-                model.addAttribute("totalScams", totalScams);
+            List<ScamReport> visible = allScams;
+            if (!isPro && totalScams > 3) {
+                visible = allScams.subList(0, 3);
+                model.addAttribute(isLoggedIn ? "showUpgradePrompt" : "showLoginPrompt", true);
             }
-
-            model.addAttribute("scams", scams);
+            model.addAttribute("scams", visible);
+            model.addAttribute("totalScams", totalScams);
             model.addAttribute("selectedCity", city);
-        } else {
-            // Dashboard mode
-            List<Object[]> topCities = scamService.getTopCities(6);
-            List<ScamReport> recentReports = scamService.getRecentReports(5);
-
-            model.addAttribute("topCities", topCities);
-            model.addAttribute("recentReports", recentReports);
-            model.addAttribute("selectedCity", null);
+            return "destination";
         }
 
+        // --- Scam library (no city) ---
+        model.addAttribute("topCities", scamService.getTopCities(8));
+        model.addAttribute("recentReports", scamService.getRecentReports(5));
+        model.addAttribute("libraryReports", scamService.getRecentReports(12));
+        model.addAttribute("selectedCity", null);
         return "scams";
     }
 }

@@ -2,193 +2,102 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Safety Intelligence - RoamSafe</title>
-
-  <!-- Custom Theme -->
-  <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
-  <!-- Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scam library · RoamSafe</title>
+    <meta name="description"
+        content="A searchable library of travel scams: warning signs and how travelers got out clean. Evidence-backed, never invented." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
 
-  <!-- LEFT SIDEBAR NAV -->
-  <div class="sidebar-left">
-    <div class="sidebar-logo">R</div>
-    <a href="/" class="nav-item" title="Home"><i data-lucide="map"></i></a>
-    <a href="/scams" class="nav-item active" title="Destinations"><i data-lucide="compass"></i></a>
-    <a href="/submit" class="nav-item" title="Report Scam"><i data-lucide="file-plus-2"></i></a>
-    <a href="#" class="nav-item" title="About"><i data-lucide="info"></i></a>
-    <div class="spacer"></div>
-    <a href="/login" class="nav-item" title="Sign In"><i data-lucide="log-in"></i></a>
-  </div>
+    <div th:replace="~{fragments/shell :: nav('scams')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
 
-  <!-- MAIN CONTENT AREA -->
-  <div class="scams-layout">
+    <main class="rs-wrap">
 
-    <!-- HEADER -->
-    <header
-      style="margin-bottom: 2rem; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <h1
-          style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 12px;">
-          <i data-lucide="shield-alert" style="color: var(--primary-accent);"></i>
-          <span th:text="${selectedCity != null ? selectedCity : 'Global'}">City</span>
-          <span style="font-weight: 300; opacity: 0.6;">Intelligence</span>
-        </h1>
-        <p style="color: var(--text-secondary); font-size: 1.1rem;">Live risk reports and safety analysis.</p>
-      </div>
-
-      <!-- SEARCH PILL -->
-      <form action="/scams" method="get">
-        <div
-          style="background: white; padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; box-shadow: var(--shadow-soft); border: 1px solid var(--border-color);">
-          <i data-lucide="search" style="color: var(--text-secondary); width: 18px;"></i>
-          <input type="text" name="city" placeholder="Analyze another city..." th:value="${selectedCity}"
-            style="border: none; outline: none; padding: 8px; font-size: 1rem; color: var(--text-primary); background: transparent; width: 200px;">
-        </div>
-      </form>
-    </header>
-
-    <!-- DASHBOARD VIEW (When no city selected) -->
-    <div th:if="${selectedCity == null}">
-
-      <!-- TOP CITIES ROW -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.5rem; color: var(--text-primary);"><i data-lucide="trending-up"
-            style="width: 20px; display: inline-block; margin-right: 8px;"></i> Trending Hotspots</h2>
-      </div>
-
-      <div
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 3rem;">
-        <a th:each="cityData : ${topCities}" th:href="@{/scams(city=${cityData[0]})}" class="glass-panel"
-          style="padding: 20px; text-decoration: none; color: inherit; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; border: 1px solid transparent;">
-          <span th:text="${cityData[0]}" style="font-weight: 700; font-size: 1.1rem;">City Name</span>
-          <span th:text="${cityData[1]}"
-            style="background: #ffebee; color: #d32f2f; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;">12</span>
-        </a>
-      </div>
-
-      <!-- RECENT ALERTS -->
-      <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary);"><i data-lucide="activity"
-          style="width: 20px; display: inline-block; margin-right: 8px;"></i> Recent Global Alerts</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
-        <div th:each="scam : ${recentReports}" class="glass-panel"
-          style="padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-          <!-- City Badge -->
-          <div
-            style="position: absolute; top: 0; right: 0; background: var(--primary-accent); color: white; padding: 6px 16px; border-bottom-left-radius: 16px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;"
-            th:text="${scam.city}">CITY</div>
-
-          <div
-            style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
-            <i data-lucide="clock" style="width: 14px;"></i> Just now
-          </div>
-
-          <h3 th:text="${scam.name}"
-            style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Scam Name</h3>
-
-          <p th:text="${#strings.abbreviate(scam.description, 120)}"
-            style="color: #666; font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px; flex-grow: 1;"></p>
-
-          <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 16px; margin-top: auto;">
-            <a th:href="@{/scams(city=${scam.city})}"
-              style="color: var(--primary-accent); font-weight: 600; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-              View Report <i data-lucide="arrow-right" style="width: 14px;"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CITY REPORTS GRID (When city selected) -->
-    <div th:if="${selectedCity != null}">
-
-      <!-- FILTERS -->
-      <div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-        <button class="glass-panel"
-          style="padding: 10px 20px; cursor: pointer; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
-          <i data-lucide="filter" style="width: 16px;"></i> All Reports
-        </button>
-        <button class="glass-panel"
-          style="padding: 10px 20px; cursor: pointer; color: #d32f2f; background: #ffebee; border-color: #ffcdd2;">
-          <i data-lucide="alert-triangle" style="width: 16px; display: inline-block; vertical-align: text-bottom;"></i>
-          High Risk
-        </button>
-        <button class="glass-panel"
-          style="padding: 10px 20px; cursor: pointer; color: #f57f17; background: #fff3e0; border-color: #ffe0b2;">
-          <i data-lucide="eye" style="width: 16px; display: inline-block; vertical-align: text-bottom;"></i> Caution
-        </button>
-      </div>
-
-      <!-- REPORTS GRID -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
-
-        <div th:each="scam : ${scams}" class="glass-panel" style="padding: 24px; position: relative; overflow: hidden;">
-          <!-- Decorative Icon Background -->
-          <i data-lucide="alert-circle"
-            style="position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; opacity: 0.05; color: var(--primary-accent);"></i>
-
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-            <span th:if="${scam.safetyZone != null}" th:text="${scam.safetyZone}"
-              style="font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;"
-              th:styleappend="${scam.safetyZone.name() == 'RED' || scam.safetyZone.name() == 'HIGH_RISK' ? 'background:#ffebee; color:#d32f2f;' : (scam.safetyZone.name() == 'YELLOW' || scam.safetyZone.name() == 'CAUTION' ? 'background:#fff3e0; color:#f57f17;' : 'background:#e8f5e9; color:#2e7d32;')}">
-              ZONE
-            </span>
-            <span style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
-              <i data-lucide="calendar" style="width: 14px;"></i> Just now
-            </span>
-          </div>
-
-          <h3 th:text="${scam.name}"
-            style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Scam Name</h3>
-
-          <div
-            style="display: flex; align-items: center; gap: 6px; margin-bottom: 16px; color: var(--text-secondary); font-size: 0.9rem;">
-            <i data-lucide="map-pin" style="width: 16px; color: var(--primary-accent);"></i>
-            <span th:text="${scam.neighborhood}">Location</span>
-          </div>
-
-          <p th:text="${scam.description}"
-            style="color: #666; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
-            Description...
-          </p>
-
-          <!-- Tip Box -->
-          <div th:if="${scam.preventionTips != null}"
-            style="background: rgba(255, 255, 255, 0.6); border-radius: 12px; padding: 12px; border-left: 4px solid var(--primary-accent);">
-            <div
-              style="display: flex; align-items: center; gap: 6px; color: var(--primary-accent); font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">
-              <i data-lucide="lightbulb" style="width: 14px;"></i> PRO TIP
+        <!-- Header -->
+        <section class="rs-page-head" style="text-align:left;max-width:none">
+            <div class="rs-eyebrow" style="justify-content:flex-start">✦ Scam library</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+                <div>
+                    <h1 style="margin-bottom:6px">Know the play before you meet it</h1>
+                    <p>Real tactics travelers reported, with the warning signs and how they got out clean.</p>
+                </div>
+                <form action="/scams" method="get" style="min-width:260px">
+                    <div class="rs-searchbar" style="box-shadow:none">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                        <input type="text" name="city" placeholder="Jump to a city…" />
+                        <button type="submit">Go</button>
+                    </div>
+                </form>
             </div>
-            <div th:text="${scam.preventionTips}" style="font-size: 0.9rem; color: var(--text-primary);">Tip...</div>
-          </div>
-        </div>
+        </section>
 
-      </div>
+        <!-- Top cities as quick chips -->
+        <section class="rs-section" style="margin-top:32px" th:if="${topCities != null and !topCities.empty}">
+            <div class="rs-eyebrow" style="margin-bottom:14px"><i data-lucide="trending-up"
+                    style="width:15px;height:15px;"></i> Most-reported destinations</div>
+            <div class="rs-popular" style="margin-top:0">
+                <a th:each="c : ${topCities}" th:href="@{/scams(city=${c[0]})}" class="rs-pill">
+                    <span th:text="${c[0]}">City</span>
+                    <span style="color:var(--muted);font-family:var(--font-mono);font-size:11px"
+                        th:text="' · ' + ${c[1]}">12</span>
+                </a>
+            </div>
+        </section>
 
-      <!-- Empty State -->
-      <div th:if="${scams != null && scams.empty}" style="text-align: center; padding: 4rem;">
-        <div class="glass-panel" style="display: inline-block; padding: 3rem;">
-          <i data-lucide="check-circle" style="width: 48px; height: 48px; color: #2e7d32; margin-bottom: 1rem;"></i>
-          <h3 style="margin-bottom: 12px;">No reports found for this location.</h3>
-          <p style="color: var(--text-secondary);">It seems safe for now, or we need more data.</p>
-          <a href="/submit"
-            style="display: inline-block; margin-top: 20px; background: var(--primary-accent); color: white; padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600;">Submit
-            a Report</a>
-        </div>
-      </div>
+        <!-- Library grid (recent tactics) -->
+        <section class="rs-section" style="margin-top:40px">
+            <div class="rs-eyebrow" style="margin-bottom:16px">Recently reported tactics</div>
+            <div class="rs-scam-grid">
+                <div class="rs-scam-card" th:each="s : ${libraryReports}">
+                    <div class="rs-scam-card-head">
+                        <span class="rs-scam-icon"
+                            th:with="sev=${s.severityScore >= 8 ? 'critical' : (s.severityScore >= 5 ? 'high' : 'low')}"
+                            th:style="'background:var(--sev-' + ${sev} + '-bg);color:var(--sev-' + ${sev} + ')'">
+                            <i data-lucide="alert-triangle" style="width:20px;height:20px;"></i>
+                        </span>
+                        <div>
+                            <span class="rs-sev-chip"
+                                th:with="sev=${s.severityScore >= 8 ? 'critical' : (s.severityScore >= 5 ? 'high' : 'low')}"
+                                th:style="'background:var(--sev-' + ${sev} + '-bg);color:var(--sev-' + ${sev} + ')'"
+                                th:text="${sev}">severity</span>
+                        </div>
+                    </div>
+                    <h4 th:text="${s.name}">Scam name</h4>
+                    <div class="rs-scam-loc">
+                        <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--forest-2)"></i>
+                        <a th:href="@{/scams(city=${s.city})}" style="color:var(--muted)"
+                            th:text="${s.city} + (${s.neighborhood} ? ' · ' + ${s.neighborhood} : '')">City</a>
+                    </div>
+                    <p class="rs-scam-desc" th:text="${#strings.abbreviate(s.description, 150)}">Description</p>
+                    <div class="rs-tip" th:if="${s.preventionTips}">
+                        <div class="rs-tip-label"><i data-lucide="shield" style="width:12px;height:12px;"></i>
+                            How to stay clear</div>
+                        <p th:text="${#strings.abbreviate(s.preventionTips, 110)}">Tip</p>
+                    </div>
+                </div>
 
-    </div> <!-- End selectedCity check -->
+                <div class="rs-empty" th:if="${libraryReports == null or libraryReports.empty}"
+                    style="grid-column:1/-1">
+                    <p>No tactics documented yet. <a href="/submit"
+                            style="color:var(--forest-2);font-weight:600">Add the first →</a></p>
+                </div>
+            </div>
+        </section>
 
-  </div>
+    </main>
 
-  <script>
-    lucide.createIcons();
-  </script>
-
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>

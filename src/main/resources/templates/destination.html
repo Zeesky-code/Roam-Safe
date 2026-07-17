@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${selectedCity} + ' · Safety intelligence · RoamSafe'">Destination · RoamSafe</title>
+    <meta name="description"
+        th:attr="content='Evidence-backed safety report for ' + ${selectedCity} + ': computed safety score, scam reports and neighborhood risk from real traveler data.'" />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('explore')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <!-- HERO BAND (gradient tint stand-in; no mislabeled stock photo) -->
+    <header class="rs-dest-hero">
+        <div class="rs-dest-hero-bg"
+            th:style="'background:linear-gradient(150deg, ' + ${destination.scoreColor} + '33, #16281D)'"></div>
+        <div class="rs-dest-hero-inner">
+            <div>
+                <div class="rs-breadcrumb">Destinations / <span th:text="${selectedCity}">City</span></div>
+                <h1 th:text="${selectedCity}">City</h1>
+                <div class="rs-dest-meta">
+                    <span th:text="${destination.updated}">updated</span>
+                    <span>·</span>
+                    <span th:text="${destination.reports} + ' traveler reports'">reports</span>
+                    <span th:if="${destination.recentReports > 0}">·</span>
+                    <span th:if="${destination.recentReports > 0}"
+                        th:text="${destination.recentReports} + ' in last 6 months'">recent</span>
+                </div>
+            </div>
+            <div class="rs-dest-actions">
+                <a href="/submit" class="rs-btn-outline"
+                    style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">
+                    <i data-lucide="plus" style="width:15px;height:15px;"></i> Add a report
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="rs-dest-body">
+
+        <!-- LEFT RAIL -->
+        <aside class="rs-rail">
+            <!-- Score card with radial ring -->
+            <div class="rs-score-card" th:if="${destination.score != null}">
+                <div class="rs-ring">
+                    <svg width="176" height="176" viewBox="0 0 176 176">
+                        <circle cx="88" cy="88" r="80" fill="none" stroke="rgba(30,40,30,.09)" stroke-width="12" />
+                        <circle cx="88" cy="88" r="80" fill="none" th:attr="stroke=${destination.scoreColor}"
+                            stroke-width="12" stroke-linecap="round" stroke-dasharray="502.65"
+                            th:style="'stroke-dashoffset:' + ${502.65 * (1 - destination.score / 100.0)}" />
+                    </svg>
+                    <div class="rs-ring-center">
+                        <span class="rs-ring-score" th:style="'color:' + ${destination.scoreColor}"
+                            th:text="${destination.score}">86</span>
+                        <span class="rs-ring-label">SAFETY SCORE</span>
+                    </div>
+                </div>
+                <div class="rs-confidence">
+                    <span class="rs-eq" style="color:var(--forest-2)">
+                        <i style="height:5px"></i><i style="height:8px"></i><i style="height:11px"></i><i
+                            style="height:7px"></i><i style="height:9px"></i>
+                    </span>
+                    <span th:text="${destination.confidencePct} + '% confidence'">92% confidence</span>
+                </div>
+            </div>
+            <div class="rs-score-card" th:unless="${destination.score != null}">
+                <p style="color:var(--muted);font-size:14px">Not enough reports to score this city yet.
+                    <a href="/submit" style="color:var(--forest-2);font-weight:600">Add the first →</a>
+                </p>
+            </div>
+
+            <!-- Risk breakdown -->
+            <div class="rs-card-panel" th:if="${!destination.meters.isEmpty()}">
+                <h3>Risk breakdown</h3>
+                <div class="rs-meter" th:each="m : ${destination.meters}">
+                    <div class="rs-meter-row">
+                        <span class="rs-meter-label" th:text="${m.label}">Label</span>
+                        <span class="rs-meter-val" th:style="'color:var(--sev-' + ${m.severity} + ')'"
+                            th:text="${m.value} + '/100'">0/100</span>
+                    </div>
+                    <div class="rs-meter-track">
+                        <div class="rs-meter-fill"
+                            th:style="'width:' + ${m.value} + '%;background:var(--sev-' + ${m.severity} + ')'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency: honest directive, NOT fabricated per-city numbers -->
+            <div class="rs-emergency">
+                <h3><i data-lucide="phone-call" style="width:13px;height:13px;"></i> Emergency</h3>
+                <div class="rs-emergency-row"><span>EU / many countries</span><span>112</span></div>
+                <div class="rs-emergency-row"><span>USA &amp; Canada</span><span>911</span></div>
+                <div class="rs-emergency-row"><span>UK</span><span>999</span></div>
+                <p style="font-size:12px;color:rgba(244,241,232,.55);margin-top:12px;line-height:1.5">
+                    Verify your destination's local emergency number before you travel. We show
+                    widely-used numbers, not city-specific ones.
+                </p>
+            </div>
+        </aside>
+
+        <!-- RIGHT CONTENT -->
+        <div>
+            <div class="rs-tabs">
+                <button type="button" class="rs-tab is-active" data-tab="overview">Overview</button>
+                <button type="button" class="rs-tab" data-tab="hoods"
+                    th:if="${!destination.neighborhoods.isEmpty()}">Neighborhoods</button>
+                <button type="button" class="rs-tab" data-tab="scams">Scam reports</button>
+            </div>
+
+            <!-- Overview -->
+            <section class="rs-tab-panel" data-panel="overview">
+                <div class="rs-card-panel">
+                    <h3>✦ What the reports say</h3>
+                    <p class="rs-lede" th:if="${destination.score != null}">
+                        <span th:text="${selectedCity}">City</span> scores
+                        <b th:text="${destination.score}" th:style="'color:' + ${destination.scoreColor}">86</b>/100,
+                        computed from <b th:text="${destination.reports}">42</b> traveler reports
+                        (<span th:text="${destination.confidencePct}">92</span>% confidence).
+                        The score reflects the recency-weighted severity of what travelers actually reported,
+                        not report volume. Every number here traces back to those reports.
+                    </p>
+                    <p class="rs-lede" th:unless="${destination.score != null}">
+                        We don't have enough reports to score <span th:text="${selectedCity}">this city</span> yet.
+                        Coverage expands as travelers contribute. Be the first to add one.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Neighborhoods -->
+            <section class="rs-tab-panel" data-panel="hoods" hidden
+                th:if="${!destination.neighborhoods.isEmpty()}">
+                <div class="rs-card-panel">
+                    <h3>Neighborhood scores</h3>
+                    <div class="rs-hood-grid">
+                        <div class="rs-hood" th:each="h : ${destination.neighborhoods}"
+                            th:style="'background:' + ${h.color} + '14'">
+                            <div class="rs-hood-score" th:style="'color:' + ${h.color}" th:text="${h.score}">88</div>
+                            <div class="rs-hood-name" th:text="${h.name}">Neighborhood</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scam reports -->
+            <section class="rs-tab-panel" data-panel="scams" hidden>
+                <div class="rs-scam-grid">
+                    <div class="rs-scam-card" th:each="s : ${scams}">
+                        <div class="rs-scam-card-head">
+                            <span class="rs-scam-icon"
+                                th:with="sev=${s.severityScore >= 8 ? 'critical' : (s.severityScore >= 5 ? 'high' : 'low')}"
+                                th:style="'background:var(--sev-' + ${sev} + '-bg);color:var(--sev-' + ${sev} + ')'">
+                                <i data-lucide="alert-triangle" style="width:20px;height:20px;"></i>
+                            </span>
+                            <div>
+                                <span class="rs-sev-chip"
+                                    th:with="sev=${s.severityScore >= 8 ? 'critical' : (s.severityScore >= 5 ? 'high' : 'low')}"
+                                    th:style="'background:var(--sev-' + ${sev} + '-bg);color:var(--sev-' + ${sev} + ')'"
+                                    th:text="${sev}">severity</span>
+                            </div>
+                        </div>
+                        <h4 th:text="${s.name}">Scam name</h4>
+                        <div class="rs-scam-loc" th:if="${s.neighborhood}">
+                            <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--forest-2)"></i>
+                            <span th:text="${s.neighborhood}">Neighborhood</span>
+                        </div>
+                        <p class="rs-scam-desc" th:text="${s.description}">Description</p>
+                        <div class="rs-tip" th:if="${s.preventionTips}">
+                            <div class="rs-tip-label"><i data-lucide="shield" style="width:12px;height:12px;"></i>
+                                How to stay clear</div>
+                            <p th:text="${s.preventionTips}">Tip</p>
+                        </div>
+                    </div>
+
+                    <!-- Paywall -->
+                    <div class="rs-paywall" th:if="${showLoginPrompt}">
+                        <h3 th:text="${totalScams - 3} + ' more reports for ' + ${selectedCity}">More reports</h3>
+                        <p>Create a free account to see the full picture for this destination.</p>
+                        <a href="/register" class="rs-btn-cream">Create free account</a>
+                    </div>
+                    <div class="rs-paywall" th:if="${showUpgradePrompt}">
+                        <h3 th:text="${totalScams - 3} + ' more reports for ' + ${selectedCity}">More reports</h3>
+                        <p>Unlock every report for this city with a Trip Pass or subscription.</p>
+                        <a href="/pricing" class="rs-btn-cream">See plans</a>
+                    </div>
+
+                    <div class="rs-empty" th:if="${scams.isEmpty()}" style="grid-column:1/-1">
+                        <p>No reports for this city yet. <a href="/submit"
+                                style="color:var(--forest-2);font-weight:600">Add the first →</a></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+
+    <script>
+        // Destination tabs
+        (function () {
+            const tabs = document.querySelectorAll('.rs-tab');
+            const panels = document.querySelectorAll('.rs-tab-panel');
+            tabs.forEach(t => t.addEventListener('click', () => {
+                tabs.forEach(x => x.classList.toggle('is-active', x === t));
+                panels.forEach(p => p.hidden = p.dataset.panel !== t.dataset.tab);
+            }));
+        })();
+    </script>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

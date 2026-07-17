@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <!-- ============ GLOBAL NAV ============ -->
+    <nav th:fragment="nav(active)" class="rs-shell-nav">
+        <div class="rs-shell-nav-inner">
+            <a href="/" class="rs-logo">
+                <span class="rs-logo-tile">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                </span>
+                <span class="rs-wordmark">Roam<span>Safe</span></span>
+            </a>
+            <div class="rs-nav-links">
+                <a href="/scams" class="rs-nav-link" th:classappend="${active == 'scams'} ? 'active'">Scam
+                    Library</a>
+                <a href="/feed" class="rs-nav-link" th:classappend="${active == 'feed'} ? 'active'">Live Feed</a>
+                <a href="/map" class="rs-nav-link" th:classappend="${active == 'map'} ? 'active'">Map</a>
+                <a href="/pricing" class="rs-nav-link" th:classappend="${active == 'pricing'} ? 'active'">Pricing</a>
+            </div>
+            <div class="rs-nav-spacer"></div>
+            <button type="button" class="rs-search-trigger" data-rs-palette-open aria-label="Search">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <span class="rs-search-label">Search anything…</span>
+                <span class="rs-kbd">⌘K</span>
+            </button>
+            <div class="rs-nav-divider"></div>
+            <a href="/login" class="rs-signin">Sign in</a>
+            <a href="/register" class="rs-btn-primary">Get started
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ============ COMMAND PALETTE (⌘K) ============ -->
+    <div th:fragment="palette(items)" class="rs-palette-overlay" data-rs-palette hidden>
+        <div class="rs-palette" role="dialog" aria-modal="true" aria-label="Search">
+            <div class="rs-palette-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input type="text" placeholder="Search cities, alerts, scams…" data-rs-palette-input
+                    aria-label="Search query" />
+                <span class="rs-kbd">esc</span>
+            </div>
+            <div class="rs-palette-results" data-rs-palette-results>
+                <th:block th:each="it, st : ${items}">
+                    <!-- Items are pre-grouped in order; emit a label when the group changes. -->
+                    <div th:if="${st.first or items[st.index - 1].group != it.group}" class="rs-palette-group-label"
+                        th:text="${it.group}" th:attr="data-group=${it.group}">Group</div>
+                    <a th:href="@{${it.href}}" class="rs-palette-row"
+                        th:attr="data-title=${#strings.toLowerCase(it.title + ' ' + it.subtitle)}">
+                        <span class="rs-palette-icon">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </span>
+                        <span>
+                            <span class="rs-palette-title" th:text="${it.title}">Title</span><br>
+                            <span class="rs-palette-sub" th:text="${it.subtitle}">Subtitle</span>
+                        </span>
+                        <span class="rs-palette-arrow">→</span>
+                    </a>
+                </th:block>
+                <div class="rs-palette-empty" data-rs-palette-empty hidden>
+                    No matches. Try “Tokyo”, “taxi”, or “strike”.
+                </div>
+            </div>
+            <div class="rs-palette-footer">
+                <span>↵ open</span>
+                <span>↑↓ navigate</span>
+                <span class="rs-palette-evidence">✦ Evidence-linked results</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <footer th:fragment="footer" class="rs-footer">
+        <!-- "Never invents" trust promise, shown on every page -->
+        <div class="rs-footer-inner">
+            <div>
+                <span class="rs-wordmark" style="font-size:17px;">Roam<span>Safe</span></span>
+                <p class="rs-footer-blurb">
+                    Evidence-backed travel intelligence. RoamSafe summarizes what real sources
+                    say. It never invents. Every insight links back to its evidence.
+                </p>
+            </div>
+            <div class="rs-footer-col">
+                <h4>Product</h4>
+                <a href="/scams">Explore destinations</a>
+                <a href="/scams">Scam library</a>
+                <a href="/map">Live map</a>
+                <a href="/pricing">Pricing</a>
+            </div>
+            <div class="rs-footer-col">
+                <h4>Platform</h4>
+                <a href="/submit">Submit a report</a>
+                <a href="/register">Create account</a>
+                <a href="/login">Sign in</a>
+            </div>
+            <div class="rs-footer-col">
+                <h4>Company</h4>
+                <a href="/">About</a>
+                <a href="/pricing">Plans</a>
+            </div>
+        </div>
+        <div class="rs-footer-bottom">
+            <span>© 2026 RoamSafe, Inc.</span>
+            <span>Made for the curious traveler · AI summarizes, evidence decides.</span>
+        </div>
+    </footer>
+
+    <!-- ============ SHELL SCRIPT (palette open/close + live filter) ============ -->
+    <th:block th:fragment="script">
+        <script>
+            (function () {
+                const overlay = document.querySelector('[data-rs-palette]');
+                if (!overlay) return;
+                const input = overlay.querySelector('[data-rs-palette-input]');
+                const results = overlay.querySelector('[data-rs-palette-results]');
+                const empty = overlay.querySelector('[data-rs-palette-empty]');
+                const rows = Array.from(results.querySelectorAll('.rs-palette-row'));
+
+                // Each group label owns the rows that follow it up to the next label.
+                const groups = Array.from(results.querySelectorAll('.rs-palette-group-label'))
+                    .map(label => {
+                        const owned = [];
+                        let el = label.nextElementSibling;
+                        while (el && el.classList.contains('rs-palette-row')) {
+                            owned.push(el);
+                            el = el.nextElementSibling;
+                        }
+                        return { label, owned };
+                    });
+
+                function open() {
+                    overlay.hidden = false;
+                    setTimeout(() => input.focus(), 20);
+                }
+                function close() {
+                    overlay.hidden = true;
+                    input.value = '';
+                    filter('');
+                }
+                function filter(q) {
+                    q = q.trim().toLowerCase();
+                    let anyVisible = false;
+                    rows.forEach(r => {
+                        const match = !q || (r.dataset.title || '').includes(q);
+                        r.style.display = match ? '' : 'none';
+                        if (match) anyVisible = true;
+                    });
+                    groups.forEach(g => {
+                        const visible = g.owned.some(r => r.style.display !== 'none');
+                        g.label.style.display = visible ? '' : 'none';
+                    });
+                    empty.hidden = anyVisible;
+                }
+
+                document.querySelectorAll('[data-rs-palette-open]').forEach(b =>
+                    b.addEventListener('click', open));
+                overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+                input.addEventListener('input', () => filter(input.value));
+                document.addEventListener('keydown', e => {
+                    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                        e.preventDefault();
+                        overlay.hidden ? open() : close();
+                    } else if (e.key === 'Escape' && !overlay.hidden) {
+                        close();
+                    }
+                });
+            })();
+        </script>
+    </th:block>
+
+</body>
+
+</html>

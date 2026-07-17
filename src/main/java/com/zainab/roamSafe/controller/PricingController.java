@@ -24,7 +24,7 @@ public class PricingController {
         model.addAttribute("isPro", isLoggedIn && user.isPro());
 
         if ("true".equals(success)) {
-            model.addAttribute("successMessage", "Welcome to Traveler Pro! Your subscription is now active.");
+            model.addAttribute("successMessage", "Welcome to Nomad! Your subscription is now active.");
         }
         if ("true".equals(canceled)) {
             model.addAttribute("cancelMessage", "Payment was canceled. You can try again anytime.");
@@ -33,6 +33,7 @@ public class PricingController {
             model.addAttribute("infoMessage", "You're already a Pro member!");
         }
 
+        model.addAttribute("proPlan", isLoggedIn ? user.getProPlan() : null);
         return "pricing";
     }
 }

@@ -53,6 +53,11 @@ public class User {
 
     private LocalDateTime subscriptionExpiry;
 
+    // "subscription" or "trip_pass" — distinguishes how Pro access was granted,
+    // so a subscription cancellation doesn't cut a still-valid Trip Pass short
+    // and a Trip Pass doesn't get silently auto-renewed by billing webhooks.
+    private String proPlan;
+
     // Default constructor
     public User() {
     }
@@ -194,5 +199,13 @@ public class User {
 
     public void setSubscriptionExpiry(LocalDateTime subscriptionExpiry) {
         this.subscriptionExpiry = subscriptionExpiry;
+    }
+
+    public String getProPlan() {
+        return proPlan;
+    }
+
+    public void setProPlan(String proPlan) {
+        this.proPlan = proPlan;
     }
 }

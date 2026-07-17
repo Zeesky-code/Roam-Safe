@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live intelligence feed · RoamSafe</title>
+    <meta name="description"
+        content="What's changing right now. A live stream of traveler-reported safety signals, filterable by category and severity." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('feed')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-feed-head">
+            <div>
+                <div class="rs-eyebrow"><span class="rs-live-dot"></span> Live intelligence feed</div>
+                <h1>What's changing, right now</h1>
+            </div>
+            <div class="rs-feed-count">
+                <b data-count th:text="${signalCount}">0</b>
+                <span>active signals</span>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <div class="rs-filter-bar">
+            <span class="rs-filter-label">Category</span>
+            <button type="button" class="rs-chip is-active" data-cat="all">All</button>
+            <button type="button" class="rs-chip" th:each="c : ${categories}" th:attr="data-cat=${c}"
+                th:text="${c}">Category</button>
+            <span class="rs-chip-divider"></span>
+            <span class="rs-filter-label">Severity</span>
+            <button type="button" class="rs-chip is-active" data-sevfilter="all">Any</button>
+            <button type="button" class="rs-chip" data-sevfilter="low" data-sev="low">Low</button>
+            <button type="button" class="rs-chip" data-sevfilter="medium" data-sev="medium">Medium</button>
+            <button type="button" class="rs-chip" data-sevfilter="high" data-sev="high">High</button>
+            <button type="button" class="rs-chip" data-sevfilter="critical" data-sev="critical">Critical</button>
+        </div>
+
+        <!-- Feed -->
+        <div class="rs-feed-list" data-feed>
+            <article class="rs-signal" th:each="s : ${signals}" th:attr="data-cat=${s.category},data-sev=${s.severity}">
+                <div class="rs-signal-bar" th:style="'background:var(--sev-' + ${s.severity} + ')'"></div>
+                <div class="rs-signal-icon"
+                    th:style="'background:var(--sev-' + ${s.severity} + '-bg);color:var(--sev-' + ${s.severity} + ')'">
+                    <i data-lucide="alert-triangle" style="width:20px;height:20px;"></i>
+                </div>
+                <div class="rs-signal-body">
+                    <div class="rs-signal-top">
+                        <span class="rs-sev-chip"
+                            th:style="'background:var(--sev-' + ${s.severity} + '-bg);color:var(--sev-' + ${s.severity} + ')'"
+                            th:text="${s.severity}">sev</span>
+                        <span class="rs-signal-cat" th:text="${s.category}">Category</span>
+                        <span class="rs-signal-loc" th:text="${s.city}">City</span>
+                        <span class="rs-signal-time" th:text="${s.time}">time</span>
+                    </div>
+                    <div class="rs-signal-title" th:text="${s.title}">Signal title</div>
+                    <div class="rs-signal-desc" th:text="${#strings.abbreviate(s.description, 180)}">Description</div>
+                    <div class="rs-signal-foot">
+                        <span>Traveler-reported</span>
+                        <a th:href="@{${s.href}}">View evidence →</a>
+                    </div>
+                </div>
+            </article>
+
+            <div class="rs-empty" data-empty hidden>
+                <p>No signals match these filters.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+
+    <script>
+        // Feed filters: category (single-select) AND severity (single-select).
+        (function () {
+            const catChips = document.querySelectorAll('[data-cat]:not(.rs-signal)');
+            const sevChips = document.querySelectorAll('[data-sevfilter]');
+            const signals = Array.from(document.querySelectorAll('.rs-signal'));
+            const empty = document.querySelector('[data-empty]');
+            const count = document.querySelector('[data-count]');
+            let cat = 'all', sev = 'all';
+
+            function apply() {
+                let visible = 0;
+                signals.forEach(s => {
+                    const ok = (cat === 'all' || s.dataset.cat === cat) &&
+                        (sev === 'all' || s.dataset.sev === sev);
+                    s.style.display = ok ? '' : 'none';
+                    if (ok) visible++;
+                });
+                empty.hidden = visible > 0;
+                count.textContent = visible;
+            }
+            catChips.forEach(c => c.addEventListener('click', () => {
+                cat = c.dataset.cat;
+                catChips.forEach(x => x.classList.toggle('is-active', x === c));
+                apply();
+            }));
+            sevChips.forEach(c => c.addEventListener('click', () => {
+                sev = c.dataset.sevfilter;
+                sevChips.forEach(x => x.classList.toggle('is-active', x === c));
+                apply();
+            }));
+        })();
+    </script>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

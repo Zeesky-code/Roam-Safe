@@ -32,4 +32,16 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
     // Count reports by city and order by count descending
     @org.springframework.data.jpa.repository.Query("SELECT s.city, COUNT(s) as reportCount FROM ScamReport s WHERE s.status = 'APPROVED' GROUP BY s.city ORDER BY reportCount DESC")
     List<Object[]> findTopCities(Pageable pageable);
+
+    // --- Landing stats (counted in SQL rather than by loading every row) ---
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(DISTINCT s.city) FROM ScamReport s WHERE s.status = 'APPROVED'")
+    long countDistinctCities();
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(DISTINCT s.neighborhood) FROM ScamReport s WHERE s.status = 'APPROVED' AND s.neighborhood IS NOT NULL AND s.neighborhood <> ''")
+    long countDistinctNeighborhoods();
+
+    long countByStatus(ScamReportStatus status);
+
+    long countByStatusAndSafetyZone(ScamReportStatus status, com.zainab.roamSafe.model.SafetyZone safetyZone);
 }

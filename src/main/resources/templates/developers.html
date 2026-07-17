@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Developers · RoamSafe API</title>
+    <meta name="description"
+        content="Travel intelligence as an endpoint. Query real safety scores and a live alert feed over a simple JSON API." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('developers')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <!-- Hero -->
+        <section class="rs-dev-hero">
+            <div>
+                <div class="rs-eyebrow">✦ API</div>
+                <h1>Travel intelligence, as an endpoint</h1>
+                <p class="rs-lede">Query the same evidence-backed safety data that powers RoamSafe: city risk
+                    scores and a live alert feed, over a simple JSON API. Structured, not scraped.</p>
+                <div class="rs-dev-btns">
+                    <a href="mailto:zainablaw1012@gmail.com?subject=RoamSafe%20API%20key%20request"
+                        class="rs-btn-primary" style="height:42px;padding:0 20px">Request an API key</a>
+                    <button type="button" class="rs-btn-outline" style="height:42px;padding:0 20px"
+                        data-rs-palette-open>Explore the data</button>
+                </div>
+            </div>
+
+            <!-- Code window (real endpoint, real X-API-KEY header) -->
+            <div class="rs-code">
+                <div class="rs-code-bar">
+                    <span class="rs-code-dot" style="background:#e06c5b"></span>
+                    <span class="rs-code-dot" style="background:#d8b24a"></span>
+                    <span class="rs-code-dot" style="background:#5C8A5A"></span>
+                    <span class="rs-code-title">briefing.py</span>
+                </div>
+                <pre><span class="c"># Get the risk profile for a city</span>
+<span class="k">import</span> requests
+
+r = requests.get(
+    <span class="s">"https://api.roamsafe.app/api/v1/risk/city/Tokyo"</span>,
+    headers={<span class="s">"X-API-KEY"</span>: <span class="s">"your_key_here"</span>},
+)
+data = r.json()
+
+<span class="k">print</span>(data[<span class="s">"overallScore"</span>])   <span class="c"># 0-100</span>
+<span class="k">print</span>(data[<span class="s">"riskLevel"</span>])      <span class="c"># LOW | MODERATE | HIGH | CRITICAL</span>
+<span class="k">for</span> a <span class="k">in</span> data[<span class="s">"latestAlerts"</span>]:
+    <span class="k">print</span>(a[<span class="s">"name"</span>], a[<span class="s">"severityScore"</span>])</pre>
+            </div>
+        </section>
+
+        <!-- Feature grid -->
+        <section class="rs-section">
+            <div class="rs-dev-features">
+                <div class="rs-dev-card">
+                    <div class="rs-dev-tile"><i data-lucide="layers"></i></div>
+                    <h4>Structured, not scraped</h4>
+                    <p>Scores, risk breakdowns and alerts as clean JSON, not HTML you have to parse.</p>
+                </div>
+                <div class="rs-dev-card">
+                    <div class="rs-dev-tile"><i data-lucide="link"></i></div>
+                    <h4>Evidence-backed</h4>
+                    <p>Every score is computed from real traveler reports, the same data the site shows.</p>
+                </div>
+                <div class="rs-dev-card">
+                    <div class="rs-dev-tile"><i data-lucide="activity"></i></div>
+                    <h4>Live alert feed</h4>
+                    <p>Poll a paginated global feed of the newest approved reports as they land.</p>
+                </div>
+                <div class="rs-dev-card">
+                    <div class="rs-dev-tile"><i data-lucide="sparkles"></i></div>
+                    <h4>MCP server</h4>
+                    <p>Native Model Context Protocol access for AI agents. On the roadmap.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Endpoints (the two that actually exist today) -->
+        <section class="rs-section">
+            <div class="rs-eyebrow" style="margin-bottom:14px">Available endpoints</div>
+            <div class="rs-endpoints">
+                <div class="rs-endpoint">
+                    <span class="rs-method get">GET</span>
+                    <code>/api/v1/risk/city/{city}</code>
+                    <span class="rs-endpoint-desc">Safety score, risk breakdown, summary and latest alerts for a
+                        city</span>
+                </div>
+                <div class="rs-endpoint">
+                    <span class="rs-method get">GET</span>
+                    <code>/api/v1/alerts/feed?page=0&amp;size=20</code>
+                    <span class="rs-endpoint-desc">Paginated global feed of the newest approved reports</span>
+                </div>
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin-top:12px;font-family:var(--font-mono)">
+                All requests require an <code>X-API-KEY</code> header. More endpoints (webhooks, neighborhood
+                detail, MCP) are on the roadmap.
+            </p>
+        </section>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

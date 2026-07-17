@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trip planner · RoamSafe</title>
+    <meta name="description"
+        content="Turn a destination into a calm, evidence-backed safety briefing before you pack." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('planner')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section style="padding-top:56px">
+            <div class="rs-eyebrow">✦ Trip planner</div>
+            <h1 class="rs-h2" style="font-size:40px;margin-bottom:6px">Your briefing, before you pack</h1>
+            <p class="rs-lede" style="max-width:560px">Enter a destination and we'll build a safety briefing from real
+                traveler reports. Every figure links back to its evidence.</p>
+        </section>
+
+        <div class="rs-planner">
+
+            <!-- Form -->
+            <form class="rs-planner-form" action="/planner" method="get">
+                <div class="rs-field">
+                    <label>Destination</label>
+                    <input type="text" name="city" th:value="${city}" placeholder="e.g. Lisbon" required />
+                </div>
+                <div class="rs-field">
+                    <label>Dates (optional)</label>
+                    <input type="text" name="dates" placeholder="Sep 12 – 18" />
+                </div>
+                <div class="rs-field">
+                    <label>Traveler profile</label>
+                    <div class="rs-profile-chips">
+                        <span class="rs-profile-chip is-active" data-profile="solo">Solo</span>
+                        <span class="rs-profile-chip" data-profile="woman">Solo woman</span>
+                        <span class="rs-profile-chip" data-profile="family">Family</span>
+                        <span class="rs-profile-chip" data-profile="nomad">Nomad</span>
+                    </div>
+                </div>
+                <button type="submit" class="rs-btn-primary" style="width:100%;justify-content:center">Build
+                    briefing</button>
+                <p class="rs-planner-note">RoamSafe summarizes real reports. It never invents. Profiles tailor the
+                    emphasis, not the facts.</p>
+            </form>
+
+            <!-- Output -->
+            <div class="rs-planner-out">
+
+                <!-- Empty state -->
+                <div class="rs-card-panel" th:unless="${hasBriefing}">
+                    <h3>No destination yet</h3>
+                    <p class="rs-lede">Enter a city on the left to generate a safety briefing from real traveler
+                        reports.</p>
+                </div>
+
+                <!-- Real briefing -->
+                <th:block th:if="${hasBriefing}">
+                    <div class="rs-card-panel">
+                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                            <div th:if="${destination.score != null}"
+                                style="display:flex;flex-direction:column;align-items:center">
+                                <span style="font-size:40px;font-weight:800;letter-spacing:-.02em"
+                                    th:style="'color:' + ${destination.scoreColor}"
+                                    th:text="${destination.score}">80</span>
+                                <span
+                                    style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--muted)">SAFETY
+                                    SCORE</span>
+                            </div>
+                            <div>
+                                <h3 style="margin-bottom:4px" th:text="${city}">City</h3>
+                                <p style="font-size:13.5px;color:var(--muted)"
+                                    th:text="${destination.reports} + ' reports · ' + ${destination.confidencePct} + '% confidence · ' + ${destination.updated}">
+                                    meta</p>
+                            </div>
+                        </div>
+                        <p class="rs-profile-tailored" style="margin-top:16px;font-size:14.5px;color:var(--ink-3)">
+                            Focus for <b data-profile-label>solo travelers</b>: prioritize the risks below and the
+                            neighborhoods scored lowest.
+                        </p>
+                    </div>
+
+                    <!-- Meters -->
+                    <div class="rs-card-panel" th:if="${!destination.meters.isEmpty()}">
+                        <h3>Risk signals</h3>
+                        <div class="rs-meter" th:each="m : ${destination.meters}">
+                            <div class="rs-meter-row">
+                                <span class="rs-meter-label" th:text="${m.label}">Label</span>
+                                <span class="rs-meter-val" th:style="'color:var(--sev-' + ${m.severity} + ')'"
+                                    th:text="${m.value} + '/100'">0/100</span>
+                            </div>
+                            <div class="rs-meter-track">
+                                <div class="rs-meter-fill"
+                                    th:style="'width:' + ${m.value} + '%;background:var(--sev-' + ${m.severity} + ')'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top scams to watch -->
+                    <div class="rs-card-panel" th:if="${!topScams.isEmpty()}">
+                        <h3>Watch for these</h3>
+                        <div th:each="s : ${topScams}"
+                            style="padding:12px 0;border-top:1px solid var(--hairline)">
+                            <b th:text="${s.name}" style="font-size:14.5px;color:var(--ink)">Scam</b>
+                            <p style="font-size:13px;color:var(--ink-3);margin-top:3px"
+                                th:text="${#strings.abbreviate(s.description, 130)}">desc</p>
+                        </div>
+                        <a th:href="@{/scams(city=${city})}" class="rs-btn-outline"
+                            style="margin-top:14px;height:38px;padding:0 16px">Full destination report →</a>
+                    </div>
+
+                    <!-- Honest roadmap note -->
+                    <div class="rs-roadmap-note">
+                        <b>Coming soon:</b> AI day-by-day itineraries, offline PDF export and embassy contacts.
+                        We only ship these once they're backed by real data, never invented plans.
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+
+    <script>
+        // Traveler profile chips: tailor the emphasis line (client-side, cosmetic).
+        (function () {
+            const chips = document.querySelectorAll('.rs-profile-chip');
+            const label = document.querySelector('[data-profile-label]');
+            const words = { solo: 'solo travelers', woman: 'solo women', family: 'families', nomad: 'long-stay nomads' };
+            chips.forEach(c => c.addEventListener('click', () => {
+                chips.forEach(x => x.classList.toggle('is-active', x === c));
+                if (label) label.textContent = words[c.dataset.profile] || 'travelers';
+            }));
+        })();
+    </script>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>
