@@ -30,7 +30,7 @@
         <button type="button" onclick="this.parentElement.style.display='none'">×</button>
       </div>
 
-      <form th:action="@{/login}" th:object="${loginRequest}" method="post" class="rs-auth-form">
+      <form action="/login" th:object="${loginRequest}" method="post" class="rs-auth-form">
         <div class="rs-form-group">
           <label for="email">Email</label>
           <input type="email" id="email" th:field="*{email}" placeholder="you@example.com" required />

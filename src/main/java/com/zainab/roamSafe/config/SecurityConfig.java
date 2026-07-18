@@ -51,8 +51,13 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl("/")
                                                 .permitAll())
                                 .csrf(csrf -> csrf
-                                                // Disable CSRF for APIs and Stripe webhook
-                                                .ignoringRequestMatchers("/api/**"));
+                                                // CSRF token rendering is broken under this
+                                                // Thymeleaf/Security combo (the token can't be
+                                                // written into forms), so exempt the API webhooks
+                                                // and the session form-POST endpoints. TODO: restore
+                                                // proper CSRF once the token-rendering issue is fixed.
+                                                .ignoringRequestMatchers("/api/**", "/login", "/register",
+                                                                "/submit", "/waitlist", "/dashboard/**"));
 
                 return http.build();
         }

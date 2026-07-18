@@ -1,13 +1,9 @@
 package com.zainab.roamSafe.controller;
 
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.exception.StripeException;
-import com.stripe.model.Event;
-import com.stripe.model.checkout.Session;
-import com.stripe.net.Webhook;
-import com.stripe.param.checkout.SessionCreateParams;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.zainab.roamSafe.model.User;
 import com.zainab.roamSafe.repository.UserRepository;
+import com.zainab.roamSafe.service.BachsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,240 +13,190 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Checkout + webhook handling via Bachs (https://bachs.io), which settles to
+ * Nigerian bank accounts (Stripe cannot). Two plans: a one-time Trip Pass and a
+ * recurring Nomad subscription, each mapped to a pre-created Bachs product.
+ */
 @Controller
 public class PaymentController {
 
     private static final int TRIP_PASS_DAYS = 14;
 
-    @Value("${stripe.public.key}")
-    private String stripePublicKey;
+    @Value("${bachs.product.trip-pass}")
+    private String tripPassProduct;
 
-    @Value("${stripe.success.url}")
-    private String successUrl;
-
-    @Value("${stripe.cancel.url}")
-    private String cancelUrl;
-
-    @Value("${stripe.webhook.secret:}")
-    private String endpointSecret;
+    @Value("${bachs.product.nomad}")
+    private String nomadProduct;
 
     private final UserRepository userRepository;
+    private final BachsService bachs;
 
-    public PaymentController(UserRepository userRepository) {
+    public PaymentController(UserRepository userRepository, BachsService bachs) {
         this.userRepository = userRepository;
+        this.bachs = bachs;
     }
 
-    /**
-     * Creates a Stripe Checkout Session for the recurring Nomad subscription and
-     * redirects the user to the hosted payment page. Nomad is $10/mo, or the
-     * same billed yearly at a 25% discount.
-     */
+    /** Recurring Nomad subscription checkout ($10/mo). */
     @GetMapping("/subscribe")
-    public String createCheckoutSession(
-            @RequestParam(name = "billing", defaultValue = "monthly") String billing,
-            HttpSession httpSession) throws StripeException {
-        User user = (User) httpSession.getAttribute("user");
-
-        if (user == null) {
-            return "redirect:/login?redirect=/pricing";
-        }
-
-        // Already pro? Redirect back.
-        if (user.isPro()) {
-            return "redirect:/pricing?already_pro=true";
-        }
-
-        boolean yearly = "yearly".equals(billing);
-        long monthlyCents = 1000L; // $10.00
-        long unitAmount = yearly ? Math.round(monthlyCents * 12 * 0.75) : monthlyCents;
-        SessionCreateParams.LineItem.PriceData.Recurring.Interval interval = yearly
-                ? SessionCreateParams.LineItem.PriceData.Recurring.Interval.YEAR
-                : SessionCreateParams.LineItem.PriceData.Recurring.Interval.MONTH;
-
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setCustomerEmail(user.getEmail())
-                .setSuccessUrl(successUrl)
-                .setCancelUrl(cancelUrl)
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("usd")
-                                                .setUnitAmount(unitAmount)
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("RoamSafe Nomad")
-                                                                .setDescription(
-                                                                        "Unlimited reports & cities, real-time alerts, neighborhood scores")
-                                                                .build())
-                                                .setRecurring(
-                                                        SessionCreateParams.LineItem.PriceData.Recurring.builder()
-                                                                .setInterval(interval)
-                                                                .build())
-                                                .build())
-                                .build())
-                .putMetadata("user_id", user.getId().toString())
-                .putMetadata("plan", "subscription")
-                .putMetadata("tier", "nomad")
-                .putMetadata("billing", yearly ? "yearly" : "monthly")
-                .build();
-
-        Session session = Session.create(params);
-        return "redirect:" + session.getUrl();
+    public String subscribe(HttpSession httpSession) {
+        return startCheckout(httpSession, nomadProduct, "nomad");
     }
 
-    /**
-     * Creates a one-time Stripe Checkout Session for a Trip Pass — a fixed
-     * window of Pro access with no recurring billing, for travelers who only
-     * need it for a single trip.
-     */
+    /** One-time Trip Pass checkout ($3, 14 days). */
     @GetMapping("/trip-pass")
-    public String createTripPassCheckoutSession(HttpSession httpSession) throws StripeException {
-        User user = (User) httpSession.getAttribute("user");
+    public String tripPass(HttpSession httpSession) {
+        return startCheckout(httpSession, tripPassProduct, "trip_pass");
+    }
 
+    private String startCheckout(HttpSession httpSession, String productId, String plan) {
+        User user = (User) httpSession.getAttribute("user");
         if (user == null) {
             return "redirect:/login?redirect=/pricing";
         }
-
         if (user.isPro()) {
             return "redirect:/pricing?already_pro=true";
         }
 
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setCustomerEmail(user.getEmail())
-                .setSuccessUrl(successUrl)
-                .setCancelUrl(cancelUrl)
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("usd")
-                                                .setUnitAmount(300L) // $3.00
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("RoamSafe Trip Pass")
-                                                                .setDescription(
-                                                                        TRIP_PASS_DAYS
-                                                                                + " days of full Pro access for one trip — no subscription")
-                                                                .build())
-                                                .build())
-                                .build())
-                .putMetadata("user_id", user.getId().toString())
-                .putMetadata("plan", "trip_pass")
-                .build();
+        // Reuse the customer we created for this user, or make one.
+        String customerId = user.getBachsCustomerId();
+        if (customerId == null || customerId.isBlank()) {
+            customerId = bachs.createCustomer(user.getEmail(), user.getFullName());
+            if (customerId == null) {
+                return "redirect:/pricing?canceled=true";
+            }
+            user.setBachsCustomerId(customerId);
+            userRepository.save(user);
+        }
 
-        Session session = Session.create(params);
-        return "redirect:" + session.getUrl();
+        String url = bachs.createCheckoutUrl(customerId, productId, Map.of(
+                "user_id", user.getId().toString(),
+                "plan", plan));
+        if (url == null) {
+            return "redirect:/pricing?canceled=true";
+        }
+        return "redirect:" + url;
     }
 
     /**
-     * Stripe Webhook endpoint. Listens for checkout.session.completed events
-     * to activate user subscriptions.
+     * Bachs webhook. Grants/renews/revokes Pro from real payment events. We
+     * match the app user by the metadata user_id we set at checkout, falling
+     * back to the Bachs customer id.
      */
-    @PostMapping("/api/stripe/webhook")
+    @PostMapping("/api/bachs/webhook")
     @ResponseBody
-    public ResponseEntity<String> handleWebhook(HttpServletRequest request) {
-        String payload;
+    public ResponseEntity<String> webhook(HttpServletRequest request) {
+        String body;
         try {
-            payload = request.getReader().lines().collect(Collectors.joining("\n"));
+            body = request.getReader().lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Unable to read request body");
+            return ResponseEntity.badRequest().body("cannot read body");
         }
 
-        String sigHeader = request.getHeader("Stripe-Signature");
+        // Bachs signs with HMAC and (per the dashboard) sends a "Bachs-Signature"
+        // header; the community client used "X-Bachs-Signature". Accept both.
+        String signature = firstNonNull(request.getHeader("Bachs-Signature"),
+                request.getHeader("X-Bachs-Signature"));
+        String timestamp = firstNonNull(request.getHeader("Bachs-Timestamp"),
+                request.getHeader("X-Bachs-Timestamp"));
+        if (!bachs.verifyWebhook(body, timestamp, signature)) {
+            return ResponseEntity.status(400).body("invalid signature");
+        }
 
-        Event event;
+        JsonNode root;
         try {
-            if (endpointSecret != null && !endpointSecret.isEmpty()) {
-                event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+            root = bachs.parse(body);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("bad json");
+        }
+
+        String type = root.path("type").asText("").toLowerCase();
+        JsonNode data = root.path("data");
+        LocalDateTime now = LocalDateTime.now();
+
+        // Subscription lifecycle (Customer Subscription Created/Updated/Deleted).
+        if (type.contains("subscription")) {
+            if (type.contains("delete") || type.contains("cancel")) {
+                revoke(data);
             } else {
-                // For development without webhook secret verification
-                event = com.stripe.net.ApiResource.GSON.fromJson(payload, Event.class);
-            }
-        } catch (SignatureVerificationException e) {
-            return ResponseEntity.badRequest().body("Invalid signature");
-        }
-
-        switch (event.getType()) {
-            case "checkout.session.completed" -> handleCheckoutCompleted(event);
-            case "invoice.paid" -> handleInvoicePaid(event);
-            case "customer.subscription.deleted" -> handleSubscriptionCanceled(event);
-            default -> {
+                grant(data, "nomad", now.plusMonths(1));
             }
         }
+        // Subscription renewal (Invoice Paid) → extend another month.
+        else if (type.contains("invoice") && type.contains("paid")) {
+            grant(data, "nomad", now.plusMonths(1));
+        }
+        // A successful payment (Collection Succeeded / Conversion Completed) →
+        // grant per the checkout metadata: Trip Pass is one-time, Nomad monthly.
+        else if (isSuccess(type, data)) {
+            String plan = data.path("metadata").path("plan").asText("trip_pass");
+            LocalDateTime expiry = "nomad".equals(plan) ? now.plusMonths(1) : now.plusDays(TRIP_PASS_DAYS);
+            grant(data, plan, expiry);
+        } else {
+            System.out.println("[bachs] Unhandled webhook type: " + type);
+        }
 
-        return ResponseEntity.ok("Received");
+        return ResponseEntity.ok("ok");
     }
 
-    private void handleCheckoutCompleted(Event event) {
-        Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
-        if (session == null) {
-            return;
-        }
+    private static String firstNonNull(String a, String b) {
+        return a != null ? a : b;
+    }
 
-        String userId = session.getMetadata().get("user_id");
-        String plan = session.getMetadata().getOrDefault("plan", "subscription");
-        if (userId == null) {
-            return;
+    /** Matches Collection Succeeded, Conversion Completed, *.paid, *.succeeded, *.completed. */
+    private static boolean isSuccess(String type, JsonNode data) {
+        if (type.contains("succeed") || type.contains("complete") || type.contains("paid")) {
+            return true;
         }
+        String status = data.path("status").asText("");
+        return status.equals("succeeded") || status.equals("completed") || status.equals("paid");
+    }
 
-        userRepository.findById(Long.parseLong(userId)).ifPresent(user -> {
+    /** Grant/extend Pro for the user referenced by the event metadata/customer. */
+    private void grant(JsonNode data, String plan, LocalDateTime expiry) {
+        findUser(data).ifPresent(user -> {
             user.setPro(true);
             user.setProPlan(plan);
-            user.setStripeCustomerId(session.getCustomer());
-            LocalDateTime expiry = "trip_pass".equals(plan)
-                    ? LocalDateTime.now().plusDays(TRIP_PASS_DAYS)
-                    : LocalDateTime.now().plusMonths(1);
             user.setSubscriptionExpiry(expiry);
+            String customerId = data.path("customer").path("customer_id").asText(null);
+            if (customerId != null && !customerId.isBlank()) {
+                user.setBachsCustomerId(customerId);
+            }
             userRepository.save(user);
-            System.out.println("[STRIPE] User " + user.getEmail() + " upgraded to Pro (" + plan + ")!");
+            System.out.println("[bachs] " + user.getEmail() + " -> Pro (" + plan + ")");
         });
     }
 
-    /**
-     * Recurring subscriptions bill monthly; each successful invoice extends
-     * access by another month so Pro doesn't lapse between billing cycles.
-     * Trip Pass purchases are one-time payments and never raise invoices, so
-     * this only ever applies to subscription customers.
-     */
-    private void handleInvoicePaid(Event event) {
-        com.stripe.model.Invoice invoice = (com.stripe.model.Invoice) event.getDataObjectDeserializer()
-                .getObject().orElse(null);
-        if (invoice == null || invoice.getCustomer() == null) {
-            return;
-        }
-
-        userRepository.findByStripeCustomerId(invoice.getCustomer()).ifPresent(user -> {
-            user.setPro(true);
-            user.setProPlan("subscription");
-            user.setSubscriptionExpiry(LocalDateTime.now().plusMonths(1));
-            userRepository.save(user);
-            System.out.println("[STRIPE] User " + user.getEmail() + " subscription renewed!");
-        });
-    }
-
-    private void handleSubscriptionCanceled(Event event) {
-        com.stripe.model.Subscription subscription = (com.stripe.model.Subscription) event.getDataObjectDeserializer()
-                .getObject().orElse(null);
-        if (subscription == null || subscription.getCustomer() == null) {
-            return;
-        }
-
-        userRepository.findByStripeCustomerId(subscription.getCustomer()).ifPresent(user -> {
-            // Don't cut off a still-valid Trip Pass just because the user also
-            // once had (and canceled) a subscription on the same customer id.
-            if ("subscription".equals(user.getProPlan())) {
+    private void revoke(JsonNode data) {
+        findUser(data).ifPresent(user -> {
+            // Don't cut off a still-valid Trip Pass because a subscription ended.
+            if ("nomad".equals(user.getProPlan()) || "subscription".equals(user.getProPlan())) {
                 user.setPro(false);
                 userRepository.save(user);
-                System.out.println("[STRIPE] User " + user.getEmail() + " subscription canceled.");
+                System.out.println("[bachs] " + user.getEmail() + " subscription canceled");
             }
         });
+    }
+
+    private java.util.Optional<User> findUser(JsonNode data) {
+        String userId = data.path("metadata").path("user_id").asText(null);
+        if (userId != null && !userId.isBlank()) {
+            try {
+                java.util.Optional<User> u = userRepository.findById(Long.parseLong(userId));
+                if (u.isPresent()) {
+                    return u;
+                }
+            } catch (NumberFormatException ignored) {
+                // fall through to customer-id lookup
+            }
+        }
+        String customerId = data.path("customer").path("customer_id").asText(null);
+        if (customerId != null && !customerId.isBlank()) {
+            return userRepository.findByBachsCustomerId(customerId);
+        }
+        return java.util.Optional.empty();
     }
 }

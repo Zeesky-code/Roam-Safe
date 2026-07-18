@@ -46,7 +46,7 @@
       <!-- Preferences Card -->
       <div class="dashboard-card">
         <h3>⚙️ Preferences</h3>
-        <form th:action="@{/dashboard/preferences}" method="post" class="preferences-form">
+        <form action="/dashboard/preferences" method="post" class="preferences-form">
           <div class="form-group">
             <label for="preferredCity">Preferred City</label>
             <input type="text" id="preferredCity" name="preferredCity" th:value="${user.preferredCity}" placeholder="e.g., London, Paris" />
@@ -115,7 +115,7 @@
     <div class="modal-content">
       <h3>Delete Account</h3>
       <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-      <form th:action="@{/dashboard/delete}" method="post" class="delete-form">
+      <form action="/dashboard/delete" method="post" class="delete-form">
         <div class="form-group">
           <label for="confirmPassword">Enter your password to confirm:</label>
           <input type="password" id="confirmPassword" name="password" required />

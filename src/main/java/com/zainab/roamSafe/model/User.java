@@ -49,7 +49,9 @@ public class User {
     // Subscription fields
     private boolean pro = false;
 
-    private String stripeCustomerId;
+    private String stripeCustomerId; // legacy, retained for old records
+
+    private String bachsCustomerId; // Bachs payments customer id (cust_...)
 
     private LocalDateTime subscriptionExpiry;
 
@@ -191,6 +193,14 @@ public class User {
 
     public void setStripeCustomerId(String stripeCustomerId) {
         this.stripeCustomerId = stripeCustomerId;
+    }
+
+    public String getBachsCustomerId() {
+        return bachsCustomerId;
+    }
+
+    public void setBachsCustomerId(String bachsCustomerId) {
+        this.bachsCustomerId = bachsCustomerId;
     }
 
     public LocalDateTime getSubscriptionExpiry() {
