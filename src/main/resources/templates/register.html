@@ -1,76 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - RoamSafe</title>
-  <link rel="stylesheet" th:href="@{/css/clean-style.css}" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Create account · RoamSafe</title>
+  <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
-  <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-  <main class="auth-container">
-    <div class="auth-card">
-      <div class="auth-header">
+  <div th:replace="~{fragments/shell :: nav('')}"></div>
+  <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+  <main class="rs-auth">
+    <div class="rs-auth-card">
+      <div class="rs-auth-head">
         <h1>Join RoamSafe</h1>
-        <p>Create your account to access personalized safety features</p>
+        <p>Create your account for personalized safety intelligence</p>
       </div>
 
-      <!-- Success/Error Messages -->
-      <div th:if="${success}" class="notification success">
+      <div th:if="${success}" class="rs-note ok">
         <span th:text="${success}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+        <button type="button" onclick="this.parentElement.style.display='none'">×</button>
       </div>
-      
-      <div th:if="${error}" class="notification error">
+      <div th:if="${error}" class="rs-note err">
         <span th:text="${error}"></span>
-        <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+        <button type="button" onclick="this.parentElement.style.display='none'">×</button>
       </div>
 
-      <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="auth-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" th:field="*{firstName}" placeholder="Enter your first name" required />
-            <span th:if="${#fields.hasErrors('firstName')}" class="error-message" th:errors="*{firstName}"></span>
+      <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="rs-auth-form">
+        <div class="rs-form-row">
+          <div class="rs-form-group">
+            <label for="firstName">First name</label>
+            <input type="text" id="firstName" th:field="*{firstName}" placeholder="Jane" required />
+            <span th:if="${#fields.hasErrors('firstName')}" class="rs-auth-error" th:errors="*{firstName}"></span>
           </div>
-
-          <div class="form-group">
-            <label for="lastName">Last Name (Optional)</label>
-            <input type="text" id="lastName" th:field="*{lastName}" placeholder="Enter your last name" />
-            <span th:if="${#fields.hasErrors('lastName')}" class="error-message" th:errors="*{lastName}"></span>
+          <div class="rs-form-group">
+            <label for="lastName">Last name</label>
+            <input type="text" id="lastName" th:field="*{lastName}" placeholder="Optional" />
+            <span th:if="${#fields.hasErrors('lastName')}" class="rs-auth-error" th:errors="*{lastName}"></span>
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="rs-form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" th:field="*{email}" placeholder="Enter your email" required />
-          <span th:if="${#fields.hasErrors('email')}" class="error-message" th:errors="*{email}"></span>
+          <input type="email" id="email" th:field="*{email}" placeholder="you@example.com" required />
+          <span th:if="${#fields.hasErrors('email')}" class="rs-auth-error" th:errors="*{email}"></span>
         </div>
 
-        <div class="form-group">
+        <div class="rs-form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" th:field="*{password}" placeholder="Create a password (min 6 characters)" required />
-          <span th:if="${#fields.hasErrors('password')}" class="error-message" th:errors="*{password}"></span>
+          <input type="password" id="password" th:field="*{password}" placeholder="At least 6 characters" required />
+          <span th:if="${#fields.hasErrors('password')}" class="rs-auth-error" th:errors="*{password}"></span>
         </div>
 
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirm your password" required />
-          <span th:if="${#fields.hasErrors('confirmPassword')}" class="error-message" th:errors="*{confirmPassword}"></span>
+        <div class="rs-form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Re-enter password"
+            required />
+          <span th:if="${#fields.hasErrors('confirmPassword')}" class="rs-auth-error"
+            th:errors="*{confirmPassword}"></span>
         </div>
 
-        <button type="submit" class="btn-primary">Create Account</button>
+        <button type="submit" class="rs-btn-primary rs-auth-submit">Create account</button>
       </form>
 
-      <div class="auth-footer">
+      <div class="rs-auth-foot">
         <p>Already have an account? <a th:href="@{/login}">Sign in</a></p>
         <p><a href="/">← Back to home</a></p>
       </div>
     </div>
   </main>
 
-  <div th:replace="~{fragments/footer :: footer}"></div>
+  <div th:replace="~{fragments/shell :: footer}"></div>
+  <div th:replace="~{fragments/shell :: script}"></div>
+  <script>lucide.createIcons();</script>
 </body>
-</html> 
+
+</html>

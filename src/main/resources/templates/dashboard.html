@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - RoamSafe</title>
+  <title>Dashboard · RoamSafe</title>
   <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <div th:replace="~{fragments/shell :: nav('')}"></div>
+  <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
 
   <main class="dashboard-container">
     <div class="dashboard-header">
-      <h1>Welcome, <span th:text="${user.firstName}">User</span>! ✨</h1>
+      <h1>Welcome, <span th:text="${user.firstName}">User</span>!</h1>
       <p>Manage your RoamSafe account and preferences</p>
     </div>
 
@@ -126,7 +128,9 @@
     </div>
   </div>
 
-  <div th:replace="~{fragments/footer :: footer}"></div>
+  <div th:replace="~{fragments/shell :: footer}"></div>
+  <div th:replace="~{fragments/shell :: script}"></div>
+  <script>lucide.createIcons();</script>
 
   <script>
     function showDeleteAccountModal() {

@@ -14,19 +14,11 @@
 
 <body>
 
-  <!-- LEFT SIDEBAR NAV -->
-  <div class="sidebar-left">
-    <div class="sidebar-logo">R</div>
-    <a href="/" class="nav-item" title="Home"><i data-lucide="map"></i></a>
-    <a href="/scams" class="nav-item" title="Destinations"><i data-lucide="compass"></i></a>
-    <a href="/submit" class="nav-item active" title="Report Scam"><i data-lucide="file-plus-2"></i></a>
-    <a href="#" class="nav-item" title="About"><i data-lucide="info"></i></a>
-    <div class="spacer"></div>
-    <a href="/login" class="nav-item" title="Sign In"><i data-lucide="log-in"></i></a>
-  </div>
+  <div th:replace="~{fragments/shell :: nav('')}"></div>
+  <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
 
   <!-- MAIN CONTENT AREA -->
-  <div class="scams-layout">
+  <div class="rs-wrap">
 
     <div style="max-width: 700px; margin: 0 auto; padding-top: 40px;">
 
@@ -132,6 +124,8 @@
 
   </div>
 
+  <div th:replace="~{fragments/shell :: footer}"></div>
+  <div th:replace="~{fragments/shell :: script}"></div>
   <script>
         lucide.createIcons();
   </script>

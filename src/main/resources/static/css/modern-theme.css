@@ -2928,6 +2928,322 @@ input[type="checkbox"] {
 }
 
 /* ================================
+   MAP PAGE (Leaflet + shell nav)
+   ================================ */
+
+.rs-map-wrap {
+    position: relative;
+    height: calc(100vh - 64px);
+    overflow: hidden;
+}
+
+#map-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.rs-map-search {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    width: min(520px, 90%);
+}
+
+.rs-map-search form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, .92);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-pill);
+    padding: 8px 8px 8px 18px;
+    box-shadow: 0 8px 24px rgba(30, 45, 30, .14);
+    backdrop-filter: blur(8px);
+}
+
+.rs-map-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: var(--ink);
+    font-family: inherit;
+}
+
+.rs-map-search button {
+    background: var(--forest);
+    color: var(--cream);
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.rs-map-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 500;
+    background: rgba(255, 255, 255, .92);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    box-shadow: 0 6px 18px rgba(30, 45, 30, .12);
+    backdrop-filter: blur(8px);
+    font-size: 12.5px;
+}
+
+.rs-map-legend div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    color: var(--ink-2);
+}
+
+.rs-map-legend div:last-child {
+    margin-bottom: 0;
+}
+
+.rs-legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.rs-map-detail {
+    position: absolute;
+    top: 84px;
+    right: 20px;
+    z-index: 500;
+    width: min(340px, 90%);
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 16px 40px rgba(30, 45, 30, .2);
+    display: none;
+}
+
+.rs-map-detail.active {
+    display: block;
+    animation: rsRise .18s ease-out;
+}
+
+.rs-map-detail-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.rs-map-detail h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding-right: 20px;
+}
+
+.rs-map-detail .rs-map-loc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.rs-map-detail p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-3);
+}
+
+.rs-map-detail .rs-tip {
+    margin-top: 12px;
+}
+
+/* ================================
+   AUTH (login / register)
+   ================================ */
+
+.rs-auth {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 72px 24px 40px;
+}
+
+.rs-auth-card {
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    box-shadow: 0 18px 44px rgba(30, 45, 30, .08);
+}
+
+.rs-auth-head {
+    text-align: center;
+    margin-bottom: 26px;
+}
+
+.rs-auth-head h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--forest-ink);
+    margin-bottom: 6px;
+}
+
+.rs-auth-head p {
+    font-size: 14.5px;
+    color: var(--ink-3);
+}
+
+.rs-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rs-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.rs-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rs-form-group label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.rs-form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--hairline);
+    background: var(--paper-hi);
+    font-size: 14.5px;
+    color: var(--ink);
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.rs-form-group input:focus {
+    border-color: var(--forest-2);
+    box-shadow: 0 0 0 3px var(--fill-green-2);
+    background: var(--card);
+}
+
+.rs-auth-checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 9px;
+}
+
+.rs-auth-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--ink-3);
+    cursor: pointer;
+}
+
+.rs-auth-checkbox input {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--forest);
+}
+
+.rs-auth-submit {
+    width: 100%;
+    justify-content: center;
+    height: 44px;
+    margin-top: 4px;
+}
+
+.rs-auth-error {
+    color: var(--sev-high);
+    font-size: 12.5px;
+}
+
+.rs-auth-foot {
+    text-align: center;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    font-size: 13.5px;
+    color: var(--ink-3);
+}
+
+.rs-auth-foot p {
+    margin-bottom: 6px;
+}
+
+.rs-auth-foot a {
+    color: var(--forest-2);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.rs-auth-foot a:hover {
+    text-decoration: underline;
+}
+
+.rs-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.rs-note.ok {
+    background: var(--sev-low-bg);
+    color: #2f6b3a;
+    border: 1px solid rgba(92, 138, 90, .3);
+}
+
+.rs-note.err {
+    background: var(--sev-high-bg);
+    color: var(--sev-high);
+    border: 1px solid rgba(180, 85, 59, .3);
+}
+
+.rs-note button {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: .7;
+}
+
+/* ================================
    DEVELOPERS
    ================================ */
 
