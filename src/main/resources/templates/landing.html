@@ -227,6 +227,35 @@
             </div>
         </section>
 
+        <!-- ============ ACTIVE GOVERNMENT ADVISORIES (real, sourced) ============ -->
+        <section class="rs-section" th:if="${activeAdvisories != null and !activeAdvisories.empty}">
+            <div class="rs-intel-head">
+                <div>
+                    <div class="rs-eyebrow"><i data-lucide="globe" style="width:15px;height:15px;"></i> Government
+                        advisories, live</div>
+                    <h2 class="rs-h2" style="margin-bottom:0">Where governments say think twice</h2>
+                </div>
+            </div>
+            <div class="rs-adv-grid">
+                <div class="rs-adv-card" th:each="a : ${activeAdvisories}">
+                    <div class="rs-adv-bar" th:style="'background:var(--sev-' + ${a.severity} + ')'"></div>
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                            <span class="rs-adv-country" th:text="${a.countryName}">Country</span>
+                            <span class="rs-sev-chip"
+                                th:style="'background:var(--sev-' + ${a.severity} + '-bg);color:var(--sev-' + ${a.severity} + ')'"
+                                th:text="${a.severity}">sev</span>
+                        </div>
+                        <div class="rs-adv-level" th:text="${a.level}">level</div>
+                        <div class="rs-adv-src" th:text="${a.source}">source</div>
+                    </div>
+                    <a th:href="${a.url}" target="_blank" rel="noopener" class="rs-adv-link" aria-label="Read advisory">
+                        <i data-lucide="external-link" style="width:15px;height:15px;"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- ============ SCAM LIBRARY PREVIEW (feedback: surface on homepage) ============ -->
         <section class="rs-section" th:if="${scamPreview != null and !scamPreview.empty}">
             <div class="rs-intel-head">

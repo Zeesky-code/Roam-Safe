@@ -111,6 +111,8 @@
                 <button type="button" class="rs-tab" data-tab="hoods"
                     th:if="${!destination.neighborhoods.isEmpty()}">Neighborhoods</button>
                 <button type="button" class="rs-tab" data-tab="scams">Scam reports</button>
+                <button type="button" class="rs-tab" data-tab="advisories"
+                    th:if="${advisories != null}">Advisories</button>
             </div>
 
             <!-- Overview -->
@@ -192,6 +194,30 @@
                     <div class="rs-empty" th:if="${scams.isEmpty()}" style="grid-column:1/-1">
                         <p>No reports for this city yet. <a href="/submit"
                                 style="color:var(--forest-2);font-weight:600">Add the first →</a></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advisories (real government advisories, sourced) -->
+            <section class="rs-tab-panel" data-panel="advisories" hidden th:if="${advisories != null}">
+                <div class="rs-card-panel" th:each="advisory : ${advisories}" style="margin-bottom:16px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+                        <span class="rs-sev-chip"
+                            th:style="'background:var(--sev-' + ${advisory.severity} + '-bg);color:var(--sev-' + ${advisory.severity} + ')'"
+                            th:text="${advisory.level}">level</span>
+                        <span style="font-size:13px;font-weight:600;color:var(--ink-2)"
+                            th:text="${advisory.source}">source</span>
+                        <span style="font-size:13px;color:var(--muted)" th:text="'· ' + ${country}">country</span>
+                    </div>
+                    <p class="rs-lede" th:text="${advisory.summary}">Advisory summary.</p>
+                    <div style="margin-top:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                        <a th:href="${advisory.url}" target="_blank" rel="noopener" class="rs-btn-outline"
+                            style="height:38px;padding:0 16px">
+                            <i data-lucide="external-link" style="width:14px;height:14px;"></i> Read the full advisory
+                        </a>
+                        <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--muted)"
+                            th:if="${advisory.sourceUpdated}"
+                            th:text="'Updated ' + ${#strings.substring(advisory.sourceUpdated,0,10)}">updated</span>
                     </div>
                 </div>
             </section>

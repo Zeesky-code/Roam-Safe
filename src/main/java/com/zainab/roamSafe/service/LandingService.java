@@ -1,16 +1,21 @@
 package com.zainab.roamSafe.service;
 
 import com.zainab.roamSafe.dto.LandingView.*;
+import com.zainab.roamSafe.model.Advisory;
 import com.zainab.roamSafe.model.SafetyScore;
 import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
+import com.zainab.roamSafe.repository.AdvisoryRepository;
 import com.zainab.roamSafe.repository.ScamReportRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Assembles the landing page from real data only.
@@ -26,13 +31,41 @@ public class LandingService {
     private final ScamReportRepository scamReportRepository;
     private final ScamService scamService;
     private final SafetyScoreService safetyScoreService;
+    private final AdvisoryRepository advisoryRepository;
 
     public LandingService(ScamReportRepository scamReportRepository,
             ScamService scamService,
-            SafetyScoreService safetyScoreService) {
+            SafetyScoreService safetyScoreService,
+            AdvisoryRepository advisoryRepository) {
         this.scamReportRepository = scamReportRepository;
         this.scamService = scamService;
         this.safetyScoreService = safetyScoreService;
+        this.advisoryRepository = advisoryRepository;
+    }
+
+    /**
+     * Countries under an active (high/critical) government advisory, one row per
+     * country (most severe kept), for the landing "active advisories" strip.
+     * Real, sourced data straight from the advisories table.
+     */
+    public List<Advisory> activeAdvisories(int limit) {
+        List<Advisory> raw = advisoryRepository.findBySeverityIn(List.of("high", "critical"));
+        Map<String, Advisory> byCountry = new LinkedHashMap<>();
+        for (Advisory a : raw) {
+            Advisory kept = byCountry.get(a.getCountryName());
+            if (kept == null || rank(a.getSeverity()) > rank(kept.getSeverity())) {
+                byCountry.put(a.getCountryName(), a);
+            }
+        }
+        return byCountry.values().stream()
+                .sorted(Comparator.comparingInt((Advisory a) -> rank(a.getSeverity())).reversed()
+                        .thenComparing(Advisory::getCountryName))
+                .limit(limit)
+                .toList();
+    }
+
+    private static int rank(String severity) {
+        return "critical".equals(severity) ? 2 : "high".equals(severity) ? 1 : 0;
     }
 
     /** Trust-strip figures, all counted in SQL. */

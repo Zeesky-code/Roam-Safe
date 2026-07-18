@@ -4,6 +4,8 @@ import java.util.List;
 import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.service.ScamService;
 import com.zainab.roamSafe.service.DestinationService;
+import com.zainab.roamSafe.service.CountryLookup;
+import com.zainab.roamSafe.repository.AdvisoryRepository;
 import com.zainab.roamSafe.model.User;
 
 import org.springframework.stereotype.Controller;
@@ -19,10 +21,13 @@ public class ScamController {
 
     private final ScamService scamService;
     private final DestinationService destinationService;
+    private final AdvisoryRepository advisoryRepository;
 
-    public ScamController(ScamService scamService, DestinationService destinationService) {
+    public ScamController(ScamService scamService, DestinationService destinationService,
+            AdvisoryRepository advisoryRepository) {
         this.scamService = scamService;
         this.destinationService = destinationService;
+        this.advisoryRepository = advisoryRepository;
     }
 
     @GetMapping
@@ -43,6 +48,16 @@ public class ScamController {
 
             // Stats/score use the full list; the card list is paywalled.
             model.addAttribute("destination", destinationService.build(city, allScams));
+
+            // Official government advisories for this city's country (real, sourced).
+            CountryLookup.forCity(city).ifPresent(country -> {
+                model.addAttribute("country", country.name());
+                List<com.zainab.roamSafe.model.Advisory> advisories = advisoryRepository
+                        .findByCountryName(country.name());
+                if (!advisories.isEmpty()) {
+                    model.addAttribute("advisories", advisories);
+                }
+            });
 
             List<ScamReport> visible = allScams;
             if (!isPro && totalScams > 3) {

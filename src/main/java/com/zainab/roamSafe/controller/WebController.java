@@ -25,6 +25,7 @@ public class WebController {
         model.addAttribute("briefing", landingService.heroBriefing());
         model.addAttribute("intel", landingService.intel());
         model.addAttribute("scamPreview", landingService.scamPreview(2));
+        model.addAttribute("activeAdvisories", landingService.activeAdvisories(6));
         model.addAttribute("scamTotal", scamReportRepository.countByStatus(
                 com.zainab.roamSafe.model.ScamReportStatus.APPROVED));
         // paletteItems supplied globally by GlobalModelAdvice

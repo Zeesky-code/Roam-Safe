@@ -9,6 +9,7 @@ public record BulkScamReportRequest(
         String name,
         String description,
         String scamType,
+        String category, // High-level category (Theft, Financial, Transport, ...)
         Integer severityScore,
         String preventionTips,
         String neighborhood,

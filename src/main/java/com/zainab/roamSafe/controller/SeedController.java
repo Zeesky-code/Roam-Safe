@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.zainab.roamSafe.service.NewsIngestionService;
+import com.zainab.roamSafe.service.AdvisoryIngestionService;
 
 @RestController
 @RequestMapping("/api/admin/seed")
@@ -30,6 +31,16 @@ public class SeedController {
 
         @Autowired
         private NewsIngestionService newsIngestionService;
+
+        @Autowired
+        private AdvisoryIngestionService advisoryIngestionService;
+
+        /** One-shot trigger to (re)populate government advisories (UK + US). */
+        @org.springframework.web.bind.annotation.GetMapping("/advisories")
+        public ResponseEntity<String> refreshAdvisories() {
+                advisoryIngestionService.refreshAll();
+                return ResponseEntity.ok("Advisory refresh triggered.");
+        }
 
         @org.springframework.web.bind.annotation.GetMapping
         public ResponseEntity<String> seedDatabase() {
@@ -136,12 +147,23 @@ public class SeedController {
         public ResponseEntity<String> bulkSeed(@RequestBody List<BulkScamReportRequest> reports) {
                 List<ScamReport> entities = new ArrayList<>();
 
+                // Create any missing cities in one pass, instead of a query per report
+                // (1400+ sequential lookups against a remote DB would time the request out).
+                java.util.Set<String> existingCities = new java.util.HashSet<>();
+                cityRepository.findAll().forEach(c -> existingCities.add(c.getName()));
+                java.util.Set<String> newCityNames = new java.util.LinkedHashSet<>();
                 for (BulkScamReportRequest req : reports) {
-                        // Ensure city exists
-                        if (cityRepository.findFirstByName(req.city()) == null) {
-                                cityRepository.save(new City(req.city(), "Unknown"));
+                        if (req.city() != null && !existingCities.contains(req.city())) {
+                                newCityNames.add(req.city());
                         }
+                }
+                List<City> newCities = new ArrayList<>();
+                for (String name : newCityNames) {
+                        newCities.add(new City(name, "Unknown"));
+                }
+                cityRepository.saveAll(newCities);
 
+                for (BulkScamReportRequest req : reports) {
                         ScamReport report = new ScamReport();
                         report.setCity(req.city());
 
@@ -152,8 +174,9 @@ public class SeedController {
                         }
                         report.setScamType(scamType);
 
-                        // Default category for bulk import if not available
-                        report.setCategory("General");
+                        // Preserve the source category (Theft, Financial, ...); default only if absent.
+                        report.setCategory(
+                                        req.category() != null && !req.category().isBlank() ? req.category() : "General");
 
                         report.setName(req.name() != null ? req.name() : scamType + " in " + req.city());
                         report.setDescription(req.description());
