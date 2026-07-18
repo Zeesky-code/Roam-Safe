@@ -27,11 +27,16 @@ FROM eclipse-temurin:21-jre-alpine
 # Set the working directory
 WORKDIR /app
 
-# Copy the jar file from the build stage
-COPY --from=build /app/target/roamSafe-1.0.0.jar app.jar
+# Copy the jar file from the build stage (version-agnostic)
+COPY --from=build /app/target/roamSafe-*.jar app.jar
 
-# Expose the port the app runs on
+# Default to the production profile; bound the heap to the container's memory
+# so it behaves on small (free-tier) VMs. Override JAVA_OPTS/PORT as needed.
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=70"
+
+# Expose the port the app runs on (app binds ${PORT:8080})
 EXPOSE 8080
 
 # Run the jar file
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]

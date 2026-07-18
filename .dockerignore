@@ -1,0 +1,14 @@
+target/
+.git/
+.gitignore
+.env
+*.log
+app.pid
+.idea/
+.vscode/
+.DS_Store
+**/.DS_Store
+design_handoff_roamsafe/
+*.zip
+*.png
+run_dev.sh
