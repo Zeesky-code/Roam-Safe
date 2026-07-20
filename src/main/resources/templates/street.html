@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${profile != null} ? ${profile.place} + ' · Street intelligence · RoamSafe'
+                    : 'Street intelligence · RoamSafe'">Street intelligence · RoamSafe</title>
+    <meta name="description"
+        content="What real traveler reports say about a specific street or district: risk, common scams, night-time incidents and safer alternatives nearby." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('street')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-page-head">
+            <div class="rs-eyebrow">✦ STREET INTELLIGENCE</div>
+            <h1>What the reports say about one place</h1>
+            <p class="rs-lede">
+                Search a street, square or district. RoamSafe shows only what real reports name it in —
+                and says so plainly when the evidence is thin.
+            </p>
+            <form action="/street" method="get" class="rs-searchbar">
+                <input name="q" th:value="${query}" placeholder="La Rambla, Taksim, Sultanahmet…"
+                    aria-label="Search a place" required />
+                <button type="submit" class="rs-btn-primary">Search</button>
+            </form>
+        </section>
+
+        <!-- No query yet -->
+        <section class="rs-section" th:if="${query == null or query.isEmpty()}">
+            <div class="rs-card-panel rs-empty">
+                <p>Try <a href="/street?q=Taksim">Taksim</a>, <a href="/street?q=Rambla">Rambla</a>
+                    or <a href="/street?q=Sultanahmet">Sultanahmet</a>.</p>
+            </div>
+        </section>
+
+        <!-- Searched, nothing found: say so rather than showing an empty shell -->
+        <section class="rs-section" th:if="${query != null and !query.isEmpty() and matches.isEmpty()}">
+            <div class="rs-card-panel rs-empty">
+                <h3>No coverage for “<span th:text="${query}">place</span>”</h3>
+                <p>
+                    No report in RoamSafe names this place. That means we have no evidence about it —
+                    not that it is safe. Try a nearby district, or
+                    <a href="/scams">browse cities we do cover</a>.
+                </p>
+            </div>
+        </section>
+
+        <!-- Several places share the name: let the user pick -->
+        <section class="rs-section" th:if="${profile == null and !matches.isEmpty()}">
+            <div class="rs-eyebrow" style="margin-bottom:12px">MATCHES</div>
+            <div class="rs-dash-tiles">
+                <a class="rs-card-panel" th:each="m : ${matches}"
+                    th:href="@{/street(q=${m.place}, city=${m.city})}"
+                    style="text-decoration:none;color:inherit;display:block">
+                    <div style="font-weight:600;font-size:16px" th:text="${m.place}">Place</div>
+                    <div style="font-size:13px;color:var(--muted);margin-top:2px" th:text="${m.city}">City</div>
+                    <div style="margin-top:10px;font-size:13px">
+                        <b th:if="${m.score != null}" th:text="${m.score} + '/100'">--</b>
+                        <span th:if="${m.score == null}" style="color:var(--muted)">too few reports to score</span>
+                        <span style="color:var(--muted)" th:text="' · ' + ${m.reports} + ' reports'"></span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- The profile -->
+        <div th:if="${profile != null}" class="rs-dest-grid">
+
+            <aside>
+                <div class="rs-card-panel">
+                    <div class="rs-eyebrow" th:text="${profile.city}">City</div>
+                    <h2 style="margin:6px 0 10px" th:text="${profile.place}">Place</h2>
+
+                    <!-- A score is stated only with enough reports behind it -->
+                    <div th:if="${profile.score != null}">
+                        <div style="font-size:42px;font-weight:600;line-height:1"
+                            th:style="'color:' + ${profile.scoreColor}" th:text="${profile.score}">50</div>
+                        <div class="rs-eyebrow" style="margin-top:4px">
+                            SAFETY SCORE · <span th:text="${profile.riskLevel}">LEVEL</span>
+                        </div>
+                    </div>
+                    <div th:if="${profile.score == null}" class="rs-tip">
+                        <span class="rs-tip-label">Not enough evidence</span>
+                        <p>Only one report names this place, which isn't enough to put a number on it.
+                            The reports below are shown so you can judge for yourself.</p>
+                    </div>
+
+                    <div style="margin-top:16px;font-size:13.5px;line-height:1.9">
+                        <div><b th:text="${profile.reports}">0</b> report(s) name this place</div>
+                        <div th:if="${profile.nightSharePct != null}">
+                            <b th:text="${profile.nightSharePct} + '%'">0%</b> flagged as night-time
+                        </div>
+                        <div th:if="${profile.country != null}">Country: <span th:text="${profile.country}"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:14px" th:if="${!profile.categories.isEmpty()}">
+                        <div class="rs-eyebrow" style="margin-bottom:6px">REPORTED CONCERNS</div>
+                        <span class="rs-pill" th:each="c : ${profile.categories}" th:text="${c}">cat</span>
+                    </div>
+
+                    <!-- Emergency numbers travel with the place, not just the city page -->
+                    <div style="margin-top:18px" th:if="${emergency != null}">
+                        <div class="rs-eyebrow" style="margin-bottom:6px">IN AN EMERGENCY</div>
+                        <div style="font-size:24px;font-weight:600" th:text="${emergency.primary}">112</div>
+                        <div style="font-size:12px;color:var(--muted)" th:text="${emergency.source}">source</div>
+                    </div>
+
+                    <a th:href="@{/scams(city=${profile.city})}" class="rs-btn-outline"
+                        style="margin-top:18px;height:38px;padding:0 16px;display:inline-flex;align-items:center"
+                        th:text="'Full ' + ${profile.city} + ' report →'">Full city report →</a>
+                </div>
+            </aside>
+
+            <div>
+                <!-- Evidence -->
+                <section class="rs-section" style="margin-top:0">
+                    <div class="rs-card-panel">
+                        <h3>✦ What reports say about <span th:text="${profile.place}">place</span></h3>
+                        <div class="rs-scam-card" th:each="r : ${profile.evidence}" style="margin-bottom:14px">
+                            <div class="rs-scam-card-head">
+                                <span style="font-weight:600" th:text="${r.name}">Title</span>
+                                <span class="rs-sev-chip"
+                                    th:style="'background:var(--sev-' + (${r.severityScore} >= 8 ? 'critical' : (${r.severityScore} >= 6 ? 'high' : (${r.severityScore} >= 4 ? 'medium' : 'low'))) + '-bg)'"
+                                    th:text="${r.category}">cat</span>
+                            </div>
+                            <p class="rs-scam-desc" th:text="${r.description}">Description</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Prevention, straight from the reports -->
+                <section class="rs-section" th:if="${!profile.preventionTips.isEmpty()}">
+                    <div class="rs-card-panel">
+                        <h3>✦ How travelers say to avoid it</h3>
+                        <div class="rs-tip" th:each="t : ${profile.preventionTips}" style="margin-bottom:10px">
+                            <p th:text="${t}">Tip</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Safer alternatives: real places that genuinely score better -->
+                <section class="rs-section" th:if="${!profile.saferAlternatives.isEmpty()}">
+                    <div class="rs-card-panel">
+                        <h3>✦ Better-scoring areas in <span th:text="${profile.city}">city</span></h3>
+                        <p class="rs-lede" style="font-size:14px">
+                            These score higher on their own reports. Scores come from a small number of
+                            reports, so treat them as a steer rather than a guarantee.
+                        </p>
+                        <div class="rs-emerg-grid">
+                            <a class="rs-emerg-cell" th:each="alt : ${profile.saferAlternatives}"
+                                th:href="@{/street(q=${alt.place}, city=${profile.city})}"
+                                style="text-decoration:none;color:inherit">
+                                <span class="rs-emerg-label" th:text="${alt.place}">Place</span>
+                                <span class="rs-emerg-num" th:text="${alt.score}">80</span>
+                                <span style="font-size:11.5px;color:var(--muted)"
+                                    th:text="${alt.reports} + ' reports'">n</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Official advice for the country -->
+                <section class="rs-section" th:if="${advisory != null}">
+                    <div class="rs-card-panel">
+                        <h3>✦ Official advice</h3>
+                        <p class="rs-lede" th:text="${advisory.summary}">Summary</p>
+                        <a th:href="${advisory.url}" target="_blank" rel="noopener" class="rs-btn-outline"
+                            style="height:38px;padding:0 16px;margin-top:10px">Read the full advisory</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+</body>
+
+</html>

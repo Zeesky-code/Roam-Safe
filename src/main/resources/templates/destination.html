@@ -113,6 +113,8 @@
                 <button type="button" class="rs-tab" data-tab="scams">Scam reports</button>
                 <button type="button" class="rs-tab" data-tab="advisories"
                     th:if="${advisories != null}">Advisories</button>
+                <button type="button" class="rs-tab" data-tab="emergency"
+                    th:if="${emergency != null}">Emergency</button>
             </div>
 
             <!-- Overview -->
@@ -219,6 +221,50 @@
                             th:if="${advisory.sourceUpdated}"
                             th:text="'Updated ' + ${#strings.substring(advisory.sourceUpdated,0,10)}">updated</span>
                     </div>
+                </div>
+            </section>
+
+            <!--
+              Emergency numbers. Sourced from Wikidata's typed emergency-number
+              statements, never written from memory: a wrong number here costs
+              someone time in a crisis. A service with no separate number is
+              omitted rather than filled in with the general one, because we
+              can't know that the general line covers it locally.
+            -->
+            <section class="rs-tab-panel" data-panel="emergency" hidden th:if="${emergency != null}">
+                <div class="rs-card-panel">
+                    <h3>✦ Emergency numbers</h3>
+                    <p class="rs-lede">
+                        In <b th:text="${country}">country</b>, call
+                        <b class="rs-emerg-primary" th:text="${emergency.primary}">112</b>
+                        for emergency services.
+                    </p>
+
+                    <div class="rs-emerg-grid">
+                        <div class="rs-emerg-cell" th:if="${emergency.general != null}">
+                            <span class="rs-emerg-label">General</span>
+                            <span class="rs-emerg-num" th:text="${emergency.general}">112</span>
+                        </div>
+                        <div class="rs-emerg-cell" th:if="${emergency.police != null}">
+                            <span class="rs-emerg-label">Police</span>
+                            <span class="rs-emerg-num" th:text="${emergency.police}">-</span>
+                        </div>
+                        <div class="rs-emerg-cell" th:if="${emergency.ambulance != null}">
+                            <span class="rs-emerg-label">Ambulance</span>
+                            <span class="rs-emerg-num" th:text="${emergency.ambulance}">-</span>
+                        </div>
+                        <div class="rs-emerg-cell" th:if="${emergency.fire != null}">
+                            <span class="rs-emerg-label">Fire</span>
+                            <span class="rs-emerg-num" th:text="${emergency.fire}">-</span>
+                        </div>
+                    </div>
+
+                    <p class="rs-emerg-note">
+                        Verify locally on arrival where you can. Source:
+                        <a th:href="${emergency.sourceUrl}" target="_blank" rel="noopener"
+                            th:text="${emergency.source}">source</a>,
+                        retrieved <span th:text="${#temporals.format(emergency.retrievedAt, 'd MMM yyyy')}">date</span>.
+                    </p>
                 </div>
             </section>
         </div>

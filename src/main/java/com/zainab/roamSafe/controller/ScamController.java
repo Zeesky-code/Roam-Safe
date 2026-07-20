@@ -22,12 +22,18 @@ public class ScamController {
     private final ScamService scamService;
     private final DestinationService destinationService;
     private final AdvisoryRepository advisoryRepository;
+    private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
+    private final com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
 
     public ScamController(ScamService scamService, DestinationService destinationService,
-            AdvisoryRepository advisoryRepository) {
+            AdvisoryRepository advisoryRepository,
+            com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
+            com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver) {
         this.scamService = scamService;
         this.destinationService = destinationService;
         this.advisoryRepository = advisoryRepository;
+        this.emergencyNumberService = emergencyNumberService;
+        this.cityCountryResolver = cityCountryResolver;
     }
 
     @GetMapping
@@ -49,15 +55,28 @@ public class ScamController {
             // Stats/score use the full list; the card list is paywalled.
             model.addAttribute("destination", destinationService.build(city, allScams));
 
-            // Official government advisories for this city's country (real, sourced).
-            CountryLookup.forCity(city).ifPresent(country -> {
-                model.addAttribute("country", country.name());
+            // Country: prefer the value resolved onto the city record, falling back
+            // to the older hardcoded lookup for anything not yet backfilled.
+            String countryName = cityCountryResolver.countryFor(city)
+                    .orElseGet(() -> CountryLookup.forCity(city)
+                            .map(com.zainab.roamSafe.service.CountryLookup.Country::name)
+                            .orElse(null));
+
+            if (countryName != null) {
+                model.addAttribute("country", countryName);
+
+                // Official government advisories for this country (real, sourced).
                 List<com.zainab.roamSafe.model.Advisory> advisories = advisoryRepository
-                        .findByCountryName(country.name());
+                        .findByCountryName(countryName);
                 if (!advisories.isEmpty()) {
                     model.addAttribute("advisories", advisories);
                 }
-            });
+
+                // Emergency numbers, from the structured dataset. Absent rather
+                // than guessed when the country isn't covered.
+                emergencyNumberService.forCountry(countryName)
+                        .ifPresent(numbers -> model.addAttribute("emergency", numbers));
+            }
 
             List<ScamReport> visible = allScams;
             if (!isPro && totalScams > 3) {

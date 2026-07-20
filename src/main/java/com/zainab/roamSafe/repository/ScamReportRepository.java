@@ -44,4 +44,10 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
     long countByStatus(ScamReportStatus status);
 
     long countByStatusAndSafetyZone(ScamReportStatus status, com.zainab.roamSafe.model.SafetyZone safetyZone);
+
+    /** Reports whose neighborhood field mentions the given text. */
+    List<ScamReport> findByStatusAndNeighborhoodContainingIgnoreCase(ScamReportStatus status, String fragment);
+
+    /** All approved reports that name any neighborhood at all. */
+    List<ScamReport> findByStatusAndNeighborhoodIsNotNull(ScamReportStatus status);
 }
