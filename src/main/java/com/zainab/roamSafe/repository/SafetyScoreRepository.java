@@ -15,6 +15,16 @@ import java.util.Optional;
 public interface SafetyScoreRepository extends JpaRepository<SafetyScore, Long> {
     
     /**
+     * City name + overall score in a single query.
+     *
+     * {@link SafetyScore#getCity()} is lazy, so iterating findAll() and reading
+     * each city name fires one query per row (N+1). List endpoints use this
+     * instead.
+     */
+    @Query("SELECT c.name, ss.overallScore FROM SafetyScore ss JOIN ss.city c")
+    List<Object[]> findCityNamesWithScores();
+
+    /**
      * Find safety score by city
      */
     Optional<SafetyScore> findByCity(City city);

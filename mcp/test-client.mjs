@@ -24,13 +24,16 @@ console.log("TOOLS:", tools.map((t) => t.name).join(", "));
 async function call(name, args) {
   const r = await client.callTool({ name, arguments: args });
   const body = r.content.map((c) => c.text).join("\n");
-  console.log(`\n===== ${name}(${JSON.stringify(args)}) =====\n${body.slice(0, 700)}`);
+  const hasJson = r.structuredContent ? " [+structuredContent JSON]" : " [text only]";
+  console.log(`\n===== ${name}(${JSON.stringify(args)})${hasJson} =====\n${body.slice(0, 900)}`);
 }
 
+await call("list_covered_cities", { limit: 5 });
 await call("get_city_safety", { city: "Paris" });
-await call("get_city_safety", { city: "Atlantis" }); // expect: no coverage, no guessing
-await call("list_recent_alerts", { limit: 3 });
-await call("compare_cities", { cities: ["Paris", "Rome", "Tokyo"] });
+await call("get_city_safety", { city: "Atlantis" }); // expect: no coverage + alternatives
+await call("get_neighborhood_safety", { city: "Barcelona" });
+await call("list_recent_alerts", { limit: 2, city: "Rome" });
+await call("compare_cities", { cities: ["Paris", "Rome", "Tokyo", "Madrid"], concern: "theft" });
 
 await client.close();
 console.log("\nSMOKE TEST DONE");

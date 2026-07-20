@@ -64,6 +64,15 @@ public class SafetyScoreService {
         return Math.max(1, Math.min(100, raw));
     }
 
+    /**
+     * All already-computed scores in one query. Used by list endpoints, which
+     * must not trigger a per-city recalculation (that is one remote round-trip
+     * per city and made /cities take ~47s).
+     */
+    public List<Object[]> getCachedCityScores() {
+        return safetyScoreRepository.findCityNamesWithScores();
+    }
+
     public SafetyScore getScoreForCity(String cityName) {
         City city = cityRepository.findFirstByName(cityName);
         if (city == null) {
