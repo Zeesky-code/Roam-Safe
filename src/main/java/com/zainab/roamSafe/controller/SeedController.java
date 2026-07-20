@@ -98,6 +98,16 @@ public class SeedController {
         @Autowired
         private com.zainab.roamSafe.service.ScoreSnapshotService scoreSnapshotService;
 
+        @Autowired
+        private com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
+
+        /** Load emergency numbers from the bundled dataset. Safe to re-run. */
+        @org.springframework.web.bind.annotation.GetMapping("/emergency")
+        public ResponseEntity<String> loadEmergencyNumbers() {
+                return ResponseEntity.ok("Loaded emergency numbers for "
+                                + emergencyNumberService.load() + " countries.");
+        }
+
         /**
          * Record today's score snapshot for every city. Safe to re-run: only one
          * snapshot per city per day is kept, so this won't stack duplicate points
