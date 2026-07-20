@@ -37,6 +37,7 @@
       <div class="glass-panel" style="padding: 40px;">
 
         <form class="modern-form" action="/submit" th:object="${scamReport}" method="post">
+        <input type="hidden" th:name="${csrfToken.parameterName}" th:value="${csrfToken.token}" />
 
           <div class="form-group">
             <label class="form-label">Title</label>

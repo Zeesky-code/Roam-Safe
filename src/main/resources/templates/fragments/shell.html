@@ -34,14 +34,18 @@
                 <span class="rs-kbd">⌘K</span>
             </button>
             <div class="rs-nav-divider"></div>
-            <a href="/login" class="rs-signin">Sign in</a>
-            <a href="/register" class="rs-btn-primary">Get started
+            <a th:if="${currentUser == null}" href="/login" class="rs-signin">Sign in</a>
+            <a th:if="${currentUser == null}" href="/register" class="rs-btn-primary">Get started
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
                 </svg>
             </a>
+            <a th:if="${currentUser != null}" href="/logout" class="rs-signin">Sign out</a>
+            <a th:if="${currentUser != null}" href="/dashboard" class="rs-btn-primary"
+                th:text="${currentUser.firstName != null and !currentUser.firstName.isBlank()}
+                         ? currentUser.firstName : 'Dashboard'">Dashboard</a>
         </div>
     </nav>
 
@@ -111,8 +115,10 @@
             <div class="rs-footer-col">
                 <h4>Platform</h4>
                 <a href="/submit">Submit a report</a>
-                <a href="/register">Create account</a>
-                <a href="/login">Sign in</a>
+                <a th:if="${currentUser == null}" href="/register">Create account</a>
+                <a th:if="${currentUser == null}" href="/login">Sign in</a>
+                <a th:if="${currentUser != null}" href="/dashboard">Dashboard</a>
+                <a th:if="${currentUser != null}" href="/logout">Sign out</a>
             </div>
             <div class="rs-footer-col">
                 <h4>Company</h4>

@@ -32,6 +32,20 @@ public class GlobalModelAdvice {
     }
 
     /**
+     * The signed-in user, or null, on every view.
+     *
+     * The shell's nav is shared by every page, so it can't rely on individual
+     * controllers to say who is signed in — most don't set anything, which is
+     * why "Sign in" and "Get started" stayed visible after logging in. Resolving
+     * it centrally means the nav is correct everywhere by default.
+     */
+    @ModelAttribute("currentUser")
+    public com.zainab.roamSafe.model.User currentUser(jakarta.servlet.http.HttpSession session) {
+        Object user = session.getAttribute("user");
+        return user instanceof com.zainab.roamSafe.model.User u ? u : null;
+    }
+
+    /**
      * Expose the CSRF token as a plain model attribute so templates can render
      * the hidden field via {@code ${csrfToken.token}}. Accessing the token
      * through the {@code ${_csrf}} request attribute broke under Thymeleaf 3.1,
