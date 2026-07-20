@@ -13,7 +13,10 @@ public record ScamReportResponse(
         String preventionTips,
         String location,
         ScamReportStatus status,
-        LocalDateTime createdAt) {
+        /** When RoamSafe ingested this record. */
+        LocalDateTime createdAt,
+        /** When the incident happened, or null if the source gave no date. */
+        LocalDateTime reportedAt) {
     public static ScamReportResponse fromEntity(ScamReport report) {
         return new ScamReportResponse(
                 report.getId(),
@@ -24,6 +27,7 @@ public record ScamReportResponse(
                 report.getPreventionTips(),
                 report.getLocation(),
                 report.getStatus(),
-                report.getCreatedAt());
+                report.getCreatedAt(),
+                report.getReportedAt());
     }
 }

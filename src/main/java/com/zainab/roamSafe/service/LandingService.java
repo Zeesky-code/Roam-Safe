@@ -123,7 +123,7 @@ public class LandingService {
         int night = 0;
         for (ScamReport r : reports) {
             sumSeverity += r.getSeverityScore();
-            if (r.getCreatedAt() != null && r.getCreatedAt().isAfter(sixMonthsAgo)) {
+            if (r.getReportedAt() != null && r.getReportedAt().isAfter(sixMonthsAgo)) {
                 recent++;
             }
             if (Boolean.TRUE.equals(r.getIsNightTimeIncident())) {

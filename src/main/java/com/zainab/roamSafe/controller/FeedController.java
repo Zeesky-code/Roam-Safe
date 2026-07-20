@@ -46,7 +46,7 @@ public class FeedController {
                     r.getCity(),
                     r.getName(),
                     r.getDescription(),
-                    relativeTime(r.getCreatedAt()),
+                    relativeTime(r.getReportedAt()),
                     "/scams?city=" + r.getCity()));
         }
         model.addAttribute("signals", signals);
@@ -69,8 +69,9 @@ public class FeedController {
     }
 
     private static String relativeTime(LocalDateTime when) {
+        // "recently" was a guess. Undated sources say so.
         if (when == null)
-            return "recently";
+            return "date unknown";
         long mins = Duration.between(when, LocalDateTime.now()).toMinutes();
         if (mins < 60)
             return Math.max(1, mins) + "m ago";

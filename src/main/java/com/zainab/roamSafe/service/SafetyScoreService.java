@@ -30,6 +30,8 @@ public class SafetyScoreService {
 
     /** More weight to recent reports so the score tracks current conditions. */
     private static double recencyWeight(LocalDateTime when) {
+        // Undated reports (most imported ones) get a mid weight: they still count
+        // as evidence, but can't claim the boost a genuinely recent report earns.
         if (when == null) {
             return 0.5;
         }
@@ -108,11 +110,11 @@ public class SafetyScoreService {
         double[] digRisk = new double[2];
 
         for (ScamReport report : reports) {
-            if (report.getCreatedAt() != null && report.getCreatedAt().isAfter(sixMonthsAgo)) {
+            if (report.getReportedAt() != null && report.getReportedAt().isAfter(sixMonthsAgo)) {
                 recentReports++;
             }
             double risk = report.getSeverityScore() / 10.0; // 0.1 .. 1.0
-            double weight = recencyWeight(report.getCreatedAt());
+            double weight = recencyWeight(report.getReportedAt());
             accumulate(allRisk, risk, weight);
 
             String cat = report.getCategory() != null ? report.getCategory().toLowerCase() : "";

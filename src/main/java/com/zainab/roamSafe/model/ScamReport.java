@@ -34,8 +34,20 @@ public class ScamReport {
     @Enumerated(EnumType.STRING)
     private ScamReportStatus status = ScamReportStatus.PENDING;
 
+    /** When RoamSafe ingested this row. Never when the incident happened. */
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * When the incident actually happened, or when the source published it.
+     *
+     * Null means unknown, and that is a normal, expected value: imported sources
+     * such as Wikivoyage carry no date at all. Everything recency-related must
+     * read this field and skip nulls rather than falling back to createdAt —
+     * ingestion time is not evidence of when something occurred, and treating it
+     * as such presented decade-old guidance as this month's news.
+     */
+    private LocalDateTime reportedAt;
 
     @Column(nullable = false)
     private String name; // Title of the report
@@ -202,6 +214,15 @@ public class ScamReport {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getReportedAt() {
+        return reportedAt;
+    }
+
+    /** Set only from a real date in the source. Leave null when unknown. */
+    public void setReportedAt(LocalDateTime reportedAt) {
+        this.reportedAt = reportedAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

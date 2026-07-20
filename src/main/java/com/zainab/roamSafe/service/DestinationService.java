@@ -81,21 +81,32 @@ public class DestinationService {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
         int total = reports.size();
         double sumSeverity = 0;
-        int recent = 0, night = 0;
+        int recent = 0, night = 0, dated = 0;
         for (ScamReport r : reports) {
             sumSeverity += r.getSeverityScore();
-            if (r.getCreatedAt() != null && r.getCreatedAt().isAfter(sixMonthsAgo))
-                recent++;
+            if (r.getReportedAt() != null) {
+                dated++;
+                if (r.getReportedAt().isAfter(sixMonthsAgo))
+                    recent++;
+            }
             if (Boolean.TRUE.equals(r.getIsNightTimeIncident()))
                 night++;
         }
         int severity = (int) Math.round(sumSeverity / total * 10);
-        int recentShare = (int) Math.round(100.0 * recent / total);
         int nightShare = (int) Math.round(100.0 * night / total);
-        return List.of(
-                new Meter("Scam severity", severity, severityOf(severity)),
-                new Meter("Recent activity", recentShare, severityOf(recentShare)),
-                new Meter("Night incidents", nightShare, severityOf(nightShare)));
+
+        List<Meter> meters = new ArrayList<>();
+        meters.add(new Meter("Scam severity", severity, severityOf(severity)));
+        // Only claim a recency figure when something is actually dated, and take
+        // the share of dated reports rather than of all of them — otherwise a city
+        // of undated imports reads as "0% recent activity", which looks like a
+        // measured all-clear instead of an absence of data.
+        if (dated > 0) {
+            int recentShare = (int) Math.round(100.0 * recent / dated);
+            meters.add(new Meter("Recent activity", recentShare, severityOf(recentShare)));
+        }
+        meters.add(new Meter("Night incidents", nightShare, severityOf(nightShare)));
+        return meters;
     }
 
     /**
@@ -198,7 +209,9 @@ public class DestinationService {
     public Coverage coverage(List<ScamReport> reports, int confidencePct) {
         LocalDateTime oldest = null, newest = null;
         for (ScamReport r : reports) {
-            LocalDateTime c = r.getCreatedAt();
+            // Real incident dates only. Ingestion time would make every source
+            // look like it was reported the day we imported it.
+            LocalDateTime c = r.getReportedAt();
             if (c == null)
                 continue;
             if (oldest == null || c.isBefore(oldest))
@@ -239,7 +252,7 @@ public class DestinationService {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
         int n = 0;
         for (ScamReport r : reports) {
-            if (r.getCreatedAt() != null && r.getCreatedAt().isAfter(sixMonthsAgo))
+            if (r.getReportedAt() != null && r.getReportedAt().isAfter(sixMonthsAgo))
                 n++;
         }
         return n;

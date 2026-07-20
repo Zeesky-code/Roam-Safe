@@ -134,8 +134,10 @@ public class SeedController {
                 report.setSeverityScore(zoneStr.equals("RED") ? 8 : (zoneStr.equals("YELLOW") ? 5 : 2));
                 report.setStatus(ScamReportStatus.APPROVED); // Auto-approve seed data
                 report.setIsNightTimeIncident(false);
-                report.setCreatedAt(LocalDateTime.now().minusDays((long) (Math.random() * 30))); // Random date in last
-                                                                                                 // 30 days
+                // reportedAt is deliberately left null: seed sources carry no incident
+                // date, and inventing one (this previously assigned a random day in the
+                // last 30) made imported guidance look like fresh reporting and fed
+                // random noise into the recency-weighted safety scores.
                 return report;
         }
 
@@ -195,9 +197,7 @@ public class SeedController {
                         report.setIsNightTimeIncident(
                                         req.isNightTimeIncident() != null ? req.isNightTimeIncident() : false);
                         report.setStatus(ScamReportStatus.APPROVED); // Always approve bulk imports
-                        report.setCreatedAt(LocalDateTime.now().minusDays((long) (Math.random() * 60))); // Random date
-                                                                                                         // in last 60
-                                                                                                         // days
+                        // No invented reportedAt — see the note in the seed path above.
 
                         entities.add(report);
                 }
