@@ -101,6 +101,25 @@ public class SeedController {
         @Autowired
         private com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
 
+        @Autowired
+        private com.zainab.roamSafe.service.GdeltIngestionService gdeltIngestionService;
+
+        /**
+         * Pull current disruption reporting. Paced at one request every six
+         * seconds as GDELT asks, so a full run takes several minutes.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/incidents")
+        public ResponseEntity<String> refreshIncidents(
+                        @org.springframework.web.bind.annotation.RequestParam(required = false) String city) {
+                if (city != null && !city.isBlank()) {
+                        int n = gdeltIngestionService.ingestCity(city);
+                        return ResponseEntity.ok("Stored " + n + " new incidents for " + city + ".");
+                }
+                var r = gdeltIngestionService.refreshAll();
+                return ResponseEntity.ok("Polled " + r.citiesPolled() + " cities, stored "
+                                + r.stored() + " incidents, pruned " + r.pruned() + ".");
+        }
+
         /** Load emergency numbers from the bundled dataset. Safe to re-run. */
         @org.springframework.web.bind.annotation.GetMapping("/emergency")
         public ResponseEntity<String> loadEmergencyNumbers() {

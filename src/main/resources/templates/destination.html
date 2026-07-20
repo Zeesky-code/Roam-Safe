@@ -115,6 +115,8 @@
                     th:if="${advisories != null}">Advisories</button>
                 <button type="button" class="rs-tab" data-tab="emergency"
                     th:if="${emergency != null}">Emergency</button>
+                <button type="button" class="rs-tab" data-tab="incidents"
+                    th:if="${incidents != null}">Happening now</button>
             </div>
 
             <!-- Overview -->
@@ -224,6 +226,37 @@
                 </div>
             </section>
 
+
+            <!--
+              Third-party news mentions, not RoamSafe findings. Headlines are
+              stored and shown exactly as published: paraphrasing one would turn
+              an unverified report into an assertion of ours. Everything is
+              attributed and clickable so the reader can judge the source.
+            -->
+            <section class="rs-tab-panel" data-panel="incidents" hidden th:if="${incidents != null}">
+                <div class="rs-card-panel">
+                    <h3>✦ Currently in the news</h3>
+                    <p class="rs-lede" style="font-size:14px">
+                        Headlines from the last two weeks mentioning
+                        <span th:text="${selectedCity}">this city</span> alongside a disruption.
+                        These are <b>news reports we have not verified</b>, shown so you can check the
+                        source yourself. They are not RoamSafe findings and do not affect the safety score.
+                    </p>
+                    <div class="rs-signal" th:each="i : ${incidents}">
+                        <div>
+                            <a th:href="${i.sourceUrl}" target="_blank" rel="noopener"
+                                class="rs-signal-title" th:text="${i.title}"
+                                style="text-decoration:none">Headline</a>
+                            <div class="rs-signal-meta">
+                                <span th:text="${i.sourceDomain}">source</span>
+                                <span th:if="${i.publishedAt != null}"
+                                    th:text="' · ' + ${#temporals.format(i.publishedAt, 'd MMM yyyy')}"> date</span>
+                            </div>
+                        </div>
+                        <span class="rs-sev-chip">UNVERIFIED</span>
+                    </div>
+                </div>
+            </section>
             <!--
               Emergency numbers. Sourced from Wikidata's typed emergency-number
               statements, never written from memory: a wrong number here costs

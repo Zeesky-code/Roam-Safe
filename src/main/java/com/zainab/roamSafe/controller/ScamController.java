@@ -26,13 +26,16 @@ public class ScamController {
     private final com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
     private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
     private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
+    private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
 
     public ScamController(ScamService scamService, DestinationService destinationService,
             AdvisoryRepository advisoryRepository,
             com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
             com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver,
             com.zainab.roamSafe.service.ScamLookupService scamLookupService,
-            com.zainab.roamSafe.service.SearchQuotaService searchQuota) {
+            com.zainab.roamSafe.service.SearchQuotaService searchQuota,
+            com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository) {
+        this.liveIncidentRepository = liveIncidentRepository;
         this.scamLookupService = scamLookupService;
         this.searchQuota = searchQuota;
         this.scamService = scamService;
@@ -99,6 +102,14 @@ public class ScamController {
                 // than guessed when the country isn't covered.
                 emergencyNumberService.forCountry(countryName)
                         .ifPresent(numbers -> model.addAttribute("emergency", numbers));
+            }
+
+            // Current news mentions for this city. Attributed and unverified -
+            // shown as third-party reporting, never as a RoamSafe finding.
+            var incidents = liveIncidentRepository
+                    .findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+            if (!incidents.isEmpty()) {
+                model.addAttribute("incidents", incidents);
             }
 
             List<ScamReport> visible = allScams;
