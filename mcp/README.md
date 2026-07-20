@@ -31,7 +31,7 @@ Then add it to your client. **Claude Desktop** —
 {
   "mcpServers": {
     "roamsafe": {
-      "command": "node",
+      "command": "/opt/homebrew/bin/node",
       "args": ["/absolute/path/to/Globe-Trotter/mcp/dist/index.js"],
       "env": {
         "ROAMSAFE_API_URL": "http://localhost:8080",
@@ -43,6 +43,10 @@ Then add it to your client. **Claude Desktop** —
 ```
 
 **Cursor** — same shape in `.cursor/mcp.json`. Restart the client after editing.
+
+> Use an **absolute path** for `command`. MCP clients spawn servers with a
+> minimal `PATH` and often won't find a shell-managed (nvm) node. Any Node >= 14
+> works — the server uses `node:http`, not global `fetch`.
 
 ### Environment
 

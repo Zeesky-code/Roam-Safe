@@ -11,6 +11,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import http from "node:http";
+import https from "node:https";
+import { URL } from "node:url";
 
 const API_URL = (process.env.ROAMSAFE_API_URL ?? "http://localhost:8080").replace(/\/$/, "");
 const API_KEY = process.env.ROAMSAFE_API_KEY ?? "roamsafe-secret-key-123";
@@ -43,16 +46,63 @@ type Report = {
   createdAt?: string;
 };
 
-async function api(path: string): Promise<{ ok: true; data: unknown } | { ok: false; status: number }> {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { "X-API-KEY": API_KEY, "User-Agent": "roamsafe-mcp/1.0" },
+/**
+ * GET JSON from the RoamSafe API.
+ *
+ * Deliberately uses node:http(s) rather than global fetch: MCP clients spawn
+ * this server with their own (sometimes older) Node runtime, and `fetch` is
+ * only global on Node >= 18. This works everywhere and adds no dependencies.
+ */
+function api(path: string): Promise<{ ok: true; data: unknown } | { ok: false; status: number }> {
+  return new Promise((resolve) => {
+    let url: URL;
+    try {
+      url = new URL(`${API_URL}${path}`);
+    } catch {
+      resolve({ ok: false, status: 0 });
+      return;
+    }
+    const client = url.protocol === "https:" ? https : http;
+    const req = client.request(
+      url,
+      {
+        method: "GET",
+        headers: { "X-API-KEY": API_KEY, "User-Agent": "roamsafe-mcp/1.0", Accept: "application/json" },
+        timeout: 20_000,
+      },
+      (res) => {
+        const status = res.statusCode ?? 0;
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => (body += chunk));
+        res.on("end", () => {
+          if (status < 200 || status >= 300) {
+            resolve({ ok: false, status });
+            return;
+          }
+          try {
+            resolve({ ok: true, data: JSON.parse(body) });
+          } catch {
+            resolve({ ok: false, status: 0 });
+          }
+        });
+      }
+    );
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", () => resolve({ ok: false, status: 0 }));
+    req.end();
   });
-  if (!res.ok) return { ok: false, status: res.status };
-  return { ok: true, data: await res.json() };
 }
 
 /** Plain-text tool result. */
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s }] });
+
+/** Human-readable failure, distinguishing "can't connect" from an HTTP error. */
+const apiError = (status: number, what: string) =>
+  status === 0
+    ? `Cannot reach the RoamSafe API at ${API_URL} (${what}). Is the RoamSafe app running, ` +
+      `and is ROAMSAFE_API_URL correct? Do not answer from memory - report that the tool is unavailable.`
+    : `RoamSafe API error (HTTP ${status}) while ${what}.`;
 
 const server = new McpServer({ name: "roamsafe", version: "1.0.0" });
 
@@ -77,7 +127,7 @@ server.registerTool(
             `Do not infer a score - say coverage is missing.`
         );
       }
-      return text(`RoamSafe API error (HTTP ${r.status}) while looking up "${city}".`);
+      return text(apiError(r.status, `looking up "${city}"`));
     }
     const d = r.data as CityRisk;
     const alerts = (d.latestAlerts ?? [])
@@ -120,7 +170,7 @@ server.registerTool(
   },
   async ({ limit }) => {
     const r = await api(`/api/v1/alerts/feed?page=0&size=${limit ?? 10}`);
-    if (!r.ok) return text(`RoamSafe API error (HTTP ${r.status}) while loading the alert feed.`);
+    if (!r.ok) return text(apiError(r.status, "loading the alert feed"));
     const rows = r.data as Report[];
     if (!rows.length) return text("No alerts in the RoamSafe feed right now.");
     const list = rows
@@ -161,6 +211,9 @@ server.registerTool(
     const missing = results.filter((x) => !x.r.ok).map((x) => x.city);
 
     if (!scored.length) {
+      // Distinguish "API unreachable" from genuine lack of coverage.
+      const unreachable = results.every((x) => !x.r.ok && (x.r as { status: number }).status === 0);
+      if (unreachable) return text(apiError(0, "comparing cities"));
       return text(`RoamSafe has no coverage for any of: ${cities.join(", ")}. No comparison is possible.`);
     }
     const table = scored
