@@ -4200,3 +4200,71 @@ input[type="checkbox"] {
     line-height: 1.6;
     color: var(--ink-2);
 }
+
+/* ---- Itinerary review ---- */
+.rs-review-form {
+    max-width: 640px;
+    margin-top: 18px;
+}
+
+.rs-review-form label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.rs-review-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--card);
+    resize: vertical;
+}
+
+.rs-review-form button {
+    margin-top: 10px;
+    height: 42px;
+    padding: 0 20px;
+}
+
+.rs-finding.high {
+    border-left: 3px solid var(--sev-high);
+}
+
+.rs-finding.medium {
+    border-left: 3px solid var(--sev-medium);
+}
+
+.rs-finding.info {
+    border-left: 3px solid var(--hairline-strong);
+}
+
+.rs-quoted {
+    margin: 10px 0;
+    padding: 8px 12px;
+    border-left: 2px solid var(--hairline-strong);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--fill-subtle);
+}
+
+.rs-sev-chip.high {
+    background: var(--sev-high-bg);
+    color: var(--sev-high);
+}
+
+.rs-sev-chip.medium {
+    background: var(--sev-medium-bg);
+    color: var(--sev-medium);
+}
+
+.rs-sev-chip.info {
+    background: var(--fill-subtle);
+    color: var(--muted);
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Itinerary review · RoamSafe</title>
+    <meta name="description"
+        content="Paste your itinerary and see what real traveler reports say about the cities, areas, timings and transport in it." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('review')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-page-head">
+            <div class="rs-eyebrow">✦ ITINERARY REVIEW</div>
+            <h1>Check a plan against the evidence</h1>
+            <p class="rs-lede">
+                Paste your itinerary. RoamSafe matches it against real reports and flags what they
+                actually say about those cities, areas, timings and transport choices.
+                It won't invent advice: where the data is silent, so is the review.
+            </p>
+
+            <form action="/review" method="post" class="rs-review-form">
+                <input type="hidden" th:name="${csrfToken.parameterName}" th:value="${csrfToken.token}" />
+                <label for="itinerary">Your plan</label>
+                <textarea id="itinerary" name="itinerary" rows="8" required
+                    th:text="${review != null} ? ${review.itinerary} : ''"
+                    placeholder="Day 1&#10;Land 10 PM&#10;Take taxi&#10;Check in near Taksim, Istanbul"></textarea>
+                <button type="submit" class="rs-btn-primary">Review it</button>
+            </form>
+        </section>
+
+        <th:block th:if="${review != null}">
+
+            <!-- Nothing recognised -->
+            <section class="rs-section" th:if="${review.citiesFound.isEmpty()}">
+                <div class="rs-card-panel rs-empty">
+                    <h3>No covered destination recognised</h3>
+                    <p>
+                        RoamSafe couldn't find a city it covers in that plan, so there's nothing it can
+                        say without guessing. Name a destination explicitly, or
+                        <a href="/scams">see which cities are covered</a>.
+                    </p>
+                </div>
+            </section>
+
+            <th:block th:unless="${review.citiesFound.isEmpty()}">
+
+                <section class="rs-section">
+                    <div class="rs-card-panel">
+                        <h3>✦ What RoamSafe recognised</h3>
+                        <p class="rs-lede" style="font-size:14px">
+                            Destinations: <b th:text="${#strings.listJoin(review.citiesFound, ', ')}">cities</b>
+                            <span th:if="${!review.placesFound.isEmpty()}">
+                                · Areas: <b th:text="${#strings.listJoin(review.placesFound, ', ')}">places</b>
+                            </span>
+                        </p>
+                        <p th:if="${review.emergencyNote != null}" style="font-size:14px;margin-top:8px"
+                            th:text="${review.emergencyNote}">emergency</p>
+                    </div>
+                </section>
+
+                <!-- Findings, each carrying its evidence -->
+                <section class="rs-section" th:if="${!review.findings.isEmpty()}">
+                    <div class="rs-eyebrow" style="margin-bottom:12px">FINDINGS</div>
+                    <div class="rs-card-panel rs-finding" th:each="f : ${review.findings}"
+                        th:classappend="${f.severity}" style="margin-bottom:14px">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
+                            <h3 style="margin:0" th:text="${f.headline}">Headline</h3>
+                            <span class="rs-sev-chip" th:classappend="${f.severity}"
+                                th:text="${f.severity}">sev</span>
+                        </div>
+
+                        <!-- The line from their own plan that triggered this -->
+                        <blockquote class="rs-quoted" th:if="${f.quotedLine != null}"
+                            th:text="${f.quotedLine}">line</blockquote>
+
+                        <p class="rs-lede" style="font-size:14px" th:text="${f.detail}">Detail</p>
+
+                        <!-- The reports behind it, so the claim is checkable -->
+                        <div th:if="${!f.evidence.isEmpty()}" style="margin-top:10px">
+                            <div class="rs-eyebrow" style="margin-bottom:6px">BASED ON</div>
+                            <div class="rs-scam-card" th:each="r : ${f.evidence}" style="margin-bottom:8px">
+                                <div style="font-weight:600;font-size:13.5px" th:text="${r.name}">Title</div>
+                                <p class="rs-scam-desc" style="font-size:13px" th:text="${r.description}">Desc</p>
+                            </div>
+                        </div>
+
+                        <a th:href="${f.linkUrl}" class="rs-dash-link" th:text="${f.linkLabel} + ' →'">link</a>
+                    </div>
+                </section>
+
+                <section class="rs-section" th:if="${review.findings.isEmpty()}">
+                    <div class="rs-card-panel rs-empty">
+                        <h3>Nothing flagged</h3>
+                        <p>
+                            Nothing in the reports we hold speaks to this plan. That is not a clean bill of
+                            health — it means our evidence has nothing to say about it.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Named openly so silence isn't read as approval -->
+                <section class="rs-section">
+                    <div class="rs-card-panel">
+                        <h3>✦ What this review can't check</h3>
+                        <p class="rs-lede" style="font-size:14px">
+                            No source RoamSafe ingests carries these, so the review is silent on them.
+                            Silence here is missing data, not approval.
+                        </p>
+                        <ul class="rs-notcovered">
+                            <li th:each="n : ${review.notAssessed}" th:text="${n}">item</li>
+                        </ul>
+                    </div>
+                </section>
+            </th:block>
+        </th:block>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+</body>
+
+</html>
