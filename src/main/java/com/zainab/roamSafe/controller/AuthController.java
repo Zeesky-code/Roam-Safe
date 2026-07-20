@@ -23,6 +23,34 @@ public class AuthController {
     @Autowired
     private UserService userService;
     
+    /**
+     * Mirrors the logged-in user into Spring Security's context.
+     *
+     * Sign-in otherwise only sets HttpSession attributes, which the views read
+     * but the security filter chain never sees. That left every rule expressed
+     * against a role - /admin/** hasRole("ADMIN") - matching nobody, so the admin
+     * area 403'd for administrators and the UserRole column had no effect on
+     * access at all.
+     *
+     * The context is written to the session explicitly because it is created
+     * after the security filter has already run for this request, so nothing
+     * else will persist it.
+     */
+    private void authenticateInSecurityContext(User user, HttpSession session) {
+        var authorities = java.util.List.of(
+                new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                        "ROLE_" + user.getRole().name()));
+        var authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                user.getEmail(), null, authorities);
+
+        var context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        org.springframework.security.core.context.SecurityContextHolder.setContext(context);
+        session.setAttribute(
+                org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                context);
+    }
+
     @GetMapping("/login")
     public String showLoginForm(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
@@ -47,7 +75,8 @@ public class AuthController {
             session.setAttribute("userId", user.getId());
             session.setAttribute("userEmail", user.getEmail());
             session.setAttribute("userName", user.getFullName());
-            
+            authenticateInSecurityContext(user, session);
+
             redirectAttributes.addFlashAttribute("success", "Welcome back, " + user.getFirstName() + "! ✨");
             return "redirect:/dashboard";
         } else {
@@ -91,6 +120,9 @@ public class AuthController {
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         session.invalidate();
+        // Clear the security context too, not just the session attributes, so
+        // the authenticated identity can't outlive the sign-out.
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
         redirectAttributes.addFlashAttribute("success", "You have been logged out successfully");
         return "redirect:/";
     }

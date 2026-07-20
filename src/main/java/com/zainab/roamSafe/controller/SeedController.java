@@ -38,6 +38,45 @@ public class SeedController {
         @Autowired
         private com.zainab.roamSafe.service.PoliceDataService policeDataService;
 
+        @Autowired
+        private com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
+
+        /**
+         * Country for a destination, or "Unknown" when it genuinely isn't known.
+         * City.country is @NotBlank, so unresolved has to be a marker rather than
+         * null - but it stays an honest marker instead of a guess.
+         */
+        private String countryFor(String city) {
+                return cityCountryResolver.countryFor(city).orElse("Unknown");
+        }
+
+        /**
+         * Backfill countries on existing cities. Every row was created as
+         * "Unknown" because the importers never carried the value, which disabled
+         * country filtering across the API. Safe to re-run.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/countries")
+        public ResponseEntity<String> backfillCountries() {
+                List<City> all = cityRepository.findAll();
+                int updated = 0;
+                List<String> unresolved = new ArrayList<>();
+                for (City c : all) {
+                        var country = cityCountryResolver.countryFor(c.getName());
+                        if (country.isEmpty()) {
+                                unresolved.add(c.getName());
+                                continue;
+                        }
+                        if (!country.get().equals(c.getCountry())) {
+                                c.setCountry(country.get());
+                                updated++;
+                        }
+                }
+                cityRepository.saveAll(all);
+                return ResponseEntity.ok("Countries backfilled: " + updated + " of " + all.size()
+                                + " updated" + (unresolved.isEmpty() ? "."
+                                                : ", " + unresolved.size() + " unresolved: " + unresolved));
+        }
+
         /**
          * One-shot trigger to pull recorded crime from data.police.uk.
          *
@@ -139,7 +178,7 @@ public class SeedController {
                         String neighborhood, int rating, String category) {
                 // Ensure city exists
                 if (cityRepository.findFirstByName(city) == null) {
-                        cityRepository.save(new City(city, "Unknown")); // Default country to Unknown for now
+                        cityRepository.save(new City(city, countryFor(city)));
                 }
 
                 ScamReport report = new ScamReport();
