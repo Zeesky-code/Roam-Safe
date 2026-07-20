@@ -95,6 +95,21 @@ public class SeedController {
                                 + (result.failed().isEmpty() ? "." : ", failed: " + result.failed()));
         }
 
+        @Autowired
+        private com.zainab.roamSafe.service.ScoreSnapshotService scoreSnapshotService;
+
+        /**
+         * Record today's score snapshot for every city. Safe to re-run: only one
+         * snapshot per city per day is kept, so this won't stack duplicate points
+         * onto a trend.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/snapshot")
+        public ResponseEntity<String> snapshotScores() {
+                int written = scoreSnapshotService.snapshotAll();
+                return ResponseEntity.ok("Recorded " + written + " score snapshots"
+                                + (written == 0 ? " (already snapshotted today)." : "."));
+        }
+
         /** One-shot trigger to (re)populate government advisories (UK + US). */
         @org.springframework.web.bind.annotation.GetMapping("/advisories")
         public ResponseEntity<String> refreshAdvisories() {

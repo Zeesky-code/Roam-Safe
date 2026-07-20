@@ -127,17 +127,9 @@ public class AuthController {
         return "redirect:/";
     }
     
-    @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/login";
-        }
-        
-        model.addAttribute("user", user);
-        return "dashboard";
-    }
-    
+    // GET /dashboard now lives in DashboardController, which assembles the
+    // watched destinations, next trip and recent signals it needs.
+
     @PostMapping("/dashboard/preferences")
     public String updatePreferences(@RequestParam String preferredCity,
                                    @RequestParam String notificationPreferences,

@@ -1,0 +1,379 @@
+/* Dashboard layout. Rides on the tokens defined in modern-theme.css. */
+
+.rs-dash {
+    padding-bottom: 72px;
+}
+
+/* ---- Greeting ---- */
+.rs-dash-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 40px 0 28px;
+    flex-wrap: wrap;
+}
+
+.rs-dash-head h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.1;
+    margin: 8px 0 6px;
+}
+
+.rs-dash-cta {
+    height: 42px;
+    padding: 0 20px;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ---- Trip + stats ---- */
+.rs-dash-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.rs-dash-trip h2 {
+    font-size: 24px;
+    margin: 6px 0 4px;
+}
+
+.rs-dash-trip-meta {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-bottom: 20px;
+}
+
+.rs-dash-trip-body {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.rs-dash-trip-note {
+    flex: 1 1 240px;
+    min-width: 0;
+}
+
+.rs-dash-trip-note p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 10px 0;
+}
+
+.rs-dash-stats {
+    display: grid;
+    gap: 14px;
+}
+
+.rs-stat {
+    padding: 18px 20px;
+}
+
+.rs-stat-num {
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.rs-stat-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.rs-stat-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+/* ---- Score ring ---- */
+.rs-score-ring {
+    --pct: 0;
+    --ring: #5C8A5A;
+    width: 118px;
+    height: 118px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    background:
+        conic-gradient(var(--ring) calc(var(--pct) * 1%), rgba(0, 0, 0, .07) 0);
+    position: relative;
+}
+
+.rs-score-ring::after {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--card, #fff);
+}
+
+.rs-score-num,
+.rs-score-cap {
+    position: relative;
+    z-index: 1;
+}
+
+.rs-score-num {
+    font-size: 34px;
+    font-weight: 600;
+    display: block;
+    line-height: 1;
+}
+
+.rs-score-cap {
+    font-size: 8.5px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-family: var(--font-mono);
+}
+
+/* ---- Watched tiles ---- */
+.rs-dash-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 16px;
+}
+
+.rs-dash-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.rs-dash-tile {
+    border: 1px solid var(--line, rgba(0, 0, 0, .08));
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--card, #fff);
+}
+
+.rs-dash-tile-top {
+    padding: 14px 16px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.rs-dash-tile-body {
+    padding: 14px 16px 16px;
+}
+
+.rs-dash-tile-score {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.rs-dash-score {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.rs-dash-change {
+    font-size: 13px;
+    font-family: var(--font-mono);
+}
+
+.rs-dash-change.up {
+    color: #4F7F4C;
+}
+
+.rs-dash-change.down {
+    color: #B4553B;
+}
+
+.rs-dash-tile-country {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* Sparkline: simple bars, so no charting library is needed. */
+.rs-spark {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 34px;
+    margin-top: 12px;
+}
+
+.rs-spark-bar {
+    flex: 1;
+    background: rgba(92, 138, 90, .55);
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+}
+
+.rs-spark-empty {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 12px;
+    line-height: 1.4;
+}
+
+.rs-dash-unwatch {
+    margin-top: 12px;
+}
+
+.rs-dash-unwatch button {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* ---- Signals + actions ---- */
+.rs-dash-bottom {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-top: 28px;
+}
+
+.rs-signal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, .07));
+}
+
+.rs-signal:last-child {
+    border-bottom: 0;
+}
+
+.rs-signal-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.rs-signal-meta {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-top: 3px;
+}
+
+.rs-sev {
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+}
+
+.rs-sev.critical {
+    background: #f6dedb;
+    color: #8d3a26;
+}
+
+.rs-sev.high {
+    background: #f8e6d9;
+    color: #8a4f22;
+}
+
+.rs-sev.medium {
+    background: #f6efd6;
+    color: #7a6520;
+}
+
+.rs-sev.low {
+    background: #e4efe2;
+    color: #3f6b3d;
+}
+
+/* ---- Forms ---- */
+.rs-dash-form {
+    margin: 16px 0 22px;
+}
+
+.rs-dash-form label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.rs-dash-form input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--line, rgba(0, 0, 0, .14));
+    border-radius: 9px;
+    font: inherit;
+    font-size: 14px;
+    background: var(--card, #fff);
+    margin-bottom: 8px;
+}
+
+.rs-dash-row {
+    display: flex;
+    gap: 8px;
+}
+
+.rs-dash-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.rs-dash-form button {
+    height: 40px;
+    padding: 0 18px;
+    flex-shrink: 0;
+}
+
+.rs-dash-jump {
+    border-top: 1px solid var(--line, rgba(0, 0, 0, .07));
+    padding-top: 14px;
+}
+
+.rs-dash-jump a {
+    display: block;
+    padding: 9px 0;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+}
+
+.rs-dash-jump a span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 1px;
+}
+
+.rs-dash-empty {
+    padding: 18px 0;
+    font-size: 14px;
+}
+
+.rs-muted {
+    color: var(--muted);
+}
+
+@media (max-width: 880px) {
+    .rs-dash-top {
+        grid-template-columns: 1fr;
+    }
+}
