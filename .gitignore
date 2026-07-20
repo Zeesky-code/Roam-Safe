@@ -47,3 +47,9 @@ run_dev.sh
 design_handoff_roamsafe/
 Screen design project.zip
 plan.md
+ssh-key-2026-07-19.key
+ssh-key-2026-07-19.key.pub
+
+# Node / MCP server
+node_modules/
+mcp/dist/

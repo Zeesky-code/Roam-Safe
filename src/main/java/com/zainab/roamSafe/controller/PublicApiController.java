@@ -86,13 +86,22 @@ public class PublicApiController {
         return ResponseEntity.ok(reports.subList(start, end));
     }
 
+    /**
+     * Map a safety score to a risk label.
+     *
+     * Calibrated to the current scoring model, where a score is
+     * {@code 100 - recencyWeightedAvgSeverity * 85} and well-reported cities
+     * land in the 45-70 band. The previous thresholds (LOW>=80, HIGH>=40) were
+     * written for the old volume-based score and labelled almost every city
+     * "HIGH", which badly overstates risk to API/MCP consumers.
+     */
     private String getRiskLevel(int score) {
-        if (score >= 80)
+        if (score >= 70)
             return "LOW";
-        if (score >= 60)
+        if (score >= 55)
             return "MODERATE";
         if (score >= 40)
-            return "HIGH";
-        return "CRITICAL";
+            return "ELEVATED";
+        return "HIGH";
     }
 }
