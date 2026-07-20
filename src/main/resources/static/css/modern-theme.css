@@ -4155,3 +4155,31 @@ input[type="checkbox"] {
     margin-top: 14px;
     line-height: 1.5;
 }
+
+/* ---- Compare ---- */
+.rs-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.rs-compare-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 13.5px;
+}
+
+.rs-compare-row:last-child {
+    border-bottom: 0;
+}
+
+.rs-notcovered {
+    margin: 12px 0 0 18px;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: var(--ink-2);
+}

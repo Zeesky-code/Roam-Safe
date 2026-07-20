@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compare destinations · RoamSafe</title>
+    <meta name="description"
+        content="Compare destinations on safety score, risk by concern, night-time incidents and live government advisories, all from real reports." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('compare')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-page-head">
+            <div class="rs-eyebrow">✦ COMPARE</div>
+            <h1>Two destinations, same evidence</h1>
+            <p class="rs-lede">
+                Compare on what the data actually supports. Where RoamSafe has nothing to say,
+                it says so rather than filling the column in.
+            </p>
+            <form action="/compare" method="get" class="rs-searchbar">
+                <input name="cities" th:value="${query}" placeholder="Barcelona vs Lisbon" aria-label="Cities"
+                    required />
+                <button type="submit" class="rs-btn-primary">Compare</button>
+            </form>
+        </section>
+
+        <section class="rs-section" th:if="${needsInput}">
+            <div class="rs-card-panel rs-empty">
+                <p>Name at least two places. Try
+                    <a href="/compare?cities=Barcelona,Lisbon">Barcelona vs Lisbon</a>,
+                    <a href="/compare?cities=Tokyo,Bangkok">Tokyo vs Bangkok</a> or
+                    <a href="/compare?cities=Paris,Rome">Paris vs Rome</a>.
+                </p>
+            </div>
+        </section>
+
+        <th:block th:if="${comparison != null}">
+
+            <!-- Verdict, hedged to the strength of the evidence -->
+            <section class="rs-section" th:if="${comparison.verdict != null}">
+                <div class="rs-card-panel">
+                    <h3>✦ What the evidence says</h3>
+                    <p class="rs-lede" th:text="${comparison.verdict}">Verdict</p>
+                </div>
+            </section>
+
+            <!-- The columns -->
+            <section class="rs-section">
+                <div class="rs-compare-grid">
+                    <div class="rs-card-panel" th:each="c : ${comparison.columns}">
+                        <div class="rs-eyebrow" th:text="${c.country != null} ? ${c.country} : 'UNKNOWN COUNTRY'">
+                            COUNTRY</div>
+                        <h2 style="margin:4px 0 12px" th:text="${c.city}">City</h2>
+
+                        <!-- Uncovered: an explicit statement, never zeros -->
+                        <div th:unless="${c.covered}" class="rs-tip">
+                            <span class="rs-tip-label">No coverage</span>
+                            <p>RoamSafe holds no reports for this destination, so it can't be compared.
+                                That's an absence of data, not a finding about its safety.</p>
+                        </div>
+
+                        <th:block th:if="${c.covered}">
+                            <div style="display:flex;align-items:baseline;gap:10px">
+                                <span style="font-size:44px;font-weight:600;line-height:1"
+                                    th:style="'color:' + ${c.scoreColor}" th:text="${c.score}">50</span>
+                                <span class="rs-sev-chip" th:text="${c.riskLevel}">LEVEL</span>
+                            </div>
+
+                            <div style="margin-top:14px;font-size:13.5px;line-height:1.9">
+                                <div><b th:text="${c.reports}">0</b> reports</div>
+                                <div><b th:text="${c.confidencePct} + '%'">0%</b> confidence</div>
+                                <div th:if="${c.nightSharePct != null}">
+                                    <b th:text="${c.nightSharePct} + '%'">0%</b> night-time incidents
+                                </div>
+                                <div th:if="${c.neighborhoods > 0}">
+                                    <b th:text="${c.neighborhoods}">0</b> areas with reports
+                                </div>
+                                <div th:if="${c.emergencyNumber != null}">
+                                    Emergency: <b th:text="${c.emergencyNumber}">112</b>
+                                </div>
+                            </div>
+
+                            <!-- Risk by concern, from real categories -->
+                            <div style="margin-top:16px" th:if="${!c.concerns.isEmpty()}">
+                                <div class="rs-eyebrow" style="margin-bottom:8px">RISK BY CONCERN</div>
+                                <div th:each="stat : ${c.concerns}" class="rs-compare-row">
+                                    <span th:text="${stat.category}">Category</span>
+                                    <span>
+                                        <b th:text="${stat.riskScore}">0</b>
+                                        <span style="color:var(--muted);font-size:12px"
+                                            th:text="' · ' + ${stat.reports} + ' rep'">n</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Live official advisory -->
+                            <div style="margin-top:16px" th:if="${c.advisoryLevel != null}">
+                                <div class="rs-eyebrow" style="margin-bottom:6px">OFFICIAL ADVISORY</div>
+                                <div style="font-size:13.5px;font-weight:600" th:text="${c.advisoryLevel}">level</div>
+                                <a th:href="${c.advisoryUrl}" target="_blank" rel="noopener"
+                                    style="font-size:12.5px">Read the source →</a>
+                            </div>
+
+                            <a th:href="@{/scams(city=${c.city})}" class="rs-btn-outline"
+                                style="margin-top:16px;height:36px;padding:0 14px;display:inline-flex;align-items:center"
+                                th:text="'Full ' + ${c.city} + ' report →'">Full report</a>
+                        </th:block>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Where they actually differ -->
+            <section class="rs-section" th:if="${!comparison.differences.isEmpty()}">
+                <div class="rs-card-panel">
+                    <h3>✦ Where they differ</h3>
+                    <p class="rs-lede" style="font-size:14px">
+                        Only gaps wide enough to mean something are listed. Scores within a few points
+                        are inside the noise of how they're computed.
+                    </p>
+                    <div class="rs-signal" th:each="d : ${comparison.differences}">
+                        <div>
+                            <div class="rs-signal-title" th:text="${d.label}">Label</div>
+                            <div style="font-size:13.5px;color:var(--ink-2);margin-top:3px" th:text="${d.detail}">
+                                Detail</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stated plainly, so absence isn't read as a low score -->
+            <section class="rs-section">
+                <div class="rs-card-panel">
+                    <h3>✦ What this comparison doesn't cover</h3>
+                    <p class="rs-lede" style="font-size:14px">
+                        RoamSafe has no source for these, so they are left out rather than estimated.
+                        A missing dimension is not a bad score.
+                    </p>
+                    <ul class="rs-notcovered">
+                        <li th:each="n : ${comparison.notCompared}" th:text="${n}">dimension</li>
+                    </ul>
+                </div>
+            </section>
+        </th:block>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+</body>
+
+</html>
