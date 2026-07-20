@@ -24,7 +24,8 @@
                 <div class="rs-eyebrow">✦ API</div>
                 <h1>Travel intelligence, as an endpoint</h1>
                 <p class="rs-lede">Query the same evidence-backed safety data that powers RoamSafe: city risk
-                    scores and a live alert feed, over a simple JSON API. Structured, not scraped.</p>
+                    scores, official recorded crime and a live alert feed, over a simple JSON API. Structured,
+                    not scraped, and it tells you when it has no coverage instead of guessing.</p>
                 <div class="rs-dev-btns">
                     <a href="mailto:zainablaw1012@gmail.com?subject=RoamSafe%20API%20key%20request"
                         class="rs-btn-primary" style="height:42px;padding:0 20px">Request an API key</a>
@@ -68,7 +69,8 @@ data = r.json()
                 <div class="rs-dev-card">
                     <div class="rs-dev-tile"><i data-lucide="link"></i></div>
                     <h4>Evidence-backed</h4>
-                    <p>Every score is computed from real traveler reports, the same data the site shows.</p>
+                    <p>Scores come from real traveler reports and official police-recorded crime, never from a
+                        model's guess. Undated sources are labelled as undated.</p>
                 </div>
                 <div class="rs-dev-card">
                     <div class="rs-dev-tile"><i data-lucide="activity"></i></div>
@@ -78,7 +80,8 @@ data = r.json()
                 <div class="rs-dev-card">
                     <div class="rs-dev-tile"><i data-lucide="sparkles"></i></div>
                     <h4>MCP server</h4>
-                    <p>Native Model Context Protocol access for AI agents. On the roadmap.</p>
+                    <p>Native Model Context Protocol access for AI agents. Five tools, shipped: city safety,
+                        neighborhoods, alerts, coverage and comparisons.</p>
                 </div>
             </div>
         </section>
@@ -89,9 +92,15 @@ data = r.json()
             <div class="rs-endpoints">
                 <div class="rs-endpoint">
                     <span class="rs-method get">GET</span>
+                    <code>/api/v1/cities</code>
+                    <span class="rs-endpoint-desc">Every covered city with its score and report count. Call this
+                        first so you query places we actually cover</span>
+                </div>
+                <div class="rs-endpoint">
+                    <span class="rs-method get">GET</span>
                     <code>/api/v1/risk/city/{city}</code>
-                    <span class="rs-endpoint-desc">Safety score, risk breakdown, summary and latest alerts for a
-                        city</span>
+                    <span class="rs-endpoint-desc">Safety score, risk split by concern, neighborhood scores,
+                        night-time risk, coverage metadata and latest alerts</span>
                 </div>
                 <div class="rs-endpoint">
                     <span class="rs-method get">GET</span>
@@ -100,8 +109,9 @@ data = r.json()
                 </div>
             </div>
             <p style="font-size:13px;color:var(--muted);margin-top:12px;font-family:var(--font-mono)">
-                All requests require an <code>X-API-KEY</code> header. More endpoints (webhooks, neighborhood
-                detail, MCP) are on the roadmap.
+                All requests require an <code>X-API-KEY</code> header. Ask for a city we don't cover and you get an
+                explicit no-coverage response rather than an invented score. Webhooks, a since-based change feed
+                and coordinate-level lookups are on the roadmap, not available today.
             </p>
         </section>
 

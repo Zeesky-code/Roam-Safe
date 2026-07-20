@@ -88,8 +88,19 @@ public class PublicApiController {
         // 1. Get Safety Score
         SafetyScore score = safetyScoreService.getScoreForCity(city);
         if (score == null) {
-            return ResponseEntity.notFound().build();
+            // An empty 404 is ambiguous to a caller: wrong path, wrong key and
+            // uncovered city all look identical. Since refusing to guess is the
+            // point of this API, say so explicitly and point at the coverage
+            // list, so an agent can distinguish "no data" from "broken request"
+            // and doesn't fall back to inventing a score.
+            response.put("city", city);
+            response.put("covered", false);
+            response.put("message", "RoamSafe has no coverage for this city. "
+                    + "No safety score exists for it and none has been inferred.");
+            response.put("coveredCitiesEndpoint", "/api/v1/cities");
+            return ResponseEntity.status(404).body(response);
         }
+        response.put("covered", true);
 
         // 2. Get AI Summary
         CitySummary summary = citySummaryService.getSummaryForCity(city);
