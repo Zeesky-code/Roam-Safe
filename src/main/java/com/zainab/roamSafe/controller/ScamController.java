@@ -27,6 +27,7 @@ public class ScamController {
     private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
     private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
+    private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
 
     public ScamController(ScamService scamService, DestinationService destinationService,
             AdvisoryRepository advisoryRepository,
@@ -34,7 +35,9 @@ public class ScamController {
             com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver,
             com.zainab.roamSafe.service.ScamLookupService scamLookupService,
             com.zainab.roamSafe.service.SearchQuotaService searchQuota,
-            com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository) {
+            com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository,
+            com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository) {
+        this.practicalInfoRepository = practicalInfoRepository;
         this.liveIncidentRepository = liveIncidentRepository;
         this.scamLookupService = scamLookupService;
         this.searchQuota = searchQuota;
@@ -110,6 +113,12 @@ public class ScamController {
                     .findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
             if (!incidents.isEmpty()) {
                 model.addAttribute("incidents", incidents);
+            }
+
+            // Arrival and practical info, verbatim excerpts with attribution.
+            var practical = practicalInfoRepository.findByCityNameIgnoreCase(city);
+            if (!practical.isEmpty()) {
+                model.addAttribute("practical", practical);
             }
 
             List<ScamReport> visible = allScams;

@@ -4268,3 +4268,14 @@ input[type="checkbox"] {
     background: var(--fill-subtle);
     color: var(--muted);
 }
+
+/* Verbatim practical excerpts */
+.rs-practical {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 6px;
+}

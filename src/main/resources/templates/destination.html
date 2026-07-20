@@ -117,6 +117,8 @@
                     th:if="${emergency != null}">Emergency</button>
                 <button type="button" class="rs-tab" data-tab="incidents"
                     th:if="${incidents != null}">Happening now</button>
+                <button type="button" class="rs-tab" data-tab="practical"
+                    th:if="${practical != null}">Arriving &amp; getting around</button>
             </div>
 
             <!-- Overview -->
@@ -227,6 +229,26 @@
             </section>
 
 
+
+            <!--
+              Practical arrival information. Verbatim excerpts from Wikivoyage,
+              not summaries: compressing "the bus runs until 01:00" can drop the
+              qualifier that made it true, and someone acts on this at an airport
+              at midnight. Attribution is also a CC BY-SA licence term.
+            -->
+            <section class="rs-tab-panel" data-panel="practical" hidden th:if="${practical != null}">
+                <div class="rs-card-panel" th:each="p : ${practical}" style="margin-bottom:16px">
+                    <h3 th:text="'✦ ' + ${p.label}">Topic</h3>
+                    <div class="rs-practical" th:text="${p.content}">content</div>
+                    <p class="rs-emerg-note">
+                        From <a th:href="${p.sourceUrl}" target="_blank" rel="noopener"
+                            th:text="${p.sourceName}">Wikivoyage</a>
+                        (<span th:text="${p.licence}">CC BY-SA</span>), retrieved
+                        <span th:text="${#temporals.format(p.retrievedAt, 'd MMM yyyy')}">date</span>.
+                        Quoted rather than summarised. Check prices and times at the source before you rely on them.
+                    </p>
+                </div>
+            </section>
             <!--
               Third-party news mentions, not RoamSafe findings. Headlines are
               stored and shown exactly as published: paraphrasing one would turn

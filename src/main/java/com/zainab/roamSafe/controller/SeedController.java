@@ -120,6 +120,27 @@ public class SeedController {
                                 + r.stored() + " incidents, pruned " + r.pruned() + ".");
         }
 
+        @Autowired
+        private com.zainab.roamSafe.service.PracticalInfoService practicalInfoService;
+
+        /**
+         * Ingest arrival and practical sections from Wikivoyage. Paced, so a run
+         * over many cities takes a couple of minutes.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/practical")
+        public ResponseEntity<String> ingestPractical(
+                        @org.springframework.web.bind.annotation.RequestParam(required = false) String city,
+                        @org.springframework.web.bind.annotation.RequestParam(defaultValue = "30") int limit) {
+                if (city != null && !city.isBlank()) {
+                        return ResponseEntity.ok("Stored " + practicalInfoService.ingestCity(city)
+                                        + " sections for " + city + ".");
+                }
+                var r = practicalInfoService.ingestTopCities(limit);
+                return ResponseEntity.ok("Practical info: " + r.sections() + " sections across "
+                                + r.cities() + " cities"
+                                + (r.missing().isEmpty() ? "." : ", none found for: " + r.missing()));
+        }
+
         /** Load emergency numbers from the bundled dataset. Safe to re-run. */
         @org.springframework.web.bind.annotation.GetMapping("/emergency")
         public ResponseEntity<String> loadEmergencyNumbers() {
