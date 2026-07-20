@@ -27,6 +27,9 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
+			<!-- optional: keeps the restart classloader out of the deployed jar,
+			     where it doubles startup work and re-fires scheduled jobs. -->
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

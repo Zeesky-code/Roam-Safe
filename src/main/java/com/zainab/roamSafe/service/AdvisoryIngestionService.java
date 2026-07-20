@@ -44,11 +44,19 @@ public class AdvisoryIngestionService {
     }
 
     /**
-     * Refresh daily. Not run on startup on purpose — startup ingestion fired
-     * twice under DevTools' restart classloader and raced. Initial population is
-     * done once via the admin trigger (GET /api/admin/seed/advisories).
+     * Refresh daily, with the first run held back 5 minutes.
+     *
+     * A plain fixedRate fires as soon as the scheduler starts, which put ~44
+     * outbound HTTP calls and their DB writes in direct competition with
+     * application startup. On a small container that pushed time-to-listening
+     * past the host's health-check window and the deploy was marked failed even
+     * though the app was fine. The delay keeps boot clear.
+     *
+     * It also fired twice under DevTools' restart classloader and raced, hence
+     * the synchronized guard. Initial population is done once via the admin
+     * trigger (GET /api/admin/seed/advisories).
      */
-    @Scheduled(fixedRate = 86_400_000) // daily
+    @Scheduled(fixedRate = 86_400_000, initialDelay = 300_000) // daily, first run 5 min after boot
     public synchronized void refreshAll() {
         System.out.println("[advisory] Refreshing government travel advisories...");
         int uk = refreshUk();
