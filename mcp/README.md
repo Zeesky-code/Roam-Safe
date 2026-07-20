@@ -10,11 +10,26 @@ safety score. Every number an agent repeats traces back to real reports.
 
 ## Tools
 
+All data tools return **both readable text and `structuredContent` JSON**, so an
+agent can reason over the numbers instead of parsing prose.
+
 | Tool | What it does |
 |---|---|
-| `get_city_safety` | Safety score (0–100), risk level, financial/physical/digital breakdown, and the most severe recent traveler reports for a city |
-| `list_recent_alerts` | The newest traveler-reported safety signals worldwide |
-| `compare_cities` | Rank 2–5 cities safest-first (cities without coverage are excluded, never estimated) |
+| `list_covered_cities` | Every covered city, safest first, with score + report count. Call this first so you pick real cities instead of guessing. Optional `country` filter. |
+| `get_city_safety` | Full profile: score, risk level, **risk split by concern** (theft/financial/harassment/transport/digital), **neighborhood scores**, **night-time risk + where it clusters**, and **evidence metadata** (report count, date range, confidence) |
+| `get_neighborhood_safety` | District-level scores within a city, safest first, with report and night-incident counts |
+| `list_recent_alerts` | Newest traveler-reported signals worldwide; optional `city` filter |
+| `compare_cities` | Rank up to **10** cities, either overall or by a specific `concern`. Explains *why* the top beats the bottom, and suggests real alternatives for uncovered cities |
+
+### What it deliberately won't do
+
+RoamSafe only reports what its data supports. These are **not** available because
+the underlying data doesn't exist — the tools will say so rather than guess:
+
+- **Historical trends / "is it improving?"** — no score snapshots are retained
+- **Seasonality** ("August protests") — report timestamps aren't reliable enough
+- **Population / region filters** — no population data; country is unknown for many cities
+- **Non-safety criteria** ("safety + nightlife") — RoamSafe has no nightlife data
 
 ## Setup
 
@@ -62,7 +77,9 @@ The RoamSafe app must be running and reachable at `ROAMSAFE_API_URL`.
 Once connected, ask your agent:
 
 - *"Using RoamSafe, how safe is Paris and what scams should I watch for?"*
-- *"Compare Tokyo, Rome and Paris for safety."*
+- *"Compare Tokyo, Rome and Paris for theft risk specifically."*
+- *"Which neighborhoods in Barcelona should I avoid after dark?"*
+- *"What cities does RoamSafe actually cover?"*
 - *"What travel safety alerts are being reported right now?"*
 - *"Is Atlantis safe?"* — watch it correctly report **no coverage** instead of making something up.
 
