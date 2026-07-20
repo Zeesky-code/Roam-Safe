@@ -22,6 +22,19 @@
         <div th:if="${infoMessage}" class="rs-alert-banner info" th:text="${infoMessage}"></div>
 
         <!-- Header -->
+        <!-- Shown when a guest runs out of free lookups -->
+        <div class="rs-card-panel rs-limit-note" th:if="${param.limit != null}">
+            <h3>You've used your free lookups</h3>
+            <p>
+                Guests get 5 searches. Create a free account to keep going, or take a Trip Pass
+                for full reports on one trip. Nothing you've already read is taken away.
+            </p>
+            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <a href="/register" class="rs-btn-primary" style="height:40px;padding:0 18px;display:inline-flex;align-items:center">Create a free account</a>
+                <a href="#plans" class="rs-btn-outline" style="height:40px;padding:0 18px;display:inline-flex;align-items:center">See plans</a>
+            </div>
+        </div>
+
         <section class="rs-page-head">
             <div class="rs-eyebrow">Pricing</div>
             <h1>Calm intelligence, fair pricing</h1>

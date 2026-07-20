@@ -4183,3 +4183,20 @@ input[type="checkbox"] {
     line-height: 1.9;
     color: var(--ink-2);
 }
+
+/* Guest search-limit notice */
+.rs-limit-note {
+    margin: 24px 0 0;
+    border-left: 3px solid var(--primary-accent);
+}
+
+.rs-limit-note h3 {
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+.rs-limit-note p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-2);
+}

@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -24,11 +25,14 @@ public class StreetController {
     private final CityCountryResolver cityCountryResolver;
     private final AdvisoryRepository advisoryRepository;
     private final EmergencyNumberService emergencyNumberService;
+    private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
 
     public StreetController(StreetIntelligenceService streetService,
             CityCountryResolver cityCountryResolver,
             AdvisoryRepository advisoryRepository,
-            EmergencyNumberService emergencyNumberService) {
+            EmergencyNumberService emergencyNumberService,
+            com.zainab.roamSafe.service.SearchQuotaService searchQuota) {
+        this.searchQuota = searchQuota;
         this.streetService = streetService;
         this.cityCountryResolver = cityCountryResolver;
         this.advisoryRepository = advisoryRepository;
@@ -38,9 +42,15 @@ public class StreetController {
     @GetMapping("/street")
     public String street(@RequestParam(required = false) String q,
             @RequestParam(required = false) String city,
+            HttpSession session,
             Model model) {
 
         model.addAttribute("query", q);
+        var user = (com.zainab.roamSafe.model.User) session.getAttribute("user");
+        if (q != null && !q.isBlank() && !searchQuota.allow(session, user, "street:" + q + "|" + city)) {
+            return "redirect:/pricing?limit=search";
+        }
+        model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
 
         if (q == null || q.isBlank()) {
             model.addAttribute("matches", List.of());

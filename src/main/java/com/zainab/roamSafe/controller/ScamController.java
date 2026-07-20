@@ -24,11 +24,17 @@ public class ScamController {
     private final AdvisoryRepository advisoryRepository;
     private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
     private final com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
+    private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
+    private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
 
     public ScamController(ScamService scamService, DestinationService destinationService,
             AdvisoryRepository advisoryRepository,
             com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
-            com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver) {
+            com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver,
+            com.zainab.roamSafe.service.ScamLookupService scamLookupService,
+            com.zainab.roamSafe.service.SearchQuotaService searchQuota) {
+        this.scamLookupService = scamLookupService;
+        this.searchQuota = searchQuota;
         this.scamService = scamService;
         this.destinationService = destinationService;
         this.advisoryRepository = advisoryRepository;
@@ -38,6 +44,7 @@ public class ScamController {
 
     @GetMapping
     public String showScamsPage(@RequestParam(required = false) String city,
+            @RequestParam(required = false) String q,
             Model model,
             HttpSession session) {
 
@@ -47,7 +54,23 @@ public class ScamController {
         model.addAttribute("isLoggedIn", isLoggedIn);
         model.addAttribute("isPro", isPro);
 
+        // Named-scam lookup: "bracelet scam Paris". Handled before the city
+        // branch so a query mentioning a city still searches the scam, rather
+        // than falling through to that city's whole report list.
+        if (q != null && !q.isBlank()) {
+            if (!searchQuota.allow(session, user, "scam:" + q)) {
+                return "redirect:/pricing?limit=search";
+            }
+            model.addAttribute("lookup", scamLookupService.lookup(q));
+            model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
+            return "scam-lookup";
+        }
+
         if (city != null && !city.isEmpty()) {
+            if (!searchQuota.allow(session, user, "city:" + city)) {
+                return "redirect:/pricing?limit=search";
+            }
+            model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
             // --- Destination report for one city ---
             List<ScamReport> allScams = scamService.getReportsByCity(city);
             int totalScams = allScams.size();

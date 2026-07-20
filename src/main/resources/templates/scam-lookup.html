@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${lookup.query} + ' · Scam lookup · RoamSafe'">Scam lookup · RoamSafe</title>
+    <meta name="description"
+        content="Look up a named scam and see exactly where it is reported, how it works, and what travelers say about avoiding it." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/shell :: nav('scams')}"></div>
+    <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-page-head">
+            <div class="rs-eyebrow">✦ SCAM LOOKUP</div>
+            <h1>“<span th:text="${lookup.query}">query</span>”</h1>
+            <p class="rs-lede" th:if="${lookup.totalReports > 0}">
+                Reported in <b th:text="${lookup.cities.size()}">0</b> covered
+                <span th:text="${lookup.cities.size() == 1} ? 'city' : 'cities'">cities</span>,
+                across <b th:text="${lookup.totalReports}">0</b> reports.
+                <span th:if="${lookup.cityFilter != null}"
+                    th:text="'Filtered to ' + ${lookup.cityFilter} + '.'"></span>
+            </p>
+            <form action="/scams" method="get" class="rs-searchbar">
+                <input name="q" th:value="${lookup.query}" placeholder="bracelet scam Paris"
+                    aria-label="Search a scam" required />
+                <button type="submit" class="rs-btn-primary">Look it up</button>
+            </form>
+        </section>
+
+        <!-- Nothing found: say so, don't describe a scam we have no evidence for -->
+        <section class="rs-section" th:if="${lookup.totalReports == 0}">
+            <div class="rs-card-panel rs-empty">
+                <h3>No reports match that</h3>
+                <p>
+                    RoamSafe has no report describing this. That means we have no evidence of it —
+                    not that it doesn't happen. We won't describe a scam we can't point to a report for.
+                </p>
+                <p style="margin-top:10px">
+                    Try a simpler term (“bracelet”, “taxi”, “ATM”), or
+                    <a href="/scams">browse the whole library</a>.
+                </p>
+            </div>
+        </section>
+
+        <th:block th:if="${lookup.totalReports > 0}">
+
+            <!-- How it works, from the reports themselves -->
+            <section class="rs-section">
+                <div class="rs-card-panel">
+                    <h3>✦ How it's described</h3>
+                    <div th:each="c : ${lookup.cities}" th:if="${c.examples.size() > 0}">
+                        <div th:each="r, it : ${c.examples}" th:if="${it.index == 0}">
+                            <p class="rs-lede" th:text="${r.description}">Description</p>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px" th:if="${!lookup.categories.isEmpty()}">
+                        <span class="rs-pill" th:each="cat : ${lookup.categories}" th:text="${cat}">cat</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Where it's reported -->
+            <section class="rs-section">
+                <div class="rs-eyebrow" style="margin-bottom:12px">WHERE IT'S REPORTED</div>
+                <div class="rs-compare-grid">
+                    <div class="rs-card-panel" th:each="c : ${lookup.cities}">
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+                            <h2 style="margin:0;font-size:20px" th:text="${c.city}">City</h2>
+                            <span class="rs-sev-chip"
+                                th:text="${c.reports} + (${c.reports} == 1 ? ' report' : ' reports')">n</span>
+                        </div>
+                        <div style="font-size:13px;color:var(--muted);margin-top:2px"
+                            th:if="${c.country != null}" th:text="${c.country}">Country</div>
+
+                        <!-- Specific places, only when reports actually named one -->
+                        <div style="margin-top:12px" th:if="${!c.places.isEmpty()}">
+                            <div class="rs-eyebrow" style="margin-bottom:6px">REPORTED AROUND</div>
+                            <a class="rs-pill" th:each="p : ${c.places}"
+                                th:href="@{/street(q=${p}, city=${c.city})}" th:text="${p}"
+                                style="text-decoration:none">place</a>
+                        </div>
+
+                        <div style="margin-top:12px">
+                            <div class="rs-scam-card" th:each="r : ${c.examples}" style="margin-bottom:10px">
+                                <div style="font-weight:600;font-size:14px" th:text="${r.name}">Title</div>
+                                <p class="rs-scam-desc" style="font-size:13px" th:text="${r.description}">Desc</p>
+                            </div>
+                        </div>
+
+                        <a th:href="@{/scams(city=${c.city})}" class="rs-btn-outline"
+                            style="height:36px;padding:0 14px;display:inline-flex;align-items:center"
+                            th:text="'All ' + ${c.city} + ' reports →'">All reports</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Avoidance, quoted from reports rather than generated -->
+            <section class="rs-section" th:if="${!lookup.preventionTips.isEmpty()}">
+                <div class="rs-card-panel">
+                    <h3>✦ How travelers say to avoid it</h3>
+                    <div class="rs-tip" th:each="t : ${lookup.preventionTips}" style="margin-bottom:10px">
+                        <p th:text="${t}">Tip</p>
+                    </div>
+                </div>
+            </section>
+
+            <!--
+              Likelihood is given as a report count, not a percentage: counts
+              reflect how well a city is documented as much as how common a scam
+              is, and a percentage would imply precision the data can't support.
+            -->
+            <section class="rs-section">
+                <div class="rs-card-panel">
+                    <h3>✦ How to read this</h3>
+                    <p class="rs-lede" style="font-size:14px">
+                        Counts show how many reports mention this, not how likely you are to encounter it.
+                        A city with more reports overall will tend to show more of everything, so treat
+                        these as "where it's documented", not a ranking of risk.
+                    </p>
+                </div>
+            </section>
+        </th:block>
+
+    </main>
+
+    <div th:replace="~{fragments/shell :: footer}"></div>
+    <div th:replace="~{fragments/shell :: script}"></div>
+</body>
+
+</html>

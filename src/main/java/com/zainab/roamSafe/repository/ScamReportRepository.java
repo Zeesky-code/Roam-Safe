@@ -5,6 +5,8 @@ import com.zainab.roamSafe.model.ScamReportStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -50,4 +52,11 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
 
     /** All approved reports that name any neighborhood at all. */
     List<ScamReport> findByStatusAndNeighborhoodIsNotNull(ScamReportStatus status);
+
+    /** Free-text lookup across the title and description of approved reports. */
+    @Query("select r from ScamReport r where r.status = :status and ("
+            + "lower(r.name) like lower(concat('%', :q, '%')) or "
+            + "lower(r.description) like lower(concat('%', :q, '%'))) "
+            + "order by r.severityScore desc")
+    List<ScamReport> searchApproved(@Param("status") ScamReportStatus status, @Param("q") String q);
 }
