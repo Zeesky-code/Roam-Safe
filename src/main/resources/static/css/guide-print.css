@@ -1,0 +1,202 @@
+/*
+ * Trip guide, on screen and on paper.
+ *
+ * The "offline guide / export PDF" requirement is met with a print stylesheet
+ * rather than a generated PDF: the browser's own print-to-PDF produces the same
+ * artefact, works offline once saved, and avoids adding a rendering dependency
+ * that would need its own fonts and layout engine.
+ */
+
+.rs-guide-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 8px 0 24px;
+}
+
+.rs-guide-actions button {
+    height: 42px;
+    padding: 0 20px;
+}
+
+.rs-print-only {
+    display: none;
+}
+
+.rs-guide-stop {
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 18px;
+    background: var(--card);
+}
+
+.rs-guide-stop-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.rs-guide-stop-head h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.rs-guide-country {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.rs-guide-score {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.rs-guide-score span {
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1;
+    display: block;
+}
+
+.rs-guide-score small {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    color: var(--muted);
+}
+
+.rs-guide-emergency {
+    background: var(--fill-subtle);
+    border-left: 3px solid var(--sev-high);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.rs-guide-note {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 14px;
+}
+
+.rs-guide-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.rs-guide-stop h3 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--eyebrow);
+    margin: 14px 0 8px;
+}
+
+.rs-guide-stop h4 {
+    font-size: 14px;
+    margin: 12px 0 4px;
+}
+
+.rs-guide-list {
+    margin: 0 0 0 16px;
+    padding: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.rs-guide-list li {
+    margin-bottom: 8px;
+}
+
+.rs-guide-list b {
+    display: block;
+}
+
+.rs-guide-list span {
+    color: var(--ink-2);
+}
+
+.rs-guide-advisory p {
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+.rs-guide-src {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    word-break: break-word;
+}
+
+.rs-guide-practical .rs-practical {
+    max-height: none;   /* a printed guide must not clip its own content */
+    overflow: visible;
+}
+
+.rs-guide-limits {
+    margin-top: 20px;
+}
+
+@media print {
+    .rs-noprint,
+    .rs-shell-nav,
+    .rs-footer,
+    .rs-palette-overlay {
+        display: none !important;
+    }
+
+    .rs-print-only {
+        display: block;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+        font-size: 11pt;
+    }
+
+    .rs-wrap {
+        max-width: none;
+        padding: 0;
+    }
+
+    /* Keep a city on one page where it fits, so a stop isn't split mid-scam. */
+    .rs-guide-stop {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        margin-bottom: 12pt;
+        padding: 12pt;
+    }
+
+    .rs-guide-emergency {
+        border-left: 3pt solid #000;
+        background: #f2f2f2;
+    }
+
+    /* URLs must be readable on paper: a printed link you can't type is useless. */
+    .rs-guide-src {
+        color: #444;
+    }
+
+    a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .rs-guide-header h1 {
+        font-size: 20pt;
+        margin-bottom: 4pt;
+    }
+}

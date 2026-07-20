@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trip guide · RoamSafe</title>
+    <meta name="description"
+        content="One printable guide for a multi-stop trip: safety scores, common scams, areas, emergency numbers, official advisories and arrival information." />
+    <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+    <link rel="stylesheet" th:href="@{/css/guide-print.css}" />
+</head>
+
+<body>
+
+    <div class="rs-noprint">
+        <div th:replace="~{fragments/shell :: nav('guide')}"></div>
+        <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
+    </div>
+
+    <main class="rs-wrap">
+
+        <section class="rs-page-head rs-noprint">
+            <div class="rs-eyebrow">✦ TRIP GUIDE</div>
+            <h1>One guide for the whole trip</h1>
+            <p class="rs-lede">
+                List your stops. RoamSafe builds a single guide with each city's score, common scams,
+                areas, emergency numbers, official advisory and arrival information —
+                then print it or save it as a PDF to carry offline.
+            </p>
+            <form action="/guide" method="get" class="rs-searchbar">
+                <input name="cities" th:value="${query}" placeholder="Paris, Brussels, Amsterdam, Berlin"
+                    aria-label="Your stops" required />
+                <button type="submit" class="rs-btn-primary">Build guide</button>
+            </form>
+        </section>
+
+        <section class="rs-section rs-noprint" th:if="${needsInput}">
+            <div class="rs-card-panel rs-empty">
+                <p>Name your stops, separated by commas. Try
+                    <a href="/guide?cities=Paris,Brussels,Amsterdam,Berlin">Paris, Brussels, Amsterdam, Berlin</a>.
+                </p>
+            </div>
+        </section>
+
+        <th:block th:if="${guide != null}">
+
+            <div class="rs-guide-actions rs-noprint">
+                <button type="button" class="rs-btn-primary" onclick="window.print()">Print / save as PDF</button>
+                <span class="rs-muted" style="font-size:13px">Your browser's print dialog can save this as a
+                    PDF to keep offline.</span>
+            </div>
+
+            <!-- Print-only header, so the saved file identifies itself -->
+            <div class="rs-print-only rs-guide-header">
+                <h1>RoamSafe trip guide</h1>
+                <p th:text="${#strings.listJoin(guide.stops.![city], ' · ')}">stops</p>
+            </div>
+
+            <!-- One block per stop -->
+            <section class="rs-guide-stop" th:each="s : ${guide.stops}">
+                <div class="rs-guide-stop-head">
+                    <div>
+                        <h2 th:text="${s.city}">City</h2>
+                        <div class="rs-guide-country" th:if="${s.country != null}" th:text="${s.country}">Country</div>
+                    </div>
+                    <div class="rs-guide-score" th:if="${s.score != null}">
+                        <span th:style="'color:' + ${s.scoreColor}" th:text="${s.score}">50</span>
+                        <small th:text="${s.riskLevel}">LEVEL</small>
+                    </div>
+                </div>
+
+                <!-- Emergency first: the most useful line in any guide -->
+                <div class="rs-guide-emergency" th:if="${s.emergencyPrimary != null}">
+                    <strong>Emergency: <span th:text="${s.emergencyPrimary}">112</span></strong>
+                    <span th:if="${s.emergencyDetail != null}" th:text="' — ' + ${s.emergencyDetail}">detail</span>
+                </div>
+
+                <!-- Uncovered stop: say so plainly rather than leaving a gap -->
+                <p class="rs-guide-note" th:unless="${s.covered}">
+                    RoamSafe holds no traveler reports for this stop, so there is no score or scam list here.
+                    That is missing evidence, not a verdict that it is safe.
+                </p>
+
+                <th:block th:if="${s.covered}">
+                    <p class="rs-guide-note">
+                        Score computed from <b th:text="${s.reports}">0</b> traveler reports.
+                    </p>
+
+                    <div class="rs-guide-cols">
+                        <div th:if="${!s.topScams.isEmpty()}">
+                            <h3>Most-reported scams</h3>
+                            <ul class="rs-guide-list">
+                                <li th:each="r : ${s.topScams}">
+                                    <b th:text="${r.name}">Title</b>
+                                    <span th:text="${r.description}">Description</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div th:if="${!s.areas.isEmpty()}">
+                            <h3>Areas with reports</h3>
+                            <ul class="rs-guide-list">
+                                <li th:each="a : ${s.areas}">
+                                    <b th:text="${a.name}">Area</b>
+                                    <span
+                                        th:text="${a.score} + '/100 · ' + ${a.reports} + (${a.reports} == 1 ? ' report' : ' reports')">score</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div th:if="${s.advisoryLevel != null}" class="rs-guide-advisory">
+                        <h3>Official advisory</h3>
+                        <p><b th:text="${s.advisoryLevel}">level</b> — <span th:text="${s.advisorySummary}">summary</span>
+                        </p>
+                        <p class="rs-guide-src" th:text="${s.advisoryUrl}">url</p>
+                    </div>
+
+                    <div th:if="${!s.practical.isEmpty()}">
+                        <h3>Arriving and getting around</h3>
+                        <div th:each="p : ${s.practical}" class="rs-guide-practical">
+                            <h4 th:text="${p.label}">Topic</h4>
+                            <div class="rs-practical" th:text="${p.content}">content</div>
+                            <p class="rs-guide-src">
+                                <span th:text="${p.sourceName} + ' (' + ${p.licence} + ')'">source</span>
+                                <span th:text="' — ' + ${p.sourceUrl}">url</span>
+                            </p>
+                        </div>
+                    </div>
+                </th:block>
+            </section>
+
+            <section class="rs-card-panel" th:if="${!guide.uncovered.isEmpty()}">
+                <h3>✦ Stops with no coverage</h3>
+                <p class="rs-lede" style="font-size:14px">
+                    RoamSafe has neither reports nor an emergency number for
+                    <b th:text="${#strings.listJoin(guide.uncovered, ', ')}">cities</b>,
+                    so they are left out rather than padded with guesses.
+                </p>
+            </section>
+
+            <!-- Stated in the printed guide too, so a gap can't read as approval -->
+            <section class="rs-card-panel rs-guide-limits">
+                <h3>✦ What this guide doesn't include</h3>
+                <ul class="rs-notcovered">
+                    <li th:each="n : ${guide.notIncluded}" th:text="${n}">item</li>
+                </ul>
+                <p class="rs-guide-src">
+                    Everything above is drawn from traveler reports, official government advisories,
+                    structured emergency-number data and Wikivoyage. Verify times, prices and
+                    requirements at their source before relying on them.
+                </p>
+            </section>
+        </th:block>
+
+    </main>
+
+    <div class="rs-noprint">
+        <div th:replace="~{fragments/shell :: footer}"></div>
+        <div th:replace="~{fragments/shell :: script}"></div>
+    </div>
+</body>
+
+</html>

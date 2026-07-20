@@ -27,6 +27,8 @@ public class PublicApiController {
     private final com.zainab.roamSafe.service.StreetIntelligenceService streetService;
     private final com.zainab.roamSafe.service.CityCountryResolver countryResolver;
     private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
+    private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
+    private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
 
     public PublicApiController(SafetyScoreService safetyScoreService,
             CitySummaryService citySummaryService,
@@ -35,7 +37,11 @@ public class PublicApiController {
             com.zainab.roamSafe.service.ScamService scamService,
             com.zainab.roamSafe.service.StreetIntelligenceService streetService,
             com.zainab.roamSafe.service.CityCountryResolver countryResolver,
-            com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService) {
+            com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
+            com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
+            com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository) {
+        this.practicalInfoRepository = practicalInfoRepository;
+        this.liveIncidentRepository = liveIncidentRepository;
         this.streetService = streetService;
         this.countryResolver = countryResolver;
         this.emergencyNumberService = emergencyNumberService;
@@ -298,5 +304,68 @@ public class PublicApiController {
                             + "None have been inferred - check an official source before travelling.");
                     return ResponseEntity.status(404).body(body);
                 });
+    }
+
+    /**
+     * Arrival and practical information for a city: airport transfers, local
+     * transport, money and connectivity.
+     *
+     * Excerpts are returned as stored - verbatim, with source and licence - so a
+     * caller repeating them is repeating the source rather than a paraphrase,
+     * and can cite it. An agent must not restate these as its own knowledge.
+     */
+    @GetMapping("/practical/{city}")
+    public ResponseEntity<Map<String, Object>> practical(@PathVariable String city) {
+        var rows = practicalInfoRepository.findByCityNameIgnoreCase(city);
+        Map<String, Object> body = new HashMap<>();
+        body.put("city", city);
+        if (rows.isEmpty()) {
+            body.put("covered", false);
+            body.put("message", "RoamSafe has no arrival or practical information for this city. "
+                    + "None has been inferred - do not substitute general knowledge.");
+            return ResponseEntity.status(404).body(body);
+        }
+        body.put("covered", true);
+        body.put("sections", rows.stream().map(p -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("topic", p.getTopic());
+            m.put("label", p.getLabel());
+            m.put("content", p.getContent());
+            m.put("source", p.getSourceName());
+            m.put("sourceUrl", p.getSourceUrl());
+            m.put("licence", p.getLicence());
+            m.put("retrievedAt", p.getRetrievedAt());
+            m.put("verbatim", true);
+            return m;
+        }).toList());
+        body.put("note", "Excerpts are quoted, not summarised. Check times and prices at the source.");
+        return ResponseEntity.ok(body);
+    }
+
+    /**
+     * Current news mentions of a disruption in a city.
+     *
+     * These are unverified third-party reports, and the response says so on every
+     * item: an agent repeating one must attribute it, not assert it.
+     */
+    @GetMapping("/incidents")
+    public ResponseEntity<Map<String, Object>> incidents(
+            @RequestParam(required = false) String city) {
+        var rows = city == null || city.isBlank()
+                ? liveIncidentRepository.findTop20ByOrderByPublishedAtDesc()
+                : liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+        Map<String, Object> body = new HashMap<>();
+        body.put("city", city);
+        body.put("count", rows.size());
+        body.put("verified", false);
+        body.put("note", "Third-party news headlines, stored verbatim and not verified by RoamSafe. "
+                + "They do not affect safety scores. Attribute them to the outlet, don't assert them.");
+        body.put("incidents", rows.stream().map(i -> Map.of(
+                "city", i.getCityName(),
+                "headline", i.getTitle(),
+                "outlet", i.getSourceDomain() == null ? "" : i.getSourceDomain(),
+                "url", i.getSourceUrl(),
+                "publishedAt", i.getPublishedAt() == null ? "" : i.getPublishedAt().toString())).toList());
+        return ResponseEntity.ok(body);
     }
 }

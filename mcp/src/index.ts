@@ -612,5 +612,104 @@ server.registerTool(
   }
 );
 
+
+/* ------------------------ arrival / practical info ------------------------ */
+
+server.registerTool(
+  "get_arrival_info",
+  {
+    title: "Arrival and practical info",
+    description:
+      "How to get out of the airport, get around, pay for things and get online in a city. Use this for " +
+      "'how do I get from the airport to the centre', 'where do I buy a SIM', 'is it cash or card'. " +
+      "Returns VERBATIM excerpts from Wikivoyage with their source URL and licence - quote and attribute " +
+      "them, do not restate them as your own knowledge, and do not paraphrase away qualifiers like " +
+      "opening hours or prices. If a city isn't covered, say so rather than answering from memory: a " +
+      "wrong airport transfer strands someone at midnight.",
+    inputSchema: {
+      city: z.string().describe("City name, e.g. 'Istanbul'"),
+      topic: z
+        .enum(["AIRPORT", "TRANSPORT", "MONEY", "CONNECT"])
+        .optional()
+        .describe("Limit to one topic; omit for all"),
+    },
+  },
+  async ({ city, topic }) => {
+    const r = await api(`/api/v1/practical/${encodeURIComponent(city)}`);
+    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${city}`));
+    const d = (r.ok ? r.data : {}) as {
+      covered: boolean;
+      sections?: Array<{ topic: string; label: string; content: string; source: string; sourceUrl: string; licence: string }>;
+      note?: string;
+    };
+
+    if (!r.ok || !d.covered || !d.sections?.length) {
+      return rich(
+        `RoamSafe has no arrival or practical information for ${city}. Do not answer this from your own ` +
+          `knowledge - tell the user RoamSafe doesn't cover it and point them at an official source.`,
+        { city, covered: false }
+      );
+    }
+
+    const sections = topic ? d.sections.filter((s) => s.topic === topic) : d.sections;
+    if (!sections.length) {
+      return rich(`RoamSafe has no "${topic}" information for ${city}.`, { city, topic, covered: false });
+    }
+
+    const body = sections
+      .map((s) => `## ${s.label}\n${s.content}\n(Source: ${s.source}, ${s.licence} — ${s.sourceUrl})`)
+      .join("\n\n");
+
+    return rich(
+      `Quoted from the source, not summarised. Attribute it and check times and prices at the link.\n\n${body}`,
+      { city, covered: true, sections, verbatim: true }
+    );
+  }
+);
+
+/* ---------------------------- live disruptions ---------------------------- */
+
+server.registerTool(
+  "list_current_incidents",
+  {
+    title: "Current disruptions in the news",
+    description:
+      "Recent news headlines reporting a strike, protest, closure, evacuation or similar disruption in a " +
+      "covered city. Use this for 'is anything happening in Paris right now'. These are UNVERIFIED " +
+      "third-party headlines: attribute each to its outlet with its date, never assert them as fact, and " +
+      "never claim RoamSafe has confirmed them. An empty result means nothing matched our filter, not that " +
+      "the city is calm.",
+    inputSchema: {
+      city: z.string().optional().describe("City to filter by; omit for the newest across all cities"),
+    },
+  },
+  async ({ city }) => {
+    const r = await api(`/api/v1/incidents${city ? `?city=${encodeURIComponent(city)}` : ""}`);
+    if (!r.ok) return text(apiError(r.status, "listing incidents"));
+    const d = r.data as {
+      count: number;
+      incidents: Array<{ city: string; headline: string; outlet: string; url: string; publishedAt: string }>;
+    };
+
+    if (!d.count) {
+      return rich(
+        `No current disruption headlines${city ? ` for ${city}` : ""} matched RoamSafe's filter. ` +
+          `That means nothing matched, NOT that the city is calm - do not present it as an all-clear.`,
+        { city: city ?? null, count: 0, incidents: [] }
+      );
+    }
+
+    const lines = d.incidents
+      .map((i) => `- "${i.headline}" — ${i.outlet}${i.publishedAt ? `, ${i.publishedAt.slice(0, 10)}` : ""}\n  ${i.url}`)
+      .join("\n");
+
+    return rich(
+      `${d.count} unverified news headline(s)${city ? ` mentioning ${city}` : ""}. ` +
+        `Attribute each to its outlet; RoamSafe has not verified them and they do not affect safety scores.\n\n${lines}`,
+      { ...d }
+    );
+  }
+);
+
 const transport = new StdioServerTransport();
 await server.connect(transport);
