@@ -154,7 +154,7 @@ public class DashboardService {
                 score != null && score.getConfidenceLevel() != null
                         ? (int) Math.round(score.getConfidenceLevel() * 100)
                         : null,
-                summary != null ? summary.getSummaryText() : null);
+                realSummary(summary));
     }
 
     /**
@@ -180,6 +180,26 @@ public class DashboardService {
                             : "date unknown")));
         }
         return signals.stream().limit(6).toList();
+    }
+
+    /**
+     * The summary text only when a real one was written.
+     *
+     * CitySummaryService hands back a "No summary available for this city yet"
+     * placeholder rather than null, which the dashboard was rendering in the
+     * position where analysis belongs - so an absence of content looked like
+     * content. Treat the placeholder as the nothing it is and let the template
+     * show its own empty state.
+     */
+    private static String realSummary(CitySummary summary) {
+        if (summary == null || summary.getSummaryText() == null) {
+            return null;
+        }
+        String text = summary.getSummaryText().trim();
+        if (text.isEmpty() || text.startsWith("No summary available")) {
+            return null;
+        }
+        return text;
     }
 
     private static String subtitle(int watchedCount) {

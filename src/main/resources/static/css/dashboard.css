@@ -114,7 +114,7 @@
     position: absolute;
     inset: 9px;
     border-radius: 50%;
-    background: var(--card, #fff);
+    background: var(--card);
 }
 
 .rs-score-num,
@@ -153,10 +153,10 @@
 }
 
 .rs-dash-tile {
-    border: 1px solid var(--line, rgba(0, 0, 0, .08));
-    border-radius: 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: var(--card, #fff);
+    background: var(--card);
 }
 
 .rs-dash-tile-top {
@@ -188,11 +188,11 @@
 }
 
 .rs-dash-change.up {
-    color: #4F7F4C;
+    color: var(--sev-low);
 }
 
 .rs-dash-change.down {
-    color: #B4553B;
+    color: var(--sev-high);
 }
 
 .rs-dash-tile-country {
@@ -212,7 +212,7 @@
 
 .rs-spark-bar {
     flex: 1;
-    background: rgba(92, 138, 90, .55);
+    background: var(--moss);
     border-radius: 2px 2px 0 0;
     min-height: 2px;
 }
@@ -252,7 +252,7 @@
     justify-content: space-between;
     gap: 14px;
     padding: 13px 0;
-    border-bottom: 1px solid var(--line, rgba(0, 0, 0, .07));
+    border-bottom: 1px solid var(--hairline);
 }
 
 .rs-signal:last-child {
@@ -282,23 +282,23 @@
 }
 
 .rs-sev.critical {
-    background: #f6dedb;
-    color: #8d3a26;
+    background: var(--sev-critical-bg);
+    color: var(--sev-critical);
 }
 
 .rs-sev.high {
-    background: #f8e6d9;
-    color: #8a4f22;
+    background: var(--sev-high-bg);
+    color: var(--sev-high);
 }
 
 .rs-sev.medium {
-    background: #f6efd6;
-    color: #7a6520;
+    background: var(--sev-medium-bg);
+    color: var(--sev-medium);
 }
 
 .rs-sev.low {
-    background: #e4efe2;
-    color: #3f6b3d;
+    background: var(--sev-low-bg);
+    color: var(--sev-low);
 }
 
 /* ---- Forms ---- */
@@ -317,11 +317,11 @@
     width: 100%;
     height: 40px;
     padding: 0 12px;
-    border: 1px solid var(--line, rgba(0, 0, 0, .14));
-    border-radius: 9px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
     font: inherit;
     font-size: 14px;
-    background: var(--card, #fff);
+    background: var(--card);
     margin-bottom: 8px;
 }
 
@@ -342,7 +342,7 @@
 }
 
 .rs-dash-jump {
-    border-top: 1px solid var(--line, rgba(0, 0, 0, .07));
+    border-top: 1px solid var(--hairline);
     padding-top: 14px;
 }
 

@@ -37,7 +37,7 @@
         <section class="rs-dash-top">
 
             <!-- Upcoming trip, or an honest empty state -->
-            <div class="rs-card rs-dash-trip">
+            <div class="rs-card-panel rs-dash-trip">
                 <th:block th:if="${view.trip != null}">
                     <div class="rs-eyebrow">YOUR UPCOMING TRIP</div>
                     <h2 th:text="${view.trip.country != null and view.trip.country != 'Unknown'}
@@ -79,18 +79,18 @@
 
             <!-- Stats: only measures with a real source -->
             <div class="rs-dash-stats">
-                <div class="rs-card rs-stat">
+                <div class="rs-card-panel rs-stat">
                     <div class="rs-stat-num" th:text="${view.watchedCount}">0</div>
                     <div class="rs-stat-label">Destinations watched</div>
                     <div class="rs-stat-sub"
                         th:text="${view.trip != null} ? '1 upcoming trip' : 'No upcoming trip'"></div>
                 </div>
-                <div class="rs-card rs-stat">
+                <div class="rs-card-panel rs-stat">
                     <div class="rs-stat-num" th:text="${view.reportsInWatched}">0</div>
                     <div class="rs-stat-label">Reports in your destinations</div>
                     <div class="rs-stat-sub">Evidence behind your scores</div>
                 </div>
-                <div class="rs-card rs-stat">
+                <div class="rs-card-panel rs-stat">
                     <div class="rs-stat-num"
                         th:text="${view.avgConfidence != null} ? ${view.avgConfidence} + '%' : '—'">—</div>
                     <div class="rs-stat-label">Coverage confidence</div>
@@ -144,8 +144,8 @@
 
         <!-- Signals + actions -->
         <section class="rs-dash-bottom">
-            <div class="rs-card">
-                <div class="rs-eyebrow">LATEST IN YOUR DESTINATIONS</div>
+            <div class="rs-card-panel">
+                <div class="rs-eyebrow">TOP CONCERNS IN YOUR DESTINATIONS</div>
                 <div th:if="${view.signals.isEmpty()}" class="rs-muted rs-dash-empty">
                     Nothing yet. Watch a destination to see its reports here.
                 </div>
@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="rs-card" id="rs-add">
+            <div class="rs-card-panel" id="rs-add">
                 <div class="rs-eyebrow">ADD A DESTINATION</div>
 
                 <form action="/dashboard/watch" method="post" class="rs-dash-form">
