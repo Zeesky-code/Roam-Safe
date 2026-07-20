@@ -25,6 +25,9 @@
         <span th:text="${success}"></span>
         <button type="button" onclick="this.parentElement.style.display='none'">×</button>
       </div>
+      <div th:if="${param.expired}" class="rs-note err">
+        <span>Your session expired while this page was open. Please sign in again.</span>
+      </div>
       <div th:if="${error}" class="rs-note err">
         <span th:text="${error}"></span>
         <button type="button" onclick="this.parentElement.style.display='none'">×</button>

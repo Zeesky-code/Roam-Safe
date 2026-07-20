@@ -43,9 +43,11 @@
                 </svg>
             </a>
             <a th:if="${currentUser != null}" href="/logout" class="rs-signin">Sign out</a>
+            <!-- The whole ternary must sit inside ${...}: closing the expression
+                 before the "?" makes Thymeleaf emit the rest as literal text. -->
             <a th:if="${currentUser != null}" href="/dashboard" class="rs-btn-primary"
-                th:text="${currentUser.firstName != null and !currentUser.firstName.isBlank()}
-                         ? currentUser.firstName : 'Dashboard'">Dashboard</a>
+                th:text="${currentUser.firstName != null and !currentUser.firstName.isBlank()
+                          ? currentUser.firstName : 'Dashboard'}">Dashboard</a>
         </div>
     </nav>
 

@@ -20,6 +20,30 @@ public class SecurityConfig {
         }
 
         /**
+         * Turns a stale-CSRF rejection into a retry instead of a dead end.
+         *
+         * A token belongs to the session that issued it, so a login page left
+         * open across a server restart posts a token the new session has never
+         * seen. That is correct to reject, but the default response is a
+         * Whitelabel 403 with no explanation and no way forward.
+         *
+         * Only CSRF failures on browser page requests are redirected. API calls
+         * and genuine authorization failures still get a plain 403, so this
+         * can't mask a real permission problem.
+         */
+        private static org.springframework.security.web.access.AccessDeniedHandler accessDeniedHandler() {
+                return (request, response, ex) -> {
+                        boolean csrfProblem = ex instanceof org.springframework.security.web.csrf.CsrfException;
+                        boolean apiCall = request.getRequestURI().startsWith("/api/");
+                        if (csrfProblem && !apiCall) {
+                                response.sendRedirect(request.getContextPath() + "/login?expired=true");
+                                return;
+                        }
+                        response.sendError(jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN);
+                };
+        }
+
+        /**
          * Resolves the CSRF token eagerly instead of on demand.
          *
          * Setting the request-attribute name to null opts out of Spring Security
@@ -59,6 +83,7 @@ public class SecurityConfig {
 
                                                 // All other requests
                                                 .anyRequest().permitAll())
+                                .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler()))
                                 .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                                 .formLogin(form -> form.disable())
                                 .logout(logout -> logout
