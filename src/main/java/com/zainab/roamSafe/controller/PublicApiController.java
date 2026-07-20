@@ -24,12 +24,21 @@ public class PublicApiController {
     private final ScamReportRepository scamReportRepository;
     private final com.zainab.roamSafe.service.DestinationService destinationService;
     private final com.zainab.roamSafe.service.ScamService scamService;
+    private final com.zainab.roamSafe.service.StreetIntelligenceService streetService;
+    private final com.zainab.roamSafe.service.CityCountryResolver countryResolver;
+    private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
 
     public PublicApiController(SafetyScoreService safetyScoreService,
             CitySummaryService citySummaryService,
             ScamReportRepository scamReportRepository,
             com.zainab.roamSafe.service.DestinationService destinationService,
-            com.zainab.roamSafe.service.ScamService scamService) {
+            com.zainab.roamSafe.service.ScamService scamService,
+            com.zainab.roamSafe.service.StreetIntelligenceService streetService,
+            com.zainab.roamSafe.service.CityCountryResolver countryResolver,
+            com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService) {
+        this.streetService = streetService;
+        this.countryResolver = countryResolver;
+        this.emergencyNumberService = emergencyNumberService;
         this.safetyScoreService = safetyScoreService;
         this.citySummaryService = citySummaryService;
         this.scamReportRepository = scamReportRepository;
@@ -176,5 +185,118 @@ public class PublicApiController {
         if (score >= 40)
             return "ELEVATED";
         return "HIGH";
+    }
+
+    /**
+     * Street-level intelligence for a named place.
+     *
+     * Searching returns every place that matches so a caller can disambiguate;
+     * passing ?city= pins it to one profile. An unmatched place returns an
+     * explicit no-coverage body, never an empty 404, so an agent can tell "no
+     * data" from "bad request" and doesn't fall back on inventing an answer.
+     */
+    @GetMapping("/street")
+    public ResponseEntity<Map<String, Object>> street(@RequestParam String place,
+            @RequestParam(required = false) String city) {
+        Map<String, Object> response = new HashMap<>();
+        List<com.zainab.roamSafe.service.StreetIntelligenceService.Match> matches =
+                streetService.search(place);
+
+        if (matches.isEmpty()) {
+            response.put("place", place);
+            response.put("covered", false);
+            response.put("message", "No report in RoamSafe names this place. "
+                    + "That is an absence of evidence, not a finding that it is safe.");
+            return ResponseEntity.status(404).body(response);
+        }
+
+        var target = matches.stream()
+                .filter(m -> city == null || m.city().equalsIgnoreCase(city))
+                .findFirst().orElse(null);
+        if (target == null) {
+            response.put("place", place);
+            response.put("covered", false);
+            response.put("message", "That place isn't reported in " + city + ".");
+            response.put("matches", matches);
+            return ResponseEntity.status(404).body(response);
+        }
+
+        String country = countryResolver.countryFor(target.city()).orElse(null);
+        var profile = streetService.profile(target.city(), target.place(), country).orElse(null);
+        if (profile == null) {
+            response.put("place", place);
+            response.put("covered", false);
+            return ResponseEntity.status(404).body(response);
+        }
+
+        response.put("covered", true);
+        response.put("place", profile.place());
+        response.put("city", profile.city());
+        response.put("country", profile.country());
+        response.put("safetyScore", profile.score());
+        response.put("riskLevel", profile.riskLevel());
+        response.put("reports", profile.reports());
+        // Null rather than 0 when there is too little evidence to state a share.
+        response.put("nightIncidentSharePct", profile.nightSharePct());
+        response.put("thinEvidence", profile.thinEvidence());
+        response.put("concerns", profile.categories());
+        response.put("preventionTips", profile.preventionTips());
+        response.put("saferAlternatives", profile.saferAlternatives());
+        response.put("evidence", profile.evidence().stream().map(r -> Map.of(
+                "title", r.getName() == null ? "" : r.getName(),
+                "description", r.getDescription() == null ? "" : r.getDescription(),
+                "category", r.getCategory() == null ? "General" : r.getCategory(),
+                "severityScore", r.getSeverityScore())).toList());
+        if (country != null) {
+            emergencyNumberService.forCountry(country).ifPresent(e -> {
+                Map<String, Object> numbers = new HashMap<>();
+                numbers.put("primary", e.getPrimary());
+                numbers.put("general", e.getGeneral());
+                numbers.put("police", e.getPolice());
+                numbers.put("ambulance", e.getAmbulance());
+                numbers.put("fire", e.getFire());
+                numbers.put("source", e.getSource());
+                response.put("emergencyNumbers", numbers);
+            });
+        }
+        // Other cities with a place of the same name, so an agent can offer them.
+        if (matches.size() > 1) {
+            response.put("alsoFoundIn", matches.stream()
+                    .filter(m -> !m.city().equalsIgnoreCase(target.city()))
+                    .map(m -> Map.of("place", m.place(), "city", m.city(), "reports", m.reports()))
+                    .toList());
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Emergency numbers for a country. Split out so an agent can answer "what do
+     * I dial" without pulling a whole city profile.
+     */
+    @GetMapping("/emergency/{country}")
+    public ResponseEntity<Map<String, Object>> emergency(@PathVariable String country) {
+        return emergencyNumberService.forCountry(country)
+                .<ResponseEntity<Map<String, Object>>>map(e -> {
+                    Map<String, Object> body = new HashMap<>();
+                    body.put("country", e.getCountry());
+                    body.put("covered", true);
+                    body.put("primary", e.getPrimary());
+                    body.put("general", e.getGeneral());
+                    body.put("police", e.getPolice());
+                    body.put("ambulance", e.getAmbulance());
+                    body.put("fire", e.getFire());
+                    body.put("source", e.getSource());
+                    body.put("sourceUrl", e.getSourceUrl());
+                    body.put("note", "Verify locally on arrival where you can.");
+                    return ResponseEntity.ok(body);
+                })
+                .orElseGet(() -> {
+                    Map<String, Object> body = new HashMap<>();
+                    body.put("country", country);
+                    body.put("covered", false);
+                    body.put("message", "RoamSafe has no emergency numbers for this country. "
+                            + "None have been inferred - check an official source before travelling.");
+                    return ResponseEntity.status(404).body(body);
+                });
     }
 }

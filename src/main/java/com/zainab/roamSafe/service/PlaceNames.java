@@ -46,6 +46,29 @@ public final class PlaceNames {
             "harassment ", "violence ", "fraud ", "assault ", "avoid ", "beware ");
 
     /**
+     * Words that make a value a thing or a person rather than somewhere you can
+     * stand. The importer produced "Taxi drivers" and "Shoe shine scam", which
+     * reached the UI as better-scoring *areas* to go to instead - the same class
+     * of nonsense as recommending the "Stay safe" district. Checked as whole
+     * words so a genuine place isn't caught by a substring.
+     */
+    private static final Set<String> TOPIC_WORDS = Set.of(
+            "scam", "scams", "driver", "drivers", "vendor", "vendors", "seller", "sellers",
+            "tout", "touts", "taxi", "taxis", "waiter", "waiters", "staff", "tourist", "tourists",
+            "locals", "stranger", "strangers", "gang", "gangs", "thief", "thieves", "beggar",
+            "beggars", "pickpockets", "shine", "exchange", "machine", "machines", "wifi",
+            "card", "cards", "money", "currency", "ticket", "tickets", "rental", "rentals",
+            "fake", "police", "officer", "officers", "guard", "guards", "agent", "agents",
+            "men", "man", "women", "woman", "people", "children", "kids", "youths",
+            // Currencies, which the extractor picked up from price warnings.
+            "lira", "euro", "euros", "dollar", "dollars", "peso", "pesos", "baht", "yen",
+            "rupee", "rupees", "pound", "pounds", "dirham", "naira", "zloty", "koruna",
+            // Activities. Listed explicitly rather than matching an "-ing" suffix,
+            // which would also reject real places such as Beijing and Nanjing.
+            "overpricing", "overcharging", "begging", "haggling", "bargaining", "tipping",
+            "spiking", "scamming", "cheating", "littering", "smoking", "drinking");
+
+    /**
      * The distinct places named in one neighborhood value, in order.
      *
      * A value listing several places yields several names; a heading yields none.
@@ -85,6 +108,14 @@ public final class PlaceNames {
         // A fragment with no letters, or one that reads as a sentence, isn't a name.
         if (!name.matches(".*[A-Za-z].*") || name.split("\\s+").length > 5) {
             return null;
+        }
+        // A value naming a thing or a person is not a location, however it's
+        // phrased: "Taxi drivers" and "Shoe shine scam" are neither districts
+        // nor places anyone can be told to go to instead.
+        for (String word : lower.split("[^a-z]+")) {
+            if (TOPIC_WORDS.contains(word)) {
+                return null;
+            }
         }
         return name;
     }

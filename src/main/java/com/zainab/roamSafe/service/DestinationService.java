@@ -109,42 +109,9 @@ public class DestinationService {
         return meters;
     }
 
-    /**
-     * Section headings the Wikivoyage import stored in the neighborhood field
-     * when no specific area was named. They are topics, not places, and would
-     * otherwise surface as advice like "avoid Stay safe after dark".
-     */
-    private static final java.util.Set<String> NOT_A_PLACE = java.util.Set.of(
-            "stay safe", "safety", "crime", "crimes", "scam", "scams", "theft", "pickpocketing",
-            "police", "emergency", "emergencies", "health", "natural disasters", "general",
-            "drugs", "terrorism", "racism", "anti-semitism", "homophobia", "women", "lgbt",
-            "solo travel", "transport", "getting around", "respect", "cope", "connect",
-            "traffic", "road safety", "corruption", "begging", "harassment",
-            // Objects/topics the extractor also mislabelled as neighborhoods
-            "violent crimes", "reporting crimes", "football", "cars", "atm", "atms",
-            "public transport", "public transportation", "subway", "metro", "buses", "trains",
-            "taxis", "nightlife", "beaches", "tourist areas", "certain tourist hotspots",
-            "areas of caution", "tourist hotspots", "restaurants", "bars", "hotels", "markets");
-
-    /** Phrases like "Theft in public transit" describe a risk, not a district. */
-    private static final List<String> TOPIC_PREFIXES = List.of(
-            "theft ", "scam", "crime ", "pickpocket", "robbery ", "mugging ",
-            "harassment ", "violence ", "fraud ", "assault ");
-
-    /** True when a neighborhood value is really a topic/heading, not a location. */
-    private static boolean isRealPlace(String name) {
-        String n = name.trim().toLowerCase();
-        if (n.isEmpty() || NOT_A_PLACE.contains(n)) {
-            return false;
-        }
-        for (String p : TOPIC_PREFIXES) {
-            if (n.startsWith(p)) {
-                return false;
-            }
-        }
-        // Long values are sentences/descriptions from the extractor, not place names.
-        return name.trim().length() <= 45;
-    }
+    // Place-name cleaning lives in PlaceNames, shared with street intelligence.
+    // It used to be duplicated here, and the two copies had already drifted:
+    // this one still admitted "Taxi drivers" and "Shoe shine scam" as districts.
 
     /** Aggregate reports by neighborhood → a safety score per district. */
     private List<NeighborhoodTile> neighborhoods(List<ScamReport> reports) {
@@ -153,17 +120,17 @@ public class DestinationService {
         Map<String, double[]> byHood = new LinkedHashMap<>();
         Map<String, String> displayName = new LinkedHashMap<>();
         for (ScamReport r : reports) {
-            String hood = r.getNeighborhood();
-            if (hood == null || hood.isBlank() || !isRealPlace(hood))
-                continue;
-            String name = hood.trim();
-            String key = name.toLowerCase();
-            displayName.putIfAbsent(key, name);
-            double[] acc = byHood.computeIfAbsent(key, k -> new double[3]);
-            acc[0] += r.getSeverityScore();
-            acc[1] += 1;
-            if (Boolean.TRUE.equals(r.getIsNightTimeIncident()))
-                acc[2] += 1;
+            // One value can name several places ("La Rambla, Raval"); each gets
+            // the report, because the source really did report it against each.
+            for (String name : PlaceNames.extract(r.getNeighborhood())) {
+                String key = name.toLowerCase();
+                displayName.putIfAbsent(key, name);
+                double[] acc = byHood.computeIfAbsent(key, k -> new double[3]);
+                acc[0] += r.getSeverityScore();
+                acc[1] += 1;
+                if (Boolean.TRUE.equals(r.getIsNightTimeIncident()))
+                    acc[2] += 1;
+            }
         }
         List<NeighborhoodTile> tiles = new ArrayList<>();
         for (Map.Entry<String, double[]> e : byHood.entrySet()) {
@@ -234,9 +201,8 @@ public class DestinationService {
         for (ScamReport r : reports) {
             if (Boolean.TRUE.equals(r.getIsNightTimeIncident())) {
                 night++;
-                String hood = r.getNeighborhood();
-                if (hood != null && !hood.isBlank() && isRealPlace(hood)) {
-                    areas.merge(hood.trim(), 1, Integer::sum);
+                for (String name : PlaceNames.extract(r.getNeighborhood())) {
+                    areas.merge(name, 1, Integer::sum);
                 }
             }
         }

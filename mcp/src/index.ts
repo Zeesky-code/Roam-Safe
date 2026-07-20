@@ -467,5 +467,150 @@ server.registerTool(
   }
 );
 
+
+/* -------------------------- street intelligence -------------------------- */
+
+type StreetProfile = {
+  covered: boolean;
+  place?: string;
+  city?: string;
+  country?: string;
+  safetyScore?: number | null;
+  riskLevel?: string | null;
+  reports?: number;
+  nightIncidentSharePct?: number | null;
+  thinEvidence?: boolean;
+  concerns?: string[];
+  preventionTips?: string[];
+  saferAlternatives?: Array<{ place: string; score: number; reports: number }>;
+  evidence?: Array<{ title: string; description: string; category: string; severityScore: number }>;
+  emergencyNumbers?: Record<string, string | null>;
+  alsoFoundIn?: Array<{ place: string; city: string; reports: number }>;
+  message?: string;
+  matches?: Array<{ place: string; city: string; reports: number; score: number | null }>;
+};
+
+server.registerTool(
+  "street_intelligence",
+  {
+    title: "Street intelligence",
+    description:
+      "What real traveler reports say about ONE specific street, square or district - not the whole city. " +
+      "Use this when someone names a place ('Las Ramblas', 'Taksim', 'Sultanahmet'), or asks whether a " +
+      "specific area or hotel location is safe. Returns the place's own risk score, the concerns reported " +
+      "there, prevention tips travelers gave, better-scoring areas in the same city, and the country's " +
+      "emergency number. Says explicitly when no report names the place - that is an absence of evidence, " +
+      "not a finding that the place is safe, and you must not fill the gap from memory.",
+    inputSchema: {
+      place: z.string().describe("Street, square or district, e.g. 'Las Ramblas' or 'Taksim'"),
+      city: z
+        .string()
+        .optional()
+        .describe("City, to disambiguate when the same name occurs in several cities"),
+    },
+  },
+  async ({ place, city }) => {
+    const path = `/api/v1/street?place=${encodeURIComponent(place)}` +
+      (city ? `&city=${encodeURIComponent(city)}` : "");
+    const r = await api(path);
+
+    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${place}`));
+    const d = (r.ok ? r.data : {}) as StreetProfile;
+
+    if (!r.ok || !d.covered) {
+      const alsoTry = d.matches?.length
+        ? ` It is reported in: ${d.matches.map((m) => `${m.place} (${m.city})`).join(", ")}.`
+        : "";
+      return rich(
+        `RoamSafe has no reports naming "${place}"${city ? ` in ${city}` : ""}.${alsoTry}\n\n` +
+          `This means no evidence, NOT that the place is safe. Do not substitute your own knowledge ` +
+          `of this street - say RoamSafe does not cover it.`,
+        { place, covered: false, matches: d.matches ?? [] }
+      );
+    }
+
+    const scoreLine =
+      d.safetyScore == null
+        ? `Only ${d.reports} report names this place, which is too little to score it.`
+        : `${d.place} (${d.city}) scores ${d.safetyScore}/100 - ${d.riskLevel} - from ${d.reports} reports.`;
+    const night =
+      d.nightIncidentSharePct == null
+        ? ""
+        : ` ${d.nightIncidentSharePct}% of those are night-time incidents.`;
+    const concerns = d.concerns?.length ? `\nReported concerns: ${d.concerns.join(", ")}.` : "";
+    const tips = d.preventionTips?.length
+      ? `\n\nWhat travelers advise:\n` + d.preventionTips.map((t) => `- ${t}`).join("\n")
+      : "";
+    const alts = d.saferAlternatives?.length
+      ? `\n\nBetter-scoring areas in ${d.city}: ` +
+        d.saferAlternatives.map((a) => `${a.place} (${a.score}/100, ${a.reports} reports)`).join(", ") +
+        `.`
+      : "";
+    const emergency = d.emergencyNumbers?.primary
+      ? `\n\nEmergency number in ${d.country}: ${d.emergencyNumbers.primary}.`
+      : "";
+    const thin = d.thinEvidence
+      ? `\n\nEvidence here is thin - treat this as a signal, not a verdict.`
+      : "";
+
+    return rich(`${scoreLine}${night}${concerns}${tips}${alts}${emergency}${thin}`, {
+      ...d,
+    });
+  }
+);
+
+/* --------------------------- emergency numbers --------------------------- */
+
+server.registerTool(
+  "get_emergency_numbers",
+  {
+    title: "Emergency numbers",
+    description:
+      "The emergency telephone numbers for a country, from a structured official source. Use this whenever " +
+      "someone asks what to dial, or when giving safety advice for a destination. NEVER answer this from " +
+      "memory: a wrong emergency number costs someone time in a crisis. If RoamSafe has no data for the " +
+      "country, say so and tell the user to check an official source.",
+    inputSchema: {
+      country: z.string().describe("Country name, e.g. 'Japan', 'Türkiye', 'United States'"),
+    },
+  },
+  async ({ country }) => {
+    const r = await api(`/api/v1/emergency/${encodeURIComponent(country)}`);
+    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${country}`));
+    const d = (r.ok ? r.data : {}) as {
+      covered: boolean;
+      country: string;
+      primary?: string;
+      general?: string | null;
+      police?: string | null;
+      ambulance?: string | null;
+      fire?: string | null;
+      source?: string;
+    };
+
+    if (!r.ok || !d.covered) {
+      return rich(
+        `RoamSafe has no emergency numbers for "${country}". Do not guess one - tell the user to check ` +
+          `an official source such as their government's travel advice page.`,
+        { country, covered: false }
+      );
+    }
+
+    const parts = [
+      d.general ? `general ${d.general}` : null,
+      d.police ? `police ${d.police}` : null,
+      d.ambulance ? `ambulance ${d.ambulance}` : null,
+      d.fire ? `fire ${d.fire}` : null,
+    ].filter(Boolean);
+
+    return rich(
+      `In ${d.country}, dial ${d.primary} for emergency services.` +
+        (parts.length ? ` Full list: ${parts.join(", ")}.` : "") +
+        ` Source: ${d.source}. Services with no separate number are omitted rather than assumed.`,
+      { ...d }
+    );
+  }
+);
+
 const transport = new StdioServerTransport();
 await server.connect(transport);

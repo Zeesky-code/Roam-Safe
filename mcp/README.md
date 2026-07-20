@@ -19,6 +19,8 @@ agent can reason over the numbers instead of parsing prose.
 | `get_city_safety` | Full profile: score, risk level, **risk split by concern** (theft/financial/harassment/transport/digital), **neighborhood scores**, **night-time risk + where it clusters**, and **evidence metadata** (report count, date range, confidence) |
 | `get_neighborhood_safety` | District-level scores within a city, safest first, with report and night-incident counts |
 | `list_recent_alerts` | Newest traveler-reported signals worldwide; optional `city` filter |
+| `street_intelligence` | **One specific street, square or district**: its own risk score, concerns reported there, prevention tips travelers gave, better-scoring areas nearby, and the country's emergency number. Disambiguates when a name occurs in several cities |
+| `get_emergency_numbers` | Emergency numbers for a country, from structured official data. Refuses to guess — a wrong number costs someone time in a crisis |
 | `compare_cities` | Rank up to **10** cities, either overall or by a specific `concern`. Explains *why* the top beats the bottom, and suggests real alternatives for uncovered cities |
 
 ### What it deliberately won't do
@@ -26,7 +28,7 @@ agent can reason over the numbers instead of parsing prose.
 RoamSafe only reports what its data supports. These are **not** available because
 the underlying data doesn't exist — the tools will say so rather than guess:
 
-- **Historical trends / "is it improving?"** — no score snapshots are retained
+- **Historical trends / "is it improving?"** — daily score snapshots now run, but a trend needs days of history before it can be shown
 - **Seasonality** ("August protests") — report timestamps aren't reliable enough
 - **Population / region filters** — no population data; country is unknown for many cities
 - **Non-safety criteria** ("safety + nightlife") — RoamSafe has no nightlife data
