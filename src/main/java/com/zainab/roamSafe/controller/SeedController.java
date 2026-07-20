@@ -35,6 +35,27 @@ public class SeedController {
         @Autowired
         private AdvisoryIngestionService advisoryIngestionService;
 
+        @Autowired
+        private com.zainab.roamSafe.service.PoliceDataService policeDataService;
+
+        /**
+         * One-shot trigger to pull recorded crime from data.police.uk.
+         *
+         * Runs inline and takes a couple of minutes (16 cities x 3 months, paced
+         * so the free source isn't hammered), so call it deliberately rather than
+         * from anything user-facing.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/police")
+        public ResponseEntity<String> refreshPoliceData() {
+                var result = policeDataService.refreshAll();
+                return ResponseEntity.ok("Police data refresh complete: "
+                                + result.cityMonths() + " city-months, "
+                                + result.crimes() + " crimes recorded"
+                                + (result.unpublished().isEmpty() ? ""
+                                                : ", no force data for: " + result.unpublished())
+                                + (result.failed().isEmpty() ? "." : ", failed: " + result.failed()));
+        }
+
         /** One-shot trigger to (re)populate government advisories (UK + US). */
         @org.springframework.web.bind.annotation.GetMapping("/advisories")
         public ResponseEntity<String> refreshAdvisories() {
