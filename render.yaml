@@ -1,0 +1,54 @@
+# Render Blueprint.
+#
+# Exists mainly as a control: the same Docker image against the same Neon
+# database, on a different provider's network. Brimble's containers time out
+# reaching Neon after 10s while a laptop reaches it in ~200ms, and there is no
+# way to tell a platform networking problem from an application one without a
+# second platform to compare against.
+#
+# Deploy: Render dashboard -> New -> Blueprint -> pick this repo.
+services:
+  - type: web
+    name: roamsafe
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+
+    # Dependency-free liveness path. Pointing a health check at "/" makes it
+    # depend on the database and on a full page render, so a slow database
+    # fails the deploy itself rather than just the pages that need data.
+    healthCheckPath: /health
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # The free instance has 512MB. Spring Boot's non-heap use here is
+      # substantial - metaspace alone measured ~94MB - so 70% for the heap
+      # leaves too little for metaspace, thread stacks and code cache, and the
+      # container gets OOM-killed without a clean error. 50% keeps the total
+      # inside the limit.
+      - key: JAVA_OPTS
+        value: -XX:MaxRAMPercentage=50 -XX:MaxMetaspaceSize=160m
+
+      # Secrets: set these in the Render dashboard, never in this file.
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_DRIVER
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BACH_DEMO_KEY
+        sync: false
+      - key: BACHS_TRIP_PASS_PRODUCT
+        sync: false
+      - key: BACHS_NOMAD_PRODUCT
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
