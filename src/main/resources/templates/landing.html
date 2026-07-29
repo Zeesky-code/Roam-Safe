@@ -4,292 +4,182 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RoamSafe · Know before you go</title>
+    <title>RoamSafe — travel safety, checked to the source</title>
     <meta name="description"
-        content="Evidence-backed travel intelligence. Real scam reports and neighborhood-level safety scores. RoamSafe summarizes, it never invents." />
+        content="Government advisories, local news and traveler reports for exactly where you're going, in one sourced briefing. RoamSafe summarizes what's real and never invents." />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/landing.css}" />
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
 
-    <!-- GLOBAL SHELL: nav + command palette -->
-    <div th:replace="~{fragments/shell :: nav('explore')}"></div>
     <div th:replace="~{fragments/shell :: palette(${paletteItems})}"></div>
 
-    <main class="rs-wrap">
+    <!-- ============ HERO (redesign) ============ -->
+    <section class="lp-hero">
+        <div class="lp-bg" aria-hidden="true"><div class="lp-photo"></div><div class="lp-scrim"></div></div>
 
-        <!-- ============ HERO ============ -->
-        <section class="rs-hero">
-            <div>
-                <div class="rs-hero-chip-row">
-                    <span class="rs-chip-dark">✦ AI-native</span>
-                    <span class="rs-chip-quiet">Travel intelligence, not travel warnings</span>
+        <nav class="lp-nav">
+            <a class="lp-brand" href="/">RoamSafe</a>
+            <div class="lp-links">
+                <a href="/scams">Library</a><a href="/street">Streets</a><a href="/compare">Compare</a><a href="/guide">Guide</a><a href="/developers">API</a>
+            </div>
+            <div class="lp-nav-right">
+                <a th:if="${currentUser == null}" class="lp-btn lp-btn-glass" href="/login">Sign in</a>
+                <a th:if="${currentUser == null}" class="lp-btn lp-btn-glass" href="/register">Get started</a>
+                <a th:if="${currentUser != null}" class="lp-btn lp-btn-glass" href="/dashboard"
+                    th:text="${currentUser.firstName != null and !currentUser.firstName.isBlank()} ? currentUser.firstName : 'Dashboard'">Dashboard</a>
+                <button class="lp-theme" id="lpTheme" type="button" aria-label="Toggle light and dark theme"><svg class="lp-i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg><svg class="lp-i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+            </div>
+        </nav>
+
+        <div class="lp-body">
+            <span class="lp-eyebrow lp-mono"><span class="lp-dot"></span>Travel intelligence</span>
+            <h1>Know what you're<br>walking into.</h1>
+            <p class="lp-lede">Government advisories, local news and traveler reports for exactly where you're going, sorted into one briefing. <b>Every claim links to its source. Nothing is made up.</b></p>
+            <form class="lp-search" action="/scams" method="get">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input name="city" placeholder="Where are you headed? Try Istanbul…" aria-label="Destination" required />
+                <button class="lp-btn lp-btn-primary" type="submit">Get briefing</button>
+            </form>
+            <div class="lp-tags">
+                <span class="lp-label lp-mono">Popular</span>
+                <a class="lp-tag" href="/scams?city=Tokyo">Tokyo</a><a class="lp-tag" href="/scams?city=Bali">Bali</a><a class="lp-tag" th:href="@{/scams(city='Mexico City')}">Mexico City</a><a class="lp-tag" href="/scams?city=Lisbon">Lisbon</a>
+            </div>
+        </div>
+
+        <!-- live briefing card: real computed score for a real city -->
+        <aside class="lp-peek" th:if="${briefing != null}">
+            <div class="lp-peek-head">
+                <div class="lp-peek-city">
+                    <span class="lp-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                    <div><h3 th:text="${briefing.city}">City</h3><div class="lp-updated lp-mono"><span class="lp-live-dot"></span><span th:text="${briefing.updated}">updated</span></div></div>
                 </div>
-                <h1>Know before you go.<br><span class="rs-h1-alt">Backed by evidence.</span></h1>
-                <p class="rs-hero-sub">
-                    Scattered advisories, local news and traveler reports, structured into one calm,
-                    sourced briefing. We summarize what's real. We never invent.
-                </p>
-
-                <form action="/scams" method="get">
-                    <div class="rs-searchbar">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.3-4.3" />
-                        </svg>
-                        <input type="text" name="city" placeholder="Where are you headed? Try Tokyo…" />
-                        <button type="submit">Get briefing</button>
-                    </div>
-                </form>
-                <div class="rs-popular">
-                    Popular:
-                    <a th:each="c : ${popularCities}" th:href="@{/scams(city=${c})}" th:text="${c}" class="rs-pill">City</a>
+                <div class="lp-score"><div class="lp-score-n" th:text="${briefing.score}">51</div><div class="lp-score-cap lp-mono">Score</div></div>
+            </div>
+            <div class="lp-meters">
+                <div class="lp-meter-row" th:each="m : ${briefing.meters}">
+                    <div class="lp-meter-top"><span th:text="${m.label}">Risk</span><span class="lp-v" th:text="${m.value}">0</span></div>
+                    <div class="lp-track"><div class="lp-fill" th:attr="data-w=${m.value}" th:style="'background:var(--sev-' + ${m.severity} + ')'"></div></div>
                 </div>
             </div>
+            <div class="lp-peek-foot"><span th:text="'From ' + ${briefing.reports} + ' traveler reports'">reports</span><a th:href="@{/scams(city=${briefing.city})}">Open &rarr;</a></div>
+        </aside>
 
-            <!-- Hero briefing panel (real computed score for a real city) -->
-            <div class="rs-hero-panel">
-                <div class="rs-briefing" th:if="${briefing != null}">
-                    <div class="rs-briefing-head">
-                        <span class="rs-briefing-tile">
-                            <i data-lucide="map-pin" style="width:20px;height:20px;"></i>
-                        </span>
-                        <span>
-                            <span class="rs-briefing-city" th:text="${briefing.city}">City</span><br>
-                            <span class="rs-briefing-updated" th:text="${briefing.updated}">updated</span>
-                        </span>
-                        <span class="rs-briefing-score">
-                            <b th:text="${briefing.score}">86</b>
-                            <small>SAFETY SCORE</small>
-                        </span>
-                    </div>
-                    <div class="rs-meter" th:each="m : ${briefing.meters}">
-                        <div class="rs-meter-row">
-                            <span class="rs-meter-label" th:text="${m.label}">Risk</span>
-                            <span class="rs-meter-val" th:style="'color:var(--sev-' + ${m.severity} + ')'"
-                                th:text="${m.value} + '/100'">22/100</span>
-                        </div>
-                        <div class="rs-meter-track">
-                            <div class="rs-meter-fill"
-                                th:style="'width:' + ${m.value} + '%;background:var(--sev-' + ${m.severity} + ')'"></div>
-                        </div>
-                    </div>
-                    <div class="rs-briefing-foot">
-                        <i data-lucide="link" style="width:13px;height:13px;"></i>
-                        <span th:text="'Evidence-backed from ' + ${briefing.reports} + ' traveler reports'">Evidence</span>
-                    </div>
-                </div>
+        <div class="lp-scroll" aria-hidden="true"><div class="lp-mouse"></div><span class="lp-mono" style="font-size:10px">Scroll</span></div>
+    </section>
 
-                <!-- Floating alert cards -->
-                <div class="rs-float-card rs-float-a" th:if="${briefing != null}">
-                    <span class="rs-float-icon" style="background:var(--sev-medium-bg);color:var(--sev-medium)">
-                        <i data-lucide="train-front" style="width:16px;height:16px;"></i>
-                    </span>
-                    <span>
-                        <span class="rs-float-title">Live safety scores</span><br>
-                        <span class="rs-float-meta">Re-checked as reports arrive</span>
-                    </span>
-                </div>
-                <div class="rs-float-card rs-float-b" th:if="${briefing != null}">
-                    <span class="rs-float-icon" style="background:var(--sev-low-bg);color:var(--sev-low)">
-                        <i data-lucide="shield-check" style="width:16px;height:16px;"></i>
-                    </span>
-                    <span>
-                        <span class="rs-float-title">Neighborhood-level</span><br>
-                        <span class="rs-float-meta">Districts, not just countries</span>
-                    </span>
+    <!-- ============ PROOF BAND ============ -->
+    <section class="lp-band">
+        <div class="lp-cell"><span class="lp-mono">Down to the block</span><h4>Street level, not country level</h4><p>An official advisory covers a whole country. We score the neighborhood you booked, and point you to a calmer one nearby.</p></div>
+        <div class="lp-cell"><span class="lp-mono">Updated when it happens</span><h4>Live, not once a year</h4><p>Government advice refreshes on a slow schedule. Your briefing changes the moment a new report comes in.</p></div>
+        <div class="lp-cell"><span class="lp-mono">Site &middot; API &middot; MCP</span><h4>Built to plug in</h4><p>The same sourced data runs the website, a REST API, and a server your AI assistant can query directly.</p></div>
+    </section>
+
+    <main class="lp-main">
+
+        <!-- TRUST STRIP (real counts) -->
+        <section class="lp-section">
+            <div class="lp-stats" style="grid-template-columns:repeat(4,1fr)"
+                th:style="'grid-template-columns:repeat(' + ${#lists.size(stats)} + ',1fr)'">
+                <div class="lp-stat" th:each="s : ${stats}">
+                    <div class="lp-stat-num" th:text="${s.value}">0</div>
+                    <div class="lp-stat-label" th:text="${s.label}">Label</div>
                 </div>
             </div>
         </section>
 
-        <!-- ============ TRUST STRIP (real counts) ============ -->
-        <section class="rs-section rs-trust"
-            style="grid-template-columns:repeat(4,1fr)" th:style="'grid-template-columns:repeat(' + ${#lists.size(stats)} + ',1fr)'">
-            <div class="rs-trust-item" th:each="s : ${stats}">
-                <div class="rs-trust-num" th:text="${s.value}">0</div>
-                <div class="rs-trust-label" th:text="${s.label}">Label</div>
+        <!-- WHY -->
+        <section class="lp-section">
+            <div class="lp-sec-eyebrow lp-mono">Why RoamSafe</div>
+            <h2 class="lp-h2">An intelligence briefing, not a fear feed</h2>
+            <p class="lp-sec-lede">Every insight traces back to the reports and advisories behind it. No vibes, no invented statistics.</p>
+            <div class="lp-grid">
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="shield-check"></i></div><h3>Evidence before AI</h3><p>Every insight links to the reports and sources behind it. We summarize, we never invent.</p></div>
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="map-pin"></i></div><h3>Neighborhood-level risk</h3><p>Skip country-wide fear. See which districts and streets actually warrant attention.</p></div>
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="activity"></i></div><h3>Updated as reports arrive</h3><p>Scores are recalculated when new traveler reports and advisories come in, not once a year.</p></div>
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="triangle-alert"></i></div><h3>Scam intelligence</h3><p>A living library of local scams with the warning signs and how travelers got out clean.</p></div>
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="users"></i></div><h3>From real travelers</h3><p>Structured reports from people who were actually there, weighted by reliability.</p></div>
+                <div class="lp-card"><div class="lp-card-ic"><i data-lucide="compass"></i></div><h3>One clear briefing</h3><p>Any destination becomes a calm, practical brief you can read before you book.</p></div>
             </div>
         </section>
 
-        <!-- ============ FEATURES ============ -->
-        <section class="rs-section">
-            <div class="rs-eyebrow">✦ Why RoamSafe</div>
-            <h2 class="rs-h2">An intelligence briefing, not a fear feed</h2>
-            <p class="rs-lede" style="max-width:560px">
-                Every insight is traceable to the reports and advisories behind it. No vibes, no invented
-                statistics.
-            </p>
-            <div class="rs-feature-grid">
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="shield-check"></i></div>
-                    <h3>Evidence before AI</h3>
-                    <p>Every insight links to the reports and sources behind it. We summarize, we never invent.</p>
-                </div>
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="map-pin"></i></div>
-                    <h3>Neighborhood-level risk</h3>
-                    <p>Skip country-wide fear. See which districts and streets actually warrant attention.</p>
-                </div>
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="activity"></i></div>
-                    <h3>Continuously updated</h3>
-                    <p>Scores are recalculated as new traveler reports and advisories come in.</p>
-                </div>
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="shield"></i></div>
-                    <h3>Scam intelligence</h3>
-                    <p>A living library of local scams with warning signs and how travelers got out clean.</p>
-                </div>
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="users"></i></div>
-                    <h3>From real travelers</h3>
-                    <p>Structured reports from people who were actually there, weighted by reliability.</p>
-                </div>
-                <div class="rs-feature-card">
-                    <div class="rs-feature-tile"><i data-lucide="sparkles"></i></div>
-                    <h3>Trip briefings</h3>
-                    <p>Turn any destination into a calm, practical intelligence brief in seconds.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============ HOW IT WORKS ============ -->
-        <section class="rs-section rs-how">
-            <div>
-                <div class="rs-eyebrow">How it works</div>
-                <h2>AI summarizes. Evidence decides.</h2>
-                <p>We gather sources, structure them with AI, and link every claim back to where it came from.
-                    Nothing is generated without a source underneath it.</p>
-                <a href="/scams" class="rs-btn-cream">See a live report
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14" />
-                        <path d="m12 5 7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-            <div class="rs-steps">
-                <div class="rs-step">
-                    <span class="rs-step-num">01</span>
-                    <div>
-                        <h4>Gather</h4>
-                        <p>Advisories, local news and traveler reports are pulled in continuously.</p>
-                    </div>
-                </div>
-                <div class="rs-step">
-                    <span class="rs-step-num">02</span>
-                    <div>
-                        <h4>Structure</h4>
-                        <p>AI classifies and scores each signal (scam, transport, safety) by severity and location.</p>
-                    </div>
-                </div>
-                <div class="rs-step">
-                    <span class="rs-step-num">03</span>
-                    <div>
-                        <h4>Link back</h4>
-                        <p>Every number in a briefing traces to the evidence it was built from.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============ LIVE INTEL (real cities + computed scores) ============ -->
-        <section class="rs-section" th:if="${intel != null and !intel.empty}">
-            <div class="rs-intel-head">
+        <!-- HOW IT WORKS -->
+        <section class="lp-section">
+            <div class="lp-how">
                 <div>
-                    <div class="rs-eyebrow"><span class="rs-live-dot"></span> Live now</div>
-                    <h2 class="rs-h2" style="margin-bottom:0">Safety scores, from real reports</h2>
+                    <div class="lp-sec-eyebrow lp-mono">How it works</div>
+                    <h2 class="lp-h2">AI summarizes. Evidence decides.</h2>
+                    <p class="lp-sec-lede">We gather sources, structure them with AI, and link every claim back to where it came from. Nothing is generated without a source underneath it.</p>
+                    <a href="/scams" class="lp-link-btn" style="margin-top:20px">See a live report
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
                 </div>
-                <a href="/scams" class="rs-btn-outline">Open all destinations</a>
+                <div class="lp-steps">
+                    <div class="lp-step"><span class="lp-step-n">01</span><div><h4>Gather</h4><p>Advisories, local news and traveler reports are pulled in continuously.</p></div></div>
+                    <div class="lp-step"><span class="lp-step-n">02</span><div><h4>Structure</h4><p>AI classifies and scores each signal by type, severity and location.</p></div></div>
+                    <div class="lp-step"><span class="lp-step-n">03</span><div><h4>Link back</h4><p>Every number in a briefing traces to the evidence it was built from.</p></div></div>
+                </div>
             </div>
-            <div class="rs-intel-grid">
-                <a th:each="c : ${intel}" th:href="@{/scams(city=${c.city})}" class="rs-intel-card">
-                    <div class="rs-intel-photo" th:style="'background:' + ${c.tint}">
-                        <div class="rs-intel-photo-label">
-                            <b th:text="${c.city}">City</b>
-                            <span th:text="${c.reports} + ' reports'">reports</span>
-                        </div>
-                    </div>
-                    <div class="rs-intel-body">
-                        <div class="rs-intel-score-row">
-                            <span class="rs-intel-score" th:style="'color:' + ${c.scoreColor}"
-                                th:text="${c.score}">86</span>
-                            <span class="rs-intel-confidence" th:text="${c.confidencePct} + '% conf.'">92% conf.</span>
-                        </div>
-                        <p class="rs-intel-note" th:text="${c.note}">Note about the city.</p>
-                        <div class="rs-tag-row">
-                            <span class="rs-tag" th:each="t : ${c.tags}" th:text="${t}">tag</span>
-                        </div>
+        </section>
+
+        <!-- LIVE INTEL (real cities + computed scores) -->
+        <section class="lp-section" th:if="${intel != null and !intel.empty}">
+            <div class="lp-sec-head">
+                <div><div class="lp-sec-eyebrow lp-mono"><span class="lp-live"></span> Live now</div><h2 class="lp-h2">Safety scores, from real reports</h2></div>
+                <a href="/scams" class="lp-link-btn">All destinations</a>
+            </div>
+            <div class="lp-intel-grid">
+                <a th:each="c : ${intel}" th:href="@{/scams(city=${c.city})}" class="lp-intel">
+                    <div class="lp-intel-top" th:style="'background:' + ${c.tint}"><b th:text="${c.city}">City</b><span th:text="${c.reports} + ' reports'">reports</span></div>
+                    <div class="lp-intel-b">
+                        <div><span class="lp-intel-score" th:style="'color:' + ${c.scoreColor}" th:text="${c.score}">86</span><span class="lp-intel-conf" th:text="${c.confidencePct} + '% conf.'">92% conf.</span></div>
+                        <p class="lp-intel-note" th:text="${c.note}">Note about the city.</p>
+                        <div class="lp-pills"><span class="lp-pill" th:each="t : ${c.tags}" th:text="${t}">tag</span></div>
                     </div>
                 </a>
             </div>
         </section>
 
-        <!-- ============ ACTIVE GOVERNMENT ADVISORIES (real, sourced) ============ -->
-        <section class="rs-section" th:if="${activeAdvisories != null and !activeAdvisories.empty}">
-            <div class="rs-intel-head">
-                <div>
-                    <div class="rs-eyebrow"><i data-lucide="globe" style="width:15px;height:15px;"></i> Government
-                        advisories, live</div>
-                    <h2 class="rs-h2" style="margin-bottom:0">Where governments say think twice</h2>
-                </div>
-            </div>
-            <div class="rs-adv-grid">
-                <div class="rs-adv-card" th:each="a : ${activeAdvisories}">
-                    <div class="rs-adv-bar" th:style="'background:var(--sev-' + ${a.severity} + ')'"></div>
-                    <div style="flex:1">
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-                            <span class="rs-adv-country" th:text="${a.countryName}">Country</span>
-                            <span class="rs-sev-chip"
-                                th:style="'background:var(--sev-' + ${a.severity} + '-bg);color:var(--sev-' + ${a.severity} + ')'"
-                                th:text="${a.severity}">sev</span>
-                        </div>
-                        <div class="rs-adv-level" th:text="${a.level}">level</div>
-                        <div class="rs-adv-src" th:text="${a.source}">source</div>
+        <!-- GOVERNMENT ADVISORIES (real, sourced) -->
+        <section class="lp-section" th:if="${activeAdvisories != null and !activeAdvisories.empty}">
+            <div class="lp-sec-head"><div><div class="lp-sec-eyebrow lp-mono">Government advisories, live</div><h2 class="lp-h2">Where governments say think twice</h2></div></div>
+            <div class="lp-adv-grid">
+                <div class="lp-adv" th:each="a : ${activeAdvisories}">
+                    <div class="lp-adv-bar" th:style="'background:var(--sev-' + ${a.severity} + ')'"></div>
+                    <div class="lp-adv-body">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="lp-adv-country" th:text="${a.countryName}">Country</span><span class="lp-chip" th:style="'background:var(--sev-' + ${a.severity} + '-bg);color:var(--sev-' + ${a.severity} + ')'" th:text="${a.severity}">sev</span></div>
+                        <div class="lp-adv-level" th:text="${a.level}">level</div>
+                        <div class="lp-adv-src" th:text="${a.source}">source</div>
                     </div>
-                    <a th:href="${a.url}" target="_blank" rel="noopener" class="rs-adv-link" aria-label="Read advisory">
-                        <i data-lucide="external-link" style="width:15px;height:15px;"></i>
-                    </a>
+                    <a th:href="${a.url}" target="_blank" rel="noopener" aria-label="Read advisory"><i data-lucide="external-link" style="width:15px;height:15px;"></i></a>
                 </div>
             </div>
         </section>
 
-        <!-- ============ SCAM LIBRARY PREVIEW (feedback: surface on homepage) ============ -->
-        <section class="rs-section" th:if="${scamPreview != null and !scamPreview.empty}">
-            <div class="rs-intel-head">
-                <div>
-                    <div class="rs-eyebrow">✦ Scam library</div>
-                    <h2 class="rs-h2" style="margin-bottom:0">Know the play before you meet it</h2>
-                </div>
-                <a href="/scams" class="rs-btn-outline"
-                    th:text="'Browse ' + ${scamTotal} + ' tactics →'">Browse tactics →</a>
+        <!-- SCAM LIBRARY PREVIEW -->
+        <section class="lp-section" th:if="${scamPreview != null and !scamPreview.empty}">
+            <div class="lp-sec-head">
+                <div><div class="lp-sec-eyebrow lp-mono">Scam library</div><h2 class="lp-h2">Know the play before you meet it</h2></div>
+                <a href="/scams" class="lp-link-btn" th:text="'Browse ' + ${scamTotal} + ' tactics'">Browse tactics</a>
             </div>
-            <div class="rs-feature-grid" style="grid-template-columns:repeat(2,1fr)">
-                <a th:each="s : ${scamPreview}" th:href="@{/scams(city=${s.city})}" class="rs-feature-card"
-                    style="text-decoration:none">
-                    <div class="rs-feature-tile" style="background:var(--sev-high-bg);color:var(--sev-high)">
-                        <i data-lucide="alert-triangle"></i>
-                    </div>
+            <div class="lp-grid" style="grid-template-columns:repeat(2,1fr);margin-top:0">
+                <a th:each="s : ${scamPreview}" th:href="@{/scams(city=${s.city})}" class="lp-card">
+                    <div class="lp-card-ic" style="background:var(--sev-high-bg);color:var(--sev-high)"><i data-lucide="triangle-alert"></i></div>
                     <h3 th:text="${s.name}">Scam name</h3>
                     <p th:text="${#strings.abbreviate(s.description, 130)}">Description</p>
-                    <div style="margin-top:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--muted)">
-                        <span th:text="${s.city}">City</span>
-                        <span th:if="${s.neighborhood}"> · <span th:text="${s.neighborhood}">Area</span></span>
-                    </div>
+                    <div class="lp-card-meta"><span th:text="${s.city}">City</span><span th:if="${s.neighborhood}"> &middot; <span th:text="${s.neighborhood}">Area</span></span></div>
                 </a>
             </div>
         </section>
 
-        <!-- ============ CTA ============ -->
-        <section class="rs-section rs-cta">
-            <h2>Travel informed. Not afraid.</h2>
+        <!-- CTA -->
+        <section class="lp-cta">
+            <h2>Travel informed, not afraid.</h2>
             <p>Start with a free briefing for your next destination. Upgrade only when you need more.</p>
-            <div class="rs-cta-btns">
-                <a href="/scams" class="rs-btn-primary" style="height:44px;padding:0 22px">Start free briefing</a>
-                <button type="button" class="rs-btn-outline" style="height:44px;padding:0 22px"
-                    data-rs-palette-open>Explore destinations</button>
+            <div class="lp-cta-btns">
+                <a href="/scams" class="lp-btn-solid">Start a free briefing</a>
+                <button type="button" class="lp-btn-outline2" data-rs-palette-open>Explore destinations</button>
             </div>
         </section>
 
@@ -300,6 +190,25 @@
 
     <div th:replace="~{fragments/shell :: script}"></div>
     <script>lucide.createIcons();</script>
+    <script>
+        // Fill the hero card's severity meters once, after first paint.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.querySelectorAll('.lp-fill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+        }));
+        // Sun/moon toggle. Stamps data-theme on <html> so it overrides the media
+        // query. Ephemeral by design: it isn't persisted, so interior pages
+        // (which are light-only for now) are never left in a half-dark state.
+        (function () {
+            var btn = document.getElementById('lpTheme');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                var root = document.documentElement;
+                var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+                var current = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+                root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            });
+        })();
+    </script>
 </body>
 
 </html>
