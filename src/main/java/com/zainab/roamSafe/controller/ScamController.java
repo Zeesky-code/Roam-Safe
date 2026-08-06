@@ -26,6 +26,7 @@ public class ScamController {
     private final com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
     private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
     private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
+    private final com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
     private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
 
@@ -36,7 +37,9 @@ public class ScamController {
             com.zainab.roamSafe.service.ScamLookupService scamLookupService,
             com.zainab.roamSafe.service.SearchQuotaService searchQuota,
             com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository,
-            com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository) {
+            com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
+            com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver) {
+        this.visaLinkResolver = visaLinkResolver;
         this.practicalInfoRepository = practicalInfoRepository;
         this.liveIncidentRepository = liveIncidentRepository;
         this.scamLookupService = scamLookupService;
@@ -105,6 +108,12 @@ public class ScamController {
                 // than guessed when the country isn't covered.
                 emergencyNumberService.forCountry(countryName)
                         .ifPresent(numbers -> model.addAttribute("emergency", numbers));
+
+                // Official entry-requirements link. A link to the government
+                // source, never advice written here, since a wrong visa claim
+                // strands people at borders.
+                visaLinkResolver.forCountry(countryName)
+                        .ifPresent(url -> model.addAttribute("visaLink", url));
             }
 
             // Current news mentions for this city. Attributed and unverified -
