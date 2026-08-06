@@ -348,15 +348,6 @@
                             th:text="${emergency.source}">source</a>,
                         retrieved <span th:text="${#temporals.format(emergency.retrievedAt, 'd MMM yyyy')}">date</span>.
                     </p>
-
-                    <!-- Entry requirements: a link to the official government page,
-                         never advice written here, since a wrong visa claim can
-                         strand a traveler at a border. -->
-                    <p class="rs-emerg-note" th:if="${visaLink != null}" style="margin-top:10px">
-                        <b style="color:var(--ink)">Entry &amp; visa requirements:</b>
-                        check the official page for <span th:text="${country}">country</span> before you travel &mdash;
-                        <a th:href="${visaLink}" target="_blank" rel="noopener">official entry requirements &rarr;</a>
-                    </p>
                 </div>
             </section>
         </div>

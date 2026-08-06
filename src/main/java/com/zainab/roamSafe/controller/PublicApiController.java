@@ -27,7 +27,6 @@ public class PublicApiController {
     private final com.zainab.roamSafe.service.StreetIntelligenceService streetService;
     private final com.zainab.roamSafe.service.CityCountryResolver countryResolver;
     private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
-    private final com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver;
     private final com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository;
     private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
@@ -40,7 +39,6 @@ public class PublicApiController {
             com.zainab.roamSafe.service.StreetIntelligenceService streetService,
             com.zainab.roamSafe.service.CityCountryResolver countryResolver,
             com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
-            com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver,
             com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository,
             com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
             com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository) {
@@ -49,7 +47,6 @@ public class PublicApiController {
         this.streetService = streetService;
         this.countryResolver = countryResolver;
         this.emergencyNumberService = emergencyNumberService;
-        this.visaLinkResolver = visaLinkResolver;
         this.coworkingSpaceRepository = coworkingSpaceRepository;
         this.safetyScoreService = safetyScoreService;
         this.citySummaryService = citySummaryService;
@@ -173,18 +170,6 @@ public class PublicApiController {
         response.put("liveIncidentsNote",
                 "Third-party news headlines mentioning this city with a disruption, not verified by "
                         + "RoamSafe and not reflected in the safety score. Repeat them as reports to check.");
-
-        // Official entry-requirements link for the country, so an agent can hand
-        // the traveler the authoritative source instead of guessing visa rules.
-        // Resolve against the city's stored country (which the visa map is keyed
-        // on), not the response "country" - that one may have been overridden
-        // with an alternate spelling that isn't in the map.
-        String countryForVisa = countryResolver.countryFor(city)
-                .orElse(score.getCity().getCountry());
-        if (countryForVisa != null) {
-            visaLinkResolver.forCountry(countryForVisa)
-                    .ifPresent(url -> response.put("entryRequirementsUrl", url));
-        }
 
         // Coworking spaces from OpenStreetMap, for the digital-nomad question.
         var coworking = coworkingSpaceRepository.findByCityNameIgnoreCaseOrderByName(city);
