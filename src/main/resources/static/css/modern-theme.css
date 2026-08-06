@@ -845,137 +845,119 @@ input[type="checkbox"] {
    (design_handoff_roamsafe: "Global Shell")
    ================================ */
 
+/* ---- Shell nav (redesigned to match the landing) ---- */
+:root {
+    --lp-ground: #FBFAF8; --lp-surface: #FFFFFF; --lp-surface-2: #F3F1EC;
+    --lp-ink: #17140F; --lp-muted: #5F5A52; --lp-faint: #8A857C;
+    --lp-hairline: rgba(23, 20, 15, .10); --lp-hairline-strong: rgba(23, 20, 15, .16);
+    --lp-accent: #2E56F5; --lp-accent-hover: #2547D6;
+    --lp-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+
 .rs-shell-nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background: rgba(244, 241, 232, .82);
-    border-bottom: 1px solid var(--hairline);
+    background: var(--lp-surface);
+    border-bottom: 1px solid var(--lp-hairline);
 }
 
 .rs-shell-nav-inner {
     max-width: var(--content-max);
     margin: 0 auto;
     padding: 0 var(--content-pad);
-    height: 64px;
+    height: 60px;
     display: flex;
     align-items: center;
     gap: 26px;
 }
 
-.rs-logo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    text-decoration: none;
-    user-select: none;
-}
-
-.rs-logo-tile {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: linear-gradient(150deg, #26492F, #1B3623);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 10px rgba(27, 54, 35, .32);
-    color: var(--sage);
-    flex-shrink: 0;
-}
+.rs-logo { display: flex; align-items: center; text-decoration: none; user-select: none; }
 
 .rs-wordmark {
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -.02em;
-    color: #1B3623;
+    font-weight: 640;
+    font-size: 17px;
+    letter-spacing: -.01em;
+    color: var(--lp-ink);
 }
 
-.rs-wordmark span {
-    color: var(--eyebrow);
-}
+.rs-wordmark span { color: var(--lp-ink); }
 
-.rs-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    margin-left: 8px;
-}
+.rs-nav-links { display: flex; align-items: center; gap: 22px; margin-left: 8px; }
 
 .rs-nav-link {
-    padding: 7px 12px;
-    border-radius: 9px;
+    padding: 0;
     font-size: 14px;
     font-weight: 500;
-    color: #4A473F;
+    color: var(--lp-muted);
     text-decoration: none;
-    transition: background .16s, color .16s;
+    transition: color .15s;
 }
 
 .rs-nav-link:hover,
-.rs-nav-link.active {
-    background: var(--fill-subtle);
-    color: #1B3623;
-}
+.rs-nav-link.active { background: none; color: var(--lp-ink); }
 
-.rs-nav-spacer {
-    flex: 1;
-}
+.rs-nav-spacer { flex: 1; }
 
 .rs-search-trigger {
     display: flex;
     align-items: center;
     gap: 9px;
-    height: 38px;
-    padding: 0 12px 0 13px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .6);
-    border: 1px solid var(--hairline-strong);
+    height: 34px;
+    padding: 0 11px;
+    border-radius: 7px;
+    background: var(--lp-surface);
+    border: 1px solid var(--lp-hairline);
     cursor: pointer;
-    color: #6B675E;
-    font-size: 13.5px;
-    transition: border-color .16s, background .16s;
+    color: var(--lp-faint);
+    font-size: 13px;
+    transition: border-color .15s;
 }
 
-.rs-search-trigger:hover {
-    background: #fff;
-    border-color: rgba(30, 40, 30, .22);
-}
+.rs-search-trigger:hover { border-color: var(--lp-hairline-strong); }
 
-.rs-search-trigger span.rs-search-label {
-    min-width: 118px;
-    text-align: left;
-}
+.rs-search-trigger span.rs-search-label { min-width: 110px; text-align: left; }
 
 .rs-kbd {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: var(--fill-subtle-2);
-    color: #59564D;
+    font-family: var(--lp-mono);
+    font-size: 10.5px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--lp-hairline);
+    color: var(--lp-faint);
+    background: none;
 }
 
-.rs-nav-divider {
-    width: 1px;
-    height: 26px;
-    background: var(--hairline-strong);
-}
+.rs-nav-divider { display: none; }
 
+/* Sign in / Sign out: outlined button, paired with the filled CTA below. */
 .rs-signin {
-    font-size: 14px;
-    font-weight: 600;
-    color: #3A382F;
+    font-size: 13.5px;
+    font-weight: 560;
+    color: var(--lp-ink);
     text-decoration: none;
-    padding: 8px 6px;
-    transition: color .16s;
+    height: 34px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--lp-hairline-strong);
+    border-radius: 7px;
+    transition: background .15s;
 }
 
-.rs-signin:hover {
-    color: #1B3623;
+.rs-signin:hover { background: var(--lp-surface-2); }
+
+/* The nav CTA (Get started / Dashboard) is the one cobalt accent, scoped so it
+   doesn't restyle every rs-btn-primary elsewhere in the app. */
+.rs-shell-nav .rs-btn-primary {
+    background: var(--lp-accent);
+    border-color: var(--lp-accent);
+    color: #fff;
+    height: 34px;
+    box-shadow: none;
 }
+
+.rs-shell-nav .rs-btn-primary:hover { background: var(--lp-accent-hover); }
 
 .rs-btn-primary {
     display: inline-flex;
@@ -1151,8 +1133,8 @@ input[type="checkbox"] {
 
 /* --- Footer --- */
 .rs-footer {
-    border-top: 1px solid var(--hairline);
-    background: rgba(244, 241, 232, .5);
+    border-top: 1px solid var(--lp-hairline);
+    background: var(--lp-ground);
     margin-top: var(--section-rhythm);
 }
 
@@ -1168,31 +1150,31 @@ input[type="checkbox"] {
 .rs-footer-blurb {
     font-size: 14px;
     line-height: 1.6;
-    color: var(--ink-3);
+    color: var(--lp-muted);
     max-width: 280px;
     margin-top: 12px;
 }
 
 .rs-footer-col h4 {
-    font-family: var(--font-mono);
+    font-family: var(--lp-mono);
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: var(--eyebrow);
+    color: var(--lp-faint);
     margin-bottom: 12px;
 }
 
 .rs-footer-col a {
     display: block;
     font-size: 14px;
-    color: var(--ink-3);
+    color: var(--lp-muted);
     text-decoration: none;
     padding: 5px 0;
     transition: color .14s;
 }
 
 .rs-footer-col a:hover {
-    color: var(--forest);
+    color: var(--lp-ink);
 }
 
 .rs-footer-bottom {
@@ -1200,11 +1182,11 @@ input[type="checkbox"] {
     margin: 0 auto;
     padding: 28px var(--content-pad);
     margin-top: 32px;
-    border-top: 1px solid var(--hairline);
+    border-top: 1px solid var(--lp-hairline);
     display: flex;
     justify-content: space-between;
     font-size: 13px;
-    color: var(--muted);
+    color: var(--lp-muted);
 }
 
 /* ================================
