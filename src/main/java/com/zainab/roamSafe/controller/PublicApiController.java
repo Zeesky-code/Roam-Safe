@@ -28,6 +28,7 @@ public class PublicApiController {
     private final com.zainab.roamSafe.service.CityCountryResolver countryResolver;
     private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
     private final com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver;
+    private final com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository;
     private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
 
@@ -40,6 +41,7 @@ public class PublicApiController {
             com.zainab.roamSafe.service.CityCountryResolver countryResolver,
             com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
             com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver,
+            com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository,
             com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
             com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository) {
         this.practicalInfoRepository = practicalInfoRepository;
@@ -48,6 +50,7 @@ public class PublicApiController {
         this.countryResolver = countryResolver;
         this.emergencyNumberService = emergencyNumberService;
         this.visaLinkResolver = visaLinkResolver;
+        this.coworkingSpaceRepository = coworkingSpaceRepository;
         this.safetyScoreService = safetyScoreService;
         this.citySummaryService = citySummaryService;
         this.scamReportRepository = scamReportRepository;
@@ -181,6 +184,19 @@ public class PublicApiController {
         if (countryForVisa != null) {
             visaLinkResolver.forCountry(countryForVisa)
                     .ifPresent(url -> response.put("entryRequirementsUrl", url));
+        }
+
+        // Coworking spaces from OpenStreetMap, for the digital-nomad question.
+        var coworking = coworkingSpaceRepository.findByCityNameIgnoreCaseOrderByName(city);
+        if (!coworking.isEmpty()) {
+            response.put("coworking", coworking.stream().limit(15).map(w -> {
+                java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+                m.put("name", w.getName());
+                m.put("website", w.getWebsite());
+                m.put("source", w.getSourceUrl());
+                return m;
+            }).toList());
+            response.put("coworkingSource", "OpenStreetMap");
         }
 
         response.put("summary", summary.getSummaryText());

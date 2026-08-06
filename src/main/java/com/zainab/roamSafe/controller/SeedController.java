@@ -102,6 +102,22 @@ public class SeedController {
         private com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
 
         @Autowired
+        private com.zainab.roamSafe.service.OsmCoworkingService osmCoworkingService;
+
+        /**
+         * Pull coworking spaces from OpenStreetMap for every covered city. Runs
+         * inline and takes a few minutes (paced for the shared Overpass service),
+         * so trigger it deliberately. Safe to re-run; upserts by OSM id.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/coworking")
+        public ResponseEntity<String> refreshCoworking() {
+                var r = osmCoworkingService.refreshAll();
+                return ResponseEntity.ok("Coworking refresh: " + r.stored() + " spaces across "
+                                + r.cities() + " cities"
+                                + (r.failed().isEmpty() ? "." : ", failed: " + r.failed()));
+        }
+
+        @Autowired
         private com.zainab.roamSafe.service.GdeltIngestionService gdeltIngestionService;
 
         /**

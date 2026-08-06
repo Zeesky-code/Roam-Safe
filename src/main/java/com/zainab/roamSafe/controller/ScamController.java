@@ -27,6 +27,7 @@ public class ScamController {
     private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
     private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
     private final com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver;
+    private final com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
     private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
 
@@ -38,7 +39,9 @@ public class ScamController {
             com.zainab.roamSafe.service.SearchQuotaService searchQuota,
             com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository,
             com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
-            com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver) {
+            com.zainab.roamSafe.service.VisaLinkResolver visaLinkResolver,
+            com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository) {
+        this.coworkingSpaceRepository = coworkingSpaceRepository;
         this.visaLinkResolver = visaLinkResolver;
         this.practicalInfoRepository = practicalInfoRepository;
         this.liveIncidentRepository = liveIncidentRepository;
@@ -128,6 +131,13 @@ public class ScamController {
             var practical = practicalInfoRepository.findByCityNameIgnoreCase(city);
             if (!practical.isEmpty()) {
                 model.addAttribute("practical", practical);
+            }
+
+            // Coworking spaces from OpenStreetMap - real named places, for the
+            // nomad "where can I work" question. Absent when OSM has none.
+            var coworking = coworkingSpaceRepository.findByCityNameIgnoreCaseOrderByName(city);
+            if (!coworking.isEmpty()) {
+                model.addAttribute("coworking", coworking);
             }
 
             List<ScamReport> visible = allScams;

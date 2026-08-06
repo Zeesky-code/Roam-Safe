@@ -119,6 +119,8 @@
                     th:if="${incidents != null}">Happening now</button>
                 <button type="button" class="rs-tab" data-tab="practical"
                     th:if="${practical != null}">Arriving &amp; getting around</button>
+                <button type="button" class="rs-tab" data-tab="cowork"
+                    th:if="${coworking != null}">Working here</button>
             </div>
 
             <!-- Overview -->
@@ -246,6 +248,32 @@
                         (<span th:text="${p.licence}">CC BY-SA</span>), retrieved
                         <span th:text="${#temporals.format(p.retrievedAt, 'd MMM yyyy')}">date</span>.
                         Quoted rather than summarised. Check prices and times at the source before you rely on them.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Coworking spaces from OpenStreetMap, for the digital-nomad case.
+                 Real named places, each linked back to its OSM element. -->
+            <section class="rs-tab-panel" data-panel="cowork" hidden th:if="${coworking != null}">
+                <div class="rs-card-panel">
+                    <h3>✦ Coworking spaces</h3>
+                    <p class="rs-lede" style="font-size:14px">
+                        Named coworking spaces mapped in <span th:text="${selectedCity}">this city</span>,
+                        from OpenStreetMap. A starting list to check, not a ranking &mdash; we hold no data on
+                        wifi speed or desk price.
+                    </p>
+                    <div class="rs-emerg-grid">
+                        <div class="rs-emerg-cell" th:each="w : ${coworking}">
+                            <span class="rs-emerg-label" th:text="${w.name}">Name</span>
+                            <a th:if="${w.website != null}" th:href="${w.website}" target="_blank" rel="noopener"
+                                style="font-size:12.5px" th:text="${w.website}">site</a>
+                            <a th:unless="${w.website != null}" th:href="${w.sourceUrl}" target="_blank"
+                                rel="noopener" style="font-size:12.5px;color:var(--muted)">View on OpenStreetMap</a>
+                        </div>
+                    </div>
+                    <p class="rs-emerg-note" style="margin-top:14px">
+                        Source: <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>
+                        contributors. Community-mapped, so it is not exhaustive.
                     </p>
                 </div>
             </section>
