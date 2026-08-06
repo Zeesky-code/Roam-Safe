@@ -289,6 +289,7 @@ public class SeedController {
         @PostMapping("/bulk")
         public ResponseEntity<String> bulkSeed(@RequestBody List<BulkScamReportRequest> reports) {
                 List<ScamReport> entities = new ArrayList<>();
+                int rejected = 0;
 
                 // Create any missing cities in one pass, instead of a query per report
                 // (1400+ sequential lookups against a remote DB would time the request out).
@@ -340,11 +341,19 @@ public class SeedController {
                         report.setStatus(ScamReportStatus.APPROVED); // Always approve bulk imports
                         // No invented reportedAt — see the note in the seed path above.
 
+                        // Gate: keep non-scams (disasters, emergency-info, vague
+                        // "general safety") out of the library so a re-import can't
+                        // undo the cleanup. A real scam is always allowed through.
+                        if (!com.zainab.roamSafe.service.ScamEntryFilter.isScamEntry(report.getName())) {
+                                rejected++;
+                                continue;
+                        }
                         entities.add(report);
                 }
 
                 scamReportRepository.saveAll(entities);
-                return ResponseEntity.ok("Bulk import successful: " + entities.size() + " reports imported.");
+                return ResponseEntity.ok("Bulk import: " + entities.size() + " reports imported"
+                                + (rejected > 0 ? ", " + rejected + " non-scam entries rejected." : "."));
         }
 
         @PostMapping("/clear")
