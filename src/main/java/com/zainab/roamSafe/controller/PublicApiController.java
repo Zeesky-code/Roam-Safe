@@ -148,6 +148,26 @@ public class PublicApiController {
         // Night-time signal + the areas those incidents cluster in.
         response.put("nightRisk", destinationService.nightRisk(all));
 
+        // Live incidents: current news mentioning this city alongside a
+        // disruption (strikes, protests, closures), from GDELT. Exposed here so
+        // agents get the same "happening now" signal the website shows. Attributed
+        // and explicitly unverified - these are third-party headlines, never a
+        // RoamSafe finding, and they do not affect the score. An agent must
+        // repeat them as reports to check, not as fact.
+        var incidents = liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+        response.put("liveIncidents", incidents.stream().limit(10).map(i -> {
+            java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
+            m.put("headline", i.getTitle());
+            m.put("source", i.getSourceDomain());
+            m.put("url", i.getSourceUrl());
+            m.put("publishedAt", i.getPublishedAt());
+            m.put("verified", false);
+            return m;
+        }).toList());
+        response.put("liveIncidentsNote",
+                "Third-party news headlines mentioning this city with a disruption, not verified by "
+                        + "RoamSafe and not reflected in the safety score. Repeat them as reports to check.");
+
         response.put("summary", summary.getSummaryText());
         response.put("latestAlerts", alerts);
         response.put("lastUpdated", LocalDateTime.now());
