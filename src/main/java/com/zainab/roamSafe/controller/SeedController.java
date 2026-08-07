@@ -29,6 +29,55 @@ public class SeedController {
         @Autowired
         private CityRepository cityRepository;
 
+        @jakarta.persistence.PersistenceContext
+        private jakarta.persistence.EntityManager entityManager;
+
+        /**
+         * Merges split-spelling duplicate cities into one canonical name, so a
+         * place isn't scored on half its data. "Krakow" and "Kraków" were two
+         * separate cities in the data; this folds the variant into the canonical
+         * across every table that keys on city name, drops the now-empty city row
+         * and its stale score, and lets the score recompute from the combined
+         * reports on next read. Safe to re-run.
+         */
+        @org.springframework.web.bind.annotation.GetMapping("/merge-cities")
+        @org.springframework.transaction.annotation.Transactional
+        public ResponseEntity<String> mergeCities() {
+                // variant -> canonical (accented / most-common spelling wins)
+                var merges = java.util.Map.of(
+                                "Krakow", "Kraków",
+                                "Cancun", "Cancún",
+                                "New York City", "New York",
+                                "Bogota", "Bogotá");
+                StringBuilder log = new StringBuilder();
+                for (var e : merges.entrySet()) {
+                        String from = e.getKey(), to = e.getValue();
+                        int moved = 0;
+                        for (String tbl : new String[] { "scam_reports", "practical_info", "live_incidents",
+                                        "coworking_spaces" }) {
+                                String col = tbl.equals("scam_reports") ? "city" : "city_name";
+                                moved += entityManager.createNativeQuery(
+                                                "update " + tbl + " set " + col + " = :to where lower(" + col
+                                                                + ") = lower(:from)")
+                                                .setParameter("to", to).setParameter("from", from).executeUpdate();
+                        }
+                        // Drop the variant city and any cached scores for both, so the
+                        // canonical recomputes from the combined reports.
+                        entityManager.createNativeQuery(
+                                        "delete from safety_scores where city_id in (select id from cities where lower(name) in (lower(:from), lower(:to)))")
+                                        .setParameter("from", from).setParameter("to", to).executeUpdate();
+                        // Score-history snapshots for the variant reference its city row;
+                        // clear them so the row can be dropped (the canonical keeps its own).
+                        entityManager.createNativeQuery(
+                                        "delete from safety_score_history where city_id in (select id from cities where lower(name) = lower(:from))")
+                                        .setParameter("from", from).executeUpdate();
+                        entityManager.createNativeQuery("delete from cities where lower(name) = lower(:from)")
+                                        .setParameter("from", from).executeUpdate();
+                        log.append(from).append(" -> ").append(to).append(" (").append(moved).append(" rows); ");
+                }
+                return ResponseEntity.ok("Merged: " + log);
+        }
+
         @Autowired
         private NewsIngestionService newsIngestionService;
 
