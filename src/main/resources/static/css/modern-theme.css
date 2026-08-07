@@ -2458,18 +2458,18 @@ input[type="checkbox"] {
 }
 
 .rs-emergency {
-    background: var(--forest-deep);
-    color: var(--cream);
+    background: var(--lp-ink);
+    color: #F5F1EA;
     border-radius: var(--radius-lg);
     padding: 22px;
 }
 
 .rs-emergency h3 {
-    font-family: var(--font-mono);
+    font-family: var(--lp-mono);
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: var(--moss-hi);
+    color: rgba(245, 241, 234, .6);
     margin-bottom: 14px;
     display: flex;
     align-items: center;
@@ -2480,47 +2480,48 @@ input[type="checkbox"] {
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-top: 1px solid rgba(244, 241, 232, .1);
+    border-top: 1px solid rgba(245, 241, 234, .12);
     font-size: 14px;
 }
 
 .rs-emergency-row span:last-child {
-    font-family: var(--font-mono);
-    color: var(--moss-hi);
+    font-family: var(--lp-mono);
+    color: #fff;
 }
 
 /* Tabs */
 .rs-tabs {
     position: sticky;
-    top: 64px;
+    top: 60px;
     z-index: 5;
     display: flex;
     gap: 6px;
     padding: 10px 0;
-    background: linear-gradient(180deg, var(--paper-hi), rgba(244, 241, 232, .85));
-    backdrop-filter: blur(8px);
+    background: var(--lp-ground);
+    border-bottom: 1px solid var(--lp-hairline);
     flex-wrap: wrap;
 }
 
 .rs-tab {
-    padding: 8px 16px;
-    border-radius: 10px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
     font-size: 14px;
-    font-weight: 600;
-    color: #4A473F;
+    font-weight: 500;
+    color: var(--lp-muted);
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: background .16s, color .16s;
+    transition: background .15s, color .15s;
 }
 
 .rs-tab:hover {
-    background: var(--fill-subtle);
+    background: var(--lp-surface-2);
+    color: var(--lp-ink);
 }
 
 .rs-tab.is-active {
-    background: var(--forest);
-    color: var(--cream);
+    background: var(--lp-accent);
+    color: #fff;
 }
 
 .rs-tab-panel {
