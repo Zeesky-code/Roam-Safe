@@ -94,3 +94,17 @@ node test-client.mjs
 ```
 
 Speaks real MCP over stdio: lists the tools and calls each one against live data.
+
+## Cross-interface consistency test
+
+RoamSafe's premise is that the website, REST API and MCP server are three
+interfaces onto one intelligence layer. `cross-interface.test.mjs` asserts they
+never disagree - it pulls each city's safety score, risk level, live incidents
+and emergency numbers through all three and fails on any drift.
+
+```bash
+# with the RoamSafe app running (prod profile, real DB)
+ROAMSAFE_API_URL=http://127.0.0.1:8080 node cross-interface.test.mjs
+```
+
+Exit code is non-zero on any inconsistency, so it can gate a deploy.
