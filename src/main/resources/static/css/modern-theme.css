@@ -3,31 +3,31 @@
 
 :root {
     /* --- Handoff tokens --- */
-    /* Paper / surfaces */
-    --paper: #EFEBE1;
-    --paper-hi: #F4F1E8;
-    --paper-lo: #ECE7DB;
-    --card: #FBF9F3;
+    /* Paper / surfaces (retheme: warm off-white, off the old cream) */
+    --paper: #FBFAF8;
+    --paper-hi: #FFFFFF;
+    --paper-lo: #F1EFEA;
+    --card: #FFFFFF;
 
-    /* Ink */
-    --ink: #23211C;
-    --ink-2: #33312A;
-    --ink-3: #4C4940;
-    --ink-4: #5C594F;
-    --muted: #8A877D;
-    --muted-2: #9A978D;
+    /* Ink (retheme: warm near-black) */
+    --ink: #17140F;
+    --ink-2: #2A261F;
+    --ink-3: #5F5A52;
+    --ink-4: #6B665C;
+    --muted: #6E695F;
+    --muted-2: #8A857C;
 
-    /* Brand */
-    --forest: #1E3D2C;
-    --forest-deep: #16281D;
-    --forest-ink: #182A1C;
-    --forest-2: #2E5A3B;
-    --forest-3: #3C6B3C;
+    /* Brand (retheme: dark-green surfaces -> ink; green accents -> cobalt) */
+    --forest: #17140F;
+    --forest-deep: #100E0B;
+    --forest-ink: #17140F;
+    --forest-2: #2E56F5;
+    --forest-3: #2547D6;
     --moss: #5C8A5A;
     --moss-hi: #9DBE97;
     --sage: #B9CBA6;
-    --cream: #F4F1E8;
-    --eyebrow: #7E9B7A;
+    --cream: #FBFAF8;
+    --eyebrow: #8A857C;
 
     /* Severity scale */
     --sev-low: #5C8A5A;
@@ -41,16 +41,16 @@
     --amber: #C4A24E;
 
     /* Hairlines & tints */
-    --hairline: rgba(30, 40, 30, .09);
-    --hairline-strong: rgba(30, 40, 30, .14);
-    --fill-subtle: rgba(30, 40, 30, .05);
-    --fill-subtle-2: rgba(30, 40, 30, .08);
-    --fill-green: rgba(30, 60, 40, .06);
-    --fill-green-2: rgba(30, 60, 40, .09);
+    --hairline: rgba(23, 20, 15, .10);
+    --hairline-strong: rgba(23, 20, 15, .16);
+    --fill-subtle: rgba(23, 20, 15, .05);
+    --fill-subtle-2: rgba(23, 20, 15, .08);
+    --fill-green: rgba(46, 86, 245, .06);
+    --fill-green-2: rgba(46, 86, 245, .09);
 
-    --shadow-card-hover: 0 16px 38px rgba(30, 45, 30, .11);
-    --shadow-btn: 0 3px 12px rgba(27, 54, 35, .28);
-    --shadow-btn-hover: 0 6px 18px rgba(27, 54, 35, .36);
+    --shadow-card-hover: 0 16px 38px rgba(23, 20, 15, .11);
+    --shadow-btn: 0 3px 12px rgba(46, 86, 245, .24);
+    --shadow-btn-hover: 0 6px 18px rgba(46, 86, 245, .32);
 
     --font-ui: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
@@ -71,9 +71,9 @@
     --text-secondary: var(--ink-3);
     --text-muted: var(--muted);
 
-    --primary-accent: var(--forest);
+    --primary-accent: #2E56F5;
     --primary-soft: var(--fill-green-2);
-    --primary-hover: var(--forest-deep);
+    --primary-hover: #2547D6;
 
     --news-bg: var(--forest-deep);
     --news-text: var(--cream);
