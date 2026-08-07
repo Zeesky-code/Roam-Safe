@@ -59,4 +59,7 @@ public interface ScamReportRepository extends JpaRepository<ScamReport, Long> {
             + "lower(r.description) like lower(concat('%', :q, '%'))) "
             + "order by r.severityScore desc")
     List<ScamReport> searchApproved(@Param("status") ScamReportStatus status, @Param("q") String q);
+
+    /** Guard against re-importing the same report on a re-scrape. */
+    boolean existsByCityIgnoreCaseAndNameIgnoreCase(String city, String name);
 }

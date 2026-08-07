@@ -339,6 +339,7 @@ public class SeedController {
         public ResponseEntity<String> bulkSeed(@RequestBody List<BulkScamReportRequest> reports) {
                 List<ScamReport> entities = new ArrayList<>();
                 int rejected = 0;
+                int skipped = 0;
 
                 // Create any missing cities in one pass, instead of a query per report
                 // (1400+ sequential lookups against a remote DB would time the request out).
@@ -397,12 +398,21 @@ public class SeedController {
                                 rejected++;
                                 continue;
                         }
+                        // Skip a report already held for this city+title, so a
+                        // re-scrape adds only genuinely new entries and can't
+                        // reintroduce the duplicates the cleanup removed.
+                        if (scamReportRepository.existsByCityIgnoreCaseAndNameIgnoreCase(
+                                        report.getCity(), report.getName())) {
+                                skipped++;
+                                continue;
+                        }
                         entities.add(report);
                 }
 
                 scamReportRepository.saveAll(entities);
-                return ResponseEntity.ok("Bulk import: " + entities.size() + " reports imported"
-                                + (rejected > 0 ? ", " + rejected + " non-scam entries rejected." : "."));
+                return ResponseEntity.ok("Bulk import: " + entities.size() + " new reports imported"
+                                + (skipped > 0 ? ", " + skipped + " already present" : "")
+                                + (rejected > 0 ? ", " + rejected + " non-scam entries rejected" : "") + ".");
         }
 
         @PostMapping("/clear")
