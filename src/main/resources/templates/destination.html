@@ -356,15 +356,22 @@
     <div th:replace="~{fragments/shell :: footer}"></div>
     <div th:replace="~{fragments/shell :: script}"></div>
 
-    <script>
+    <script th:inline="javascript">
         // Destination tabs
         (function () {
             const tabs = document.querySelectorAll('.rs-tab');
             const panels = document.querySelectorAll('.rs-tab-panel');
-            tabs.forEach(t => t.addEventListener('click', () => {
-                tabs.forEach(x => x.classList.toggle('is-active', x === t));
-                panels.forEach(p => p.hidden = p.dataset.panel !== t.dataset.tab);
-            }));
+            const activate = tab => {
+                tabs.forEach(x => x.classList.toggle('is-active', x === tab));
+                panels.forEach(p => p.hidden = p.dataset.panel !== tab.dataset.tab);
+            };
+            tabs.forEach(t => t.addEventListener('click', () => activate(t)));
+            // US4: airport queries land straight on the arrival/practical tab.
+            const initial = /*[[${initialTab}]]*/ null;
+            if (initial) {
+                const target = document.querySelector('.rs-tab[data-tab="' + initial + '"]');
+                if (target) activate(target);
+            }
         })();
     </script>
     <script>lucide.createIcons();</script>

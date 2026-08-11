@@ -80,17 +80,29 @@ public class ScamController {
                 return "redirect:/pricing?limit=search";
             }
             model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
+
+            // US4: an airport query ("Istanbul Airport") resolves to its city and
+            // opens on the arrival tab, where the real airport->city transport,
+            // SIM and currency guidance already lives.
+            final String cityName;
+            if (com.zainab.roamSafe.service.AirportQuery.isAirport(city)) {
+                cityName = com.zainab.roamSafe.service.AirportQuery.toCity(city);
+                model.addAttribute("initialTab", "practical");
+            } else {
+                cityName = city;
+            }
+
             // --- Destination report for one city ---
-            List<ScamReport> allScams = scamService.getReportsByCity(city);
+            List<ScamReport> allScams = scamService.getReportsByCity(cityName);
             int totalScams = allScams.size();
 
             // Stats/score use the full list; the card list is paywalled.
-            model.addAttribute("destination", destinationService.build(city, allScams));
+            model.addAttribute("destination", destinationService.build(cityName, allScams));
 
             // Country: prefer the value resolved onto the city record, falling back
             // to the older hardcoded lookup for anything not yet backfilled.
-            String countryName = cityCountryResolver.countryFor(city)
-                    .orElseGet(() -> CountryLookup.forCity(city)
+            String countryName = cityCountryResolver.countryFor(cityName)
+                    .orElseGet(() -> CountryLookup.forCity(cityName)
                             .map(com.zainab.roamSafe.service.CountryLookup.Country::name)
                             .orElse(null));
 
@@ -113,20 +125,20 @@ public class ScamController {
             // Current news mentions for this city. Attributed and unverified -
             // shown as third-party reporting, never as a RoamSafe finding.
             var incidents = liveIncidentRepository
-                    .findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+                    .findByCityNameIgnoreCaseOrderByPublishedAtDesc(cityName);
             if (!incidents.isEmpty()) {
                 model.addAttribute("incidents", incidents);
             }
 
             // Arrival and practical info, verbatim excerpts with attribution.
-            var practical = practicalInfoRepository.findByCityNameIgnoreCase(city);
+            var practical = practicalInfoRepository.findByCityNameIgnoreCase(cityName);
             if (!practical.isEmpty()) {
                 model.addAttribute("practical", practical);
             }
 
             // Coworking spaces from OpenStreetMap - real named places, for the
             // nomad "where can I work" question. Absent when OSM has none.
-            var coworking = coworkingSpaceRepository.findByCityNameIgnoreCaseOrderByName(city);
+            var coworking = coworkingSpaceRepository.findByCityNameIgnoreCaseOrderByName(cityName);
             if (!coworking.isEmpty()) {
                 model.addAttribute("coworking", coworking);
             }
@@ -138,7 +150,7 @@ public class ScamController {
             }
             model.addAttribute("scams", visible);
             model.addAttribute("totalScams", totalScams);
-            model.addAttribute("selectedCity", city);
+            model.addAttribute("selectedCity", cityName);
             return "destination";
         }
 
