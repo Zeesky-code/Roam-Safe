@@ -53,3 +53,4 @@ ssh-key-2026-07-19.key.pub
 # Node / MCP server
 node_modules/
 mcp/dist/
+scraped_reports.json

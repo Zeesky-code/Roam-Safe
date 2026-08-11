@@ -26,7 +26,7 @@
             <h1>One guide for the whole trip</h1>
             <p class="rs-lede">
                 List your stops. RoamSafe builds a single guide with each city's score, common scams,
-                areas, emergency numbers, official advisory and arrival information —
+                areas, emergency numbers, official advisory and arrival information,
                 then print it or save it as a PDF to carry offline.
             </p>
             <form action="/guide" method="get" class="rs-searchbar">
@@ -74,7 +74,7 @@
                 <!-- Emergency first: the most useful line in any guide -->
                 <div class="rs-guide-emergency" th:if="${s.emergencyPrimary != null}">
                     <strong>Emergency: <span th:text="${s.emergencyPrimary}">112</span></strong>
-                    <span th:if="${s.emergencyDetail != null}" th:text="' — ' + ${s.emergencyDetail}">detail</span>
+                    <span th:if="${s.emergencyDetail != null}" th:text="', ' + ${s.emergencyDetail}">detail</span>
                 </div>
 
                 <!-- Uncovered stop: say so plainly rather than leaving a gap -->
@@ -113,7 +113,7 @@
 
                     <div th:if="${s.advisoryLevel != null}" class="rs-guide-advisory">
                         <h3>Official advisory</h3>
-                        <p><b th:text="${s.advisoryLevel}">level</b> — <span th:text="${s.advisorySummary}">summary</span>
+                        <p><b th:text="${s.advisoryLevel}">level</b>, <span th:text="${s.advisorySummary}">summary</span>
                         </p>
                         <p class="rs-guide-src" th:text="${s.advisoryUrl}">url</p>
                     </div>
@@ -125,7 +125,7 @@
                             <div class="rs-practical" th:text="${p.content}">content</div>
                             <p class="rs-guide-src">
                                 <span th:text="${p.sourceName} + ' (' + ${p.licence} + ')'">source</span>
-                                <span th:text="' — ' + ${p.sourceUrl}">url</span>
+                                <span th:text="', ' + ${p.sourceUrl}">url</span>
                             </p>
                         </div>
                     </div>

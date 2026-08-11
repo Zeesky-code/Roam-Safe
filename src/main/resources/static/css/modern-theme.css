@@ -2630,10 +2630,10 @@ input[type="checkbox"] {
 }
 
 .rs-tip {
-    background: var(--fill-green-2);
-    border-left: 3px solid var(--forest-2);
-    border-radius: 8px;
-    padding: 11px 13px;
+    background: var(--fill-subtle);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
 }
 
 .rs-tip-label {
@@ -2643,16 +2643,17 @@ input[type="checkbox"] {
     font-family: var(--font-mono);
     font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: .05em;
+    letter-spacing: .06em;
     text-transform: uppercase;
-    color: var(--forest-2);
-    margin-bottom: 4px;
+    color: var(--muted);
+    margin-bottom: 5px;
 }
 
 .rs-tip p {
     font-size: 13px;
     color: var(--ink-2);
-    line-height: 1.45;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* Paywall prompt */
@@ -2680,6 +2681,39 @@ input[type="checkbox"] {
     text-align: center;
     padding: 48px 24px;
     color: var(--muted);
+}
+
+.rs-place-chips {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+}
+
+.rs-place-chips a {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 14px 16px;
+    background: var(--fill-subtle);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+.rs-place-chips a:hover {
+    border-color: var(--lp-accent);
+    background: var(--paper);
+}
+
+.rs-place-chips a span {
+    font-weight: 400;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-left: auto;
 }
 
 @media (max-width: 900px) {

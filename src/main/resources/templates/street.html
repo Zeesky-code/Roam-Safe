@@ -23,7 +23,7 @@
             <div class="rs-eyebrow">✦ STREET INTELLIGENCE</div>
             <h1>What the reports say about one place</h1>
             <p class="rs-lede">
-                Search a street, square or district. RoamSafe shows only what real reports name it in —
+                Search a street, square or district. RoamSafe shows only what real reports name it in,
                 and says so plainly when the evidence is thin.
             </p>
             <form action="/street" method="get" class="rs-searchbar">
@@ -33,11 +33,16 @@
             </form>
         </section>
 
-        <!-- No query yet -->
+        <!-- No query yet: offer real places we actually cover, not a blank card -->
         <section class="rs-section" th:if="${query == null or query.isEmpty()}">
-            <div class="rs-card-panel rs-empty">
-                <p>Try <a href="/street?q=Taksim">Taksim</a>, <a href="/street?q=Rambla">Rambla</a>
-                    or <a href="/street?q=Sultanahmet">Sultanahmet</a>.</p>
+            <div class="rs-eyebrow" style="margin-bottom:12px">POPULAR PLACES</div>
+            <div class="rs-place-chips">
+                <a href="/street?q=Taksim">Taksim <span>Istanbul</span></a>
+                <a href="/street?q=Sultanahmet">Sultanahmet <span>Istanbul</span></a>
+                <a href="/street?q=La Rambla">La Rambla <span>Barcelona</span></a>
+                <a href="/street?q=Trastevere">Trastevere <span>Rome</span></a>
+                <a href="/street?q=Montmartre">Montmartre <span>Paris</span></a>
+                <a href="/street?q=Grand Bazaar">Grand Bazaar <span>Istanbul</span></a>
             </div>
         </section>
 
@@ -46,7 +51,7 @@
             <div class="rs-card-panel rs-empty">
                 <h3>No coverage for “<span th:text="${query}">place</span>”</h3>
                 <p>
-                    No report in RoamSafe names this place. That means we have no evidence about it —
+                    No report in RoamSafe names this place. That means we have no evidence about it,
                     not that it is safe. Try a nearby district, or
                     <a href="/scams">browse cities we do cover</a>.
                 </p>

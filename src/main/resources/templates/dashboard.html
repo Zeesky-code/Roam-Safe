@@ -92,7 +92,7 @@
                 </div>
                 <div class="rs-card-panel rs-stat">
                     <div class="rs-stat-num"
-                        th:text="${view.avgConfidence != null} ? ${view.avgConfidence} + '%' : '—'">—</div>
+                        th:text="${view.avgConfidence != null} ? ${view.avgConfidence} + '%' : 'N/A'">N/A</div>
                     <div class="rs-stat-label">Coverage confidence</div>
                     <div class="rs-stat-sub">How much evidence backs these scores</div>
                 </div>
@@ -112,7 +112,7 @@
                     </div>
                     <div class="rs-dash-tile-body">
                         <div class="rs-dash-tile-score">
-                            <span class="rs-dash-score" th:text="${w.score != null} ? ${w.score} : '—'">0</span>
+                            <span class="rs-dash-score" th:text="${w.score != null} ? ${w.score} : 'N/A'">0</span>
                             <!-- Only shown once two snapshots exist; never a fake zero. -->
                             <span class="rs-dash-change" th:if="${w.change != null}"
                                 th:classappend="${w.change >= 0} ? 'up' : 'down'"
