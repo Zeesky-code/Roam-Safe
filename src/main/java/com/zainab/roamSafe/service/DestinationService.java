@@ -244,17 +244,26 @@ public class DestinationService {
         return "#B4553B";
     }
 
+    /**
+     * How long ago the score was recalculated - said as exactly that.
+     *
+     * This read "updated 6 min ago", which describes the arithmetic rather than
+     * the evidence: the score recomputes on read whenever its cache is over a
+     * day old, so a page whose underlying reports are years old still announced
+     * itself as minutes fresh. That is the same false-recency mistake the
+     * reportedAt field exists to avoid, made in the header instead of the data.
+     * Naming the subject ("score recalculated") costs a word and stops the line
+     * implying we learned something new.
+     */
     private static String relativeTime(LocalDateTime when) {
         if (when == null)
-            return "just now";
+            return "not yet scored";
         long mins = java.time.Duration.between(when, LocalDateTime.now()).toMinutes();
-        if (mins < 1)
-            return "updated just now";
         if (mins < 60)
-            return "updated " + mins + " min ago";
+            return "score recalculated just now";
         long hours = mins / 60;
         if (hours < 24)
-            return "updated " + hours + "h ago";
-        return "updated " + (hours / 24) + "d ago";
+            return "score recalculated " + hours + "h ago";
+        return "score recalculated " + (hours / 24) + "d ago";
     }
 }

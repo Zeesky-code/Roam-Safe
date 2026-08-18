@@ -4295,3 +4295,56 @@ input[type="checkbox"] {
     overflow-y: auto;
     padding-right: 6px;
 }
+
+/* ---------------------------------------------------------------------------
+   Overview "what's in this report" cards.
+
+   Overview held one paragraph, so the main column ran out of content roughly
+   600px before the sidebar did and the destination page looked half-built.
+   These summarise what the other tabs actually contain and jump to them.
+   --------------------------------------------------------------------------- */
+.rs-overview-jump {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.rs-overview-jump button {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.rs-overview-jump button:hover {
+    border-color: var(--ink);
+    background: rgba(23, 20, 15, .03);
+    transform: translateY(-1px);
+}
+
+.rs-overview-jump button:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+}
+
+.rs-overview-jump b {
+    font-size: 22px;
+    line-height: 1.1;
+    letter-spacing: -.01em;
+}
+
+.rs-overview-jump span {
+    font-size: 12.5px;
+    opacity: .62;
+    line-height: 1.35;
+}

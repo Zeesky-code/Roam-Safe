@@ -223,6 +223,11 @@ public class AdvisoryIngestionService {
         if (s == null)
             return "";
         String text = s.replaceAll("<[^>]+>", " ").replaceAll("&nbsp;", " ").replaceAll("\\s+", " ").trim();
+        // Dropping tags leaves the space that stood where the tag was, so
+        // sentences ended "civil unrest ." on the page. Closing the gap before
+        // punctuation is typography, not editing: no word is added, removed or
+        // reordered, and the advisory still reads exactly as its source wrote it.
+        text = text.replaceAll("\\s+([.,;:!?])", "$1");
         return text.length() > 600 ? text.substring(0, 597).trim() + "..." : text;
     }
 }

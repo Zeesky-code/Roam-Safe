@@ -57,6 +57,12 @@ public class FeedController {
         return "feed";
     }
 
+    /**
+     * Markers kept per city. Enough that a big city shows more than a single
+     * pin, few enough that dense cities don't bury the rest of the world.
+     */
+    private static final int MARKERS_PER_CITY = 3;
+
     /** One plotted marker: only the fields the map actually renders. */
     public record MapSignal(
             String city,
@@ -83,7 +89,7 @@ public class FeedController {
     @org.springframework.web.bind.annotation.ResponseBody
     public List<MapSignal> mapSignals() {
         List<MapSignal> out = new ArrayList<>();
-        for (ScamReport r : scamService.getRecentApproved(200)) {
+        for (ScamReport r : scamService.getMapSpread(MARKERS_PER_CITY)) {
             out.add(new MapSignal(
                     r.getCity(),
                     r.getName(),

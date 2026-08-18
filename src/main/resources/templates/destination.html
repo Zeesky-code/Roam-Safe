@@ -91,16 +91,50 @@
                 </div>
             </div>
 
-            <!-- Emergency: honest directive, NOT fabricated per-city numbers -->
+            <!--
+              Emergency. This card used to show a fixed EU/US/UK list on every
+              destination, with a caption apologising that the numbers weren't
+              local. That predates the Wikidata (P2852) ingestion: the real
+              numbers for this country are now in hand, so showing the generic
+              list instead was hiding sourced data behind a disclaimer. The
+              fallback stays for countries the dataset doesn't cover, and it is
+              still labelled as generic rather than passed off as local.
+            -->
             <div class="rs-emergency">
                 <h3><i data-lucide="phone-call" style="width:13px;height:13px;"></i> Emergency</h3>
-                <div class="rs-emergency-row"><span>EU / many countries</span><span>112</span></div>
-                <div class="rs-emergency-row"><span>USA &amp; Canada</span><span>911</span></div>
-                <div class="rs-emergency-row"><span>UK</span><span>999</span></div>
-                <p style="font-size:12px;color:rgba(244,241,232,.55);margin-top:12px;line-height:1.5">
-                    Verify your destination's local emergency number before you travel. We show
-                    widely-used numbers, not city-specific ones.
-                </p>
+
+                <th:block th:if="${emergency != null}">
+                    <div class="rs-emergency-row" th:if="${emergency.general != null}">
+                        <span th:text="${country != null ? country : 'General'}">Country</span>
+                        <span th:text="${emergency.general}">112</span>
+                    </div>
+                    <div class="rs-emergency-row" th:if="${emergency.police != null}">
+                        <span>Police</span><span th:text="${emergency.police}">-</span>
+                    </div>
+                    <div class="rs-emergency-row" th:if="${emergency.ambulance != null}">
+                        <span>Ambulance</span><span th:text="${emergency.ambulance}">-</span>
+                    </div>
+                    <div class="rs-emergency-row" th:if="${emergency.fire != null}">
+                        <span>Fire</span><span th:text="${emergency.fire}">-</span>
+                    </div>
+                    <p style="font-size:12px;color:rgba(244,241,232,.55);margin-top:12px;line-height:1.5">
+                        For <span th:text="${country}">this country</span>, from
+                        <a th:href="${emergency.sourceUrl}" target="_blank" rel="noopener"
+                            style="color:inherit;text-decoration:underline"
+                            th:text="${emergency.source}">Wikidata</a>. Verify locally on arrival
+                        where you can.
+                    </p>
+                </th:block>
+
+                <th:block th:if="${emergency == null}">
+                    <div class="rs-emergency-row"><span>EU / many countries</span><span>112</span></div>
+                    <div class="rs-emergency-row"><span>USA &amp; Canada</span><span>911</span></div>
+                    <div class="rs-emergency-row"><span>UK</span><span>999</span></div>
+                    <p style="font-size:12px;color:rgba(244,241,232,.55);margin-top:12px;line-height:1.5">
+                        We don't hold a verified number for this country yet, so these are the
+                        widely-used ones rather than local. Check before you travel.
+                    </p>
+                </th:block>
             </div>
         </aside>
 
@@ -139,6 +173,59 @@
                         We don't have enough reports to score <span th:text="${selectedCity}">this city</span> yet.
                         Coverage expands as travelers contribute. Be the first to add one.
                     </p>
+                </div>
+
+                <!--
+                  What this report actually contains.
+
+                  Overview was a single paragraph, which left most of the column
+                  empty while the sidebar ran on for another 600px - the page
+                  read as unfinished, and nothing told the reader that six other
+                  tabs of sourced material were sitting behind the row of tabs.
+                  Each card below is rendered only when that section has content,
+                  so this is a description of what is held for this city rather
+                  than a fixed menu with dead entries.
+                -->
+                <div class="rs-card-panel" style="margin-top:16px">
+                    <h3>✦ What's in this report</h3>
+                    <div class="rs-overview-jump">
+                        <button type="button" data-jump="scams">
+                            <b th:text="${totalScams}">0</b>
+                            <span th:text="${totalScams == 1 ? 'scam report' : 'scam reports'}">scam reports</span>
+                        </button>
+                        <button type="button" data-jump="hoods" th:if="${!destination.neighborhoods.isEmpty()}">
+                            <b th:text="${destination.neighborhoods.size()}">0</b>
+                            <span
+                                th:text="${destination.neighborhoods.size() == 1 ? 'neighborhood scored' : 'neighborhoods scored'}">neighborhoods
+                                scored</span>
+                        </button>
+                        <button type="button" data-jump="advisories" th:if="${advisories != null}">
+                            <b th:text="${advisories.size()}">0</b>
+                            <span
+                                th:text="${advisories.size() == 1 ? 'government advisory' : 'government advisories'}">government
+                                advisories</span>
+                        </button>
+                        <button type="button" data-jump="incidents" th:if="${incidents != null}">
+                            <b th:text="${incidents.size()}">0</b>
+                            <span th:text="${incidents.size() == 1 ? 'recent mention' : 'recent mentions'}">recent
+                                mentions</span>
+                        </button>
+                        <button type="button" data-jump="practical" th:if="${practical != null}">
+                            <b th:text="${practical.size()}">0</b>
+                            <span th:text="${practical.size() == 1 ? 'arrival note' : 'arrival notes'}">arrival
+                                notes</span>
+                        </button>
+                        <!--
+                          No emergency card here: the sidebar already shows the
+                          full set of numbers a few centimetres to the left, and
+                          repeating them adds a tile without adding information.
+                        -->
+                        <button type="button" data-jump="cowork" th:if="${coworking != null}">
+                            <b th:text="${coworking.size()}">0</b>
+                            <span th:text="${coworking.size() == 1 ? 'place to work' : 'places to work'}">places to
+                                work</span>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -366,6 +453,16 @@
                 panels.forEach(p => p.hidden = p.dataset.panel !== tab.dataset.tab);
             };
             tabs.forEach(t => t.addEventListener('click', () => activate(t)));
+            // Overview's summary cards open the tab they describe.
+            document.querySelectorAll('[data-jump]').forEach(j => {
+                j.addEventListener('click', () => {
+                    const target = document.querySelector('.rs-tab[data-tab="' + j.dataset.jump + '"]');
+                    if (target) {
+                        activate(target);
+                        target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                });
+            });
             // US4: airport queries land straight on the arrival/practical tab.
             const initial = /*[[${initialTab}]]*/ null;
             if (initial) {

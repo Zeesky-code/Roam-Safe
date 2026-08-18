@@ -84,7 +84,7 @@
                 <span th:if="${isPro}" class="rs-plan-cta is-outline" style="opacity:.35;cursor:default">Free
                     tier</span>
                 <ul class="rs-plan-features">
-                    <li th:each="f : ${#lists.toList({'Search any destination','3 reports per city','Community access','Live safety map'})}">
+                    <li th:each="f : ${#lists.toList({'Search any destination','3 reports per city','Scam lookup','Live safety map','Community access'})}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5" />
@@ -103,7 +103,7 @@
                 <a th:if="${!isPro}" href="/trip-pass" class="rs-plan-cta is-outline">Get Trip Pass</a>
                 <span th:if="${isPro}" class="rs-plan-cta is-outline" style="opacity:.35;cursor:default">Active</span>
                 <ul class="rs-plan-features">
-                    <li th:each="f : ${#lists.toList({'Everything in Explorer','Unlimited reports for 14 days','One destination deep-dive','Offline PDF briefing'})}">
+                    <li th:each="f : ${#lists.toList({'Everything in Explorer','Unlimited reports for 14 days','Street intelligence','Compare destinations','Itinerary review','Multi-city briefing + offline PDF'})}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6 9 17l-5-5" />

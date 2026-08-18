@@ -99,7 +99,10 @@
                     </div>
 
                     <div style="margin-top:16px;font-size:13.5px;line-height:1.9">
-                        <div><b th:text="${profile.reports}">0</b> report(s) name this place</div>
+                        <div><b th:text="${profile.reports}">0</b>
+                            <span th:text="${profile.reports == 1 ? 'report names' : 'reports name'}">reports
+                                name</span> this place
+                        </div>
                         <div th:if="${profile.nightSharePct != null}">
                             <b th:text="${profile.nightSharePct} + '%'">0%</b> flagged as night-time
                         </div>
