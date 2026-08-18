@@ -11,7 +11,7 @@ const transport = new StdioClientTransport({
   env: {
     ...process.env,
     ROAMSAFE_API_URL: process.env.ROAMSAFE_API_URL ?? "http://localhost:8080",
-    ROAMSAFE_API_KEY: process.env.ROAMSAFE_API_KEY ?? "roamsafe-secret-key-123",
+    ROAMSAFE_API_KEY: process.env.ROAMSAFE_API_KEY,
   },
 });
 

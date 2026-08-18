@@ -87,6 +87,17 @@ DB_DRIVER=org.postgresql.Driver
 # --- AI ---
 GEMINI_API_KEY=...
 
+# --- API keys (REQUIRED — both fail closed if unset) ---
+# ROAMSAFE_API_KEY  gates /api/v1. The MCP server and any REST consumer send it
+#                   as X-API-KEY. Unset means every /api/v1 call returns 403.
+# ROAMSAFE_ADMIN_KEY gates /api/admin (ingestion, seeding, and the destructive
+#                   maintenance endpoints). Keep it separate from the partner
+#                   key and give it to nobody external; the scraper and
+#                   upload scripts read it from this same variable name.
+# Generate with: openssl rand -hex 32
+ROAMSAFE_API_KEY=...
+ROAMSAFE_ADMIN_KEY=...
+
 # --- Bachs: LIVE for production ---
 # Do NOT set BACH_DEMO_KEY in prod (that would force sandbox).
 BACH_API_KEY=sk_live_...
@@ -157,7 +168,11 @@ Go-live checklist:
 - [ ] `BACH_DEMO_KEY` is **absent** in prod.env (so it runs live, not sandbox)
 - [ ] Live Bachs webhook secret set
 - [ ] A real $3 Trip Pass purchase flips the account to Pro
-- [ ] (Recommended) Restore proper CSRF — see the TODO in `SecurityConfig`
+- [ ] `ROAMSAFE_API_KEY` set — otherwise every `/api/v1` call (including the
+      MCP server) returns 403
+- [ ] `ROAMSAFE_ADMIN_KEY` set, and **different** from the partner key
+- [ ] Verify the gate from outside: `curl -X POST https://YOUR-HOST/api/admin/seed/clear`
+      must return **403**. If it returns 200 it just wiped your database.
 
 ---
 

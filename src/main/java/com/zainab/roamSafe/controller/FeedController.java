@@ -57,6 +57,44 @@ public class FeedController {
         return "feed";
     }
 
+    /** One plotted marker: only the fields the map actually renders. */
+    public record MapSignal(
+            String city,
+            String name,
+            String neighborhood,
+            String description,
+            String preventionTips,
+            String safetyZone) {
+    }
+
+    /**
+     * Marker data for the map page.
+     *
+     * The map used to read this from /api/v1/alerts/feed, which meant the page
+     * shipped a partner API key in its JavaScript to every visitor - published
+     * on a public page and therefore not a secret at all. The map needs no
+     * privilege the page itself doesn't already have, so it reads from a
+     * same-origin endpoint instead and no key is involved.
+     *
+     * The response carries only the six fields the marker popup renders, rather
+     * than serialising the whole entity as the partner feed does.
+     */
+    @GetMapping("/map/signals")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public List<MapSignal> mapSignals() {
+        List<MapSignal> out = new ArrayList<>();
+        for (ScamReport r : scamService.getRecentApproved(200)) {
+            out.add(new MapSignal(
+                    r.getCity(),
+                    r.getName(),
+                    r.getNeighborhood(),
+                    r.getDescription(),
+                    r.getPreventionTips(),
+                    r.getSafetyZone() != null ? r.getSafetyZone().name() : "YELLOW"));
+        }
+        return out;
+    }
+
     private static String severityOf(Integer sev) {
         int s = sev == null ? 5 : sev;
         if (s >= 8)

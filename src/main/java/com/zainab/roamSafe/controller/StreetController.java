@@ -47,10 +47,11 @@ public class StreetController {
 
         model.addAttribute("query", q);
         var user = (com.zainab.roamSafe.model.User) session.getAttribute("user");
-        if (q != null && !q.isBlank() && !searchQuota.allow(session, user, "street:" + q + "|" + city)) {
-            return "redirect:/pricing?limit=search";
+        // Street intelligence is a Trip Pass feature. The empty form stays
+        // reachable so the page can explain what it does before asking for money.
+        if (q != null && !q.isBlank() && !searchQuota.hasProAccess(user)) {
+            return "redirect:/pricing?locked=street";
         }
-        model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
 
         if (q == null || q.isBlank()) {
             model.addAttribute("matches", List.of());

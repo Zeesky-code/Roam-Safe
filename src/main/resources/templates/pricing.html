@@ -22,6 +22,25 @@
         <div th:if="${infoMessage}" class="rs-alert-banner info" th:text="${infoMessage}"></div>
 
         <!-- Header -->
+        <!-- Shown when a gated feature sent the visitor here -->
+        <div class="rs-card-panel rs-limit-note" th:if="${lockedFeature}">
+            <h3 th:text="${lockedFeature} + ' needs a Trip Pass'">Feature needs a Trip Pass</h3>
+            <p th:if="${!isLoggedIn}">
+                Destination reports and scam lookup stay free — you don't need an account for those.
+                This one is part of the pass.
+            </p>
+            <p th:if="${isLoggedIn}">
+                Your account covers destination reports and scam lookup. A Trip Pass adds street
+                intelligence, comparison, the trip briefing and its offline PDF, and itinerary review.
+            </p>
+            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <a href="/trip-pass" class="rs-btn-primary"
+                    style="height:40px;padding:0 18px;display:inline-flex;align-items:center">Get a Trip Pass</a>
+                <a href="#plans" class="rs-btn-outline"
+                    style="height:40px;padding:0 18px;display:inline-flex;align-items:center">See plans</a>
+            </div>
+        </div>
+
         <!-- Shown when a guest runs out of free lookups -->
         <div class="rs-card-panel rs-limit-note" th:if="${param.limit != null}">
             <h3>You've used your free lookups</h3>

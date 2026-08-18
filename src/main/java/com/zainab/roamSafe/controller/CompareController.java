@@ -46,10 +46,10 @@ public class CompareController {
             return "compare";
         }
         var user = (com.zainab.roamSafe.model.User) session.getAttribute("user");
-        if (!searchQuota.allow(session, user, "compare:" + String.join(",", names))) {
-            return "redirect:/pricing?limit=search";
+        // Comparison is a Trip Pass feature.
+        if (!searchQuota.hasProAccess(user)) {
+            return "redirect:/pricing?locked=compare";
         }
-        model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
         if (names.size() > MAX_CITIES) {
             names = names.subList(0, MAX_CITIES);
             model.addAttribute("trimmed", true);

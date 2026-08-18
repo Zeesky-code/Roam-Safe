@@ -9,7 +9,7 @@
  *
  * Run against a running server (prod profile, real DB):
  *   ROAMSAFE_API_URL=http://127.0.0.1:8080 \
- *   ROAMSAFE_API_KEY=roamsafe-secret-key-123 \
+ *   ROAMSAFE_API_KEY=$ROAMSAFE_API_KEY \
  *   node cross-interface.test.mjs
  *
  * Exit code is non-zero if any interface drifts, so CI can gate on it.
@@ -19,7 +19,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import http from "node:http";
 
 const API_URL = (process.env.ROAMSAFE_API_URL ?? "http://127.0.0.1:8080").replace(/\/$/, "");
-const API_KEY = process.env.ROAMSAFE_API_KEY ?? "roamsafe-secret-key-123";
+const API_KEY = process.env.ROAMSAFE_API_KEY;
 const CITIES = ["Istanbul", "Tokyo", "Barcelona", "London", "Bangkok"];
 
 let failures = 0;

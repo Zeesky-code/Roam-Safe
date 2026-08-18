@@ -32,8 +32,9 @@ public class ReviewController {
     @PostMapping("/review")
     public String review(@RequestParam String itinerary, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (!searchQuota.allow(session, user, "review:" + itinerary.hashCode())) {
-            return "redirect:/pricing?limit=search";
+        // Itinerary review is a Trip Pass feature.
+        if (!searchQuota.hasProAccess(user)) {
+            return "redirect:/pricing?locked=review";
         }
         model.addAttribute("review", tripReviewService.review(itinerary));
         return "review";

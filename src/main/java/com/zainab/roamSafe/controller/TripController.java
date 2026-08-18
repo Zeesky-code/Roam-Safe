@@ -43,10 +43,10 @@ public class TripController {
         }
 
         User user = (User) session.getAttribute("user");
-        if (!searchQuota.allow(session, user, "trip:" + String.join(",", names))) {
-            return "redirect:/pricing?limit=search";
+        // The multi-city briefing and its offline PDF are Trip Pass features.
+        if (!searchQuota.hasProAccess(user)) {
+            return "redirect:/pricing?locked=trip";
         }
-        model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
 
         if (names.size() > TripBriefingService.MAX_LEGS) {
             names = names.subList(0, TripBriefingService.MAX_LEGS);

@@ -115,7 +115,7 @@
 
     async function loadData() {
       try {
-        const res = await fetch('/api/v1/alerts/feed?size=200', { headers: { 'X-API-KEY': 'roamsafe-secret-key-123' } });
+        const res = await fetch('/map/signals');
         if (!res.ok) return;
         const reports = await res.json();
         reports.forEach(r => {

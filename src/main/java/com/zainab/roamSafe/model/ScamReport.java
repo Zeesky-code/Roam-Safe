@@ -61,6 +61,27 @@ public class ScamReport {
 
     private Boolean isNightTimeIncident;
 
+    /**
+     * Where this report came from, so a reader can go and check it.
+     *
+     * Every other kind of evidence here carries its origin — PracticalInfo,
+     * EmergencyNumber, LiveIncident and Advisory all do, and the destination
+     * page renders it. Scam reports were the exception, which left the product's
+     * central claim (never invent; every data point traces to a real public
+     * source) resting on trust rather than on anything the schema enforced.
+     *
+     * Null is honest and expected on rows imported before these columns existed:
+     * their origin genuinely wasn't recorded and inventing one after the fact
+     * would be exactly the failure this field exists to prevent. New imports
+     * carry it through from the source.
+     */
+    @Column(name = "source_url", length = 900)
+    private String sourceUrl;
+
+    /** Human-readable origin, e.g. "Wikivoyage". Null when not recorded. */
+    @Column(name = "source_name")
+    private String sourceName;
+
     public ScamReport() {
         this.createdAt = LocalDateTime.now();
     }
@@ -227,5 +248,27 @@ public class ScamReport {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getSourceUrl() {
+        return sourceUrl;
+    }
+
+    /** Set only from the actual origin of the report. Leave null when unknown. */
+    public void setSourceUrl(String sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    /** True when this report can be traced back to a source a reader can open. */
+    public boolean hasSource() {
+        return sourceUrl != null && !sourceUrl.isBlank();
     }
 }

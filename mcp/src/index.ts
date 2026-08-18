@@ -19,7 +19,17 @@ import https from "node:https";
 import { URL } from "node:url";
 
 const API_URL = (process.env.ROAMSAFE_API_URL ?? "http://localhost:8080").replace(/\/$/, "");
-const API_KEY = process.env.ROAMSAFE_API_KEY ?? "roamsafe-secret-key-123";
+// No fallback key. The server no longer ships a default, so a baked-in guess
+// would only turn "you forgot to configure this" into an opaque 403 on every
+// tool call. Failing here names the actual problem once, at startup.
+const API_KEY = process.env.ROAMSAFE_API_KEY ?? "";
+if (!API_KEY) {
+  console.error(
+    "ROAMSAFE_API_KEY is not set. Add it to the MCP server's env config — " +
+      "it must match ROAMSAFE_API_KEY on the RoamSafe server, or every /api/v1 call returns 403.",
+  );
+  process.exit(1);
+}
 
 type Neighborhood = { name: string; score: number; reports: number; nightIncidents: number };
 type CategoryStat = { category: string; reports: number; avgSeverity: number; riskScore: number };

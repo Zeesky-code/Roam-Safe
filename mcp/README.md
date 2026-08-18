@@ -70,7 +70,7 @@ Then add it to your client. **Claude Desktop** —
 | Variable | Default | Notes |
 |---|---|---|
 | `ROAMSAFE_API_URL` | `http://localhost:8080` | Point at your deployed instance in production |
-| `ROAMSAFE_API_KEY` | `roamsafe-secret-key-123` | Sent as the `X-API-KEY` header |
+| `ROAMSAFE_API_KEY` | _(none — required)_ | Sent as the `X-API-KEY` header. Must match `ROAMSAFE_API_KEY` on the RoamSafe server; the server has no default key, so an unset or mismatched value makes every call return 403. |
 
 The RoamSafe app must be running and reachable at `ROAMSAFE_API_URL`.
 

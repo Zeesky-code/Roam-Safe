@@ -24,6 +24,23 @@ public class SearchQuotaService {
     /** Free lookups before a guest is asked to sign up. */
     public static final int GUEST_SEARCH_LIMIT = 5;
 
+    /**
+     * Whether the paid features are open to this visitor.
+     *
+     * Street intelligence, comparison, the multi-city briefing and its PDF, and
+     * the itinerary review are what the Trip Pass sells. They were reachable by
+     * any signed-in account, because they only ever checked the guest search
+     * quota - and that quota returns true unconditionally for a signed-in user.
+     * So registering, which is free, unlocked everything the pass was meant to
+     * unlock, and the pricing page described a product the code didn't enforce.
+     *
+     * Destination reports and scam lookup stay outside this gate: they are the
+     * free tier, and the funnel depends on them being genuinely usable.
+     */
+    public boolean hasProAccess(User user) {
+        return user != null && user.isPro();
+    }
+
     private static final String SEEN_KEY = "rs.searches.seen";
 
     /**

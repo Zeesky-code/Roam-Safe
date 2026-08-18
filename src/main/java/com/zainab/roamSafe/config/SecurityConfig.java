@@ -69,14 +69,27 @@ public class SecurityConfig {
                                                 .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/robots.txt",
                                                                 "/sitemap.xml")
                                                 .permitAll()
-                                                .requestMatchers("/api/admin/seed/**").permitAll()
                                                 .requestMatchers("/scams", "/submit", "/waitlist", "/register",
                                                                 "/login", "/dashboard/**", "/pricing", "/subscribe",
-                                                                "/map")
+                                                                "/map", "/map/signals")
                                                 .permitAll()
+
+                                                // Payment webhook: authenticated by HMAC signature in
+                                                // PaymentController, not by session or key, so it cannot
+                                                // sit behind an authorization rule.
+                                                .requestMatchers("/api/bachs/webhook").permitAll()
 
                                                 // Public API (Protected by API Key via Filter)
                                                 .requestMatchers("/api/v1/**").authenticated()
+
+                                                // Ingestion and maintenance. These write, delete and
+                                                // auto-approve safety data, so they require the admin
+                                                // key presented as a header - never anonymous access,
+                                                // and deliberately not a browser session either. This
+                                                // was previously permitAll, which left POST
+                                                // /api/admin/seed/clear - a full wipe of every report
+                                                // and city - open to anyone who found the path.
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN_API")
 
                                                 // Admin pages
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")

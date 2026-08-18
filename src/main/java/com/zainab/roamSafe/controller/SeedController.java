@@ -391,6 +391,17 @@ public class SeedController {
                         report.setStatus(ScamReportStatus.APPROVED); // Always approve bulk imports
                         // No invented reportedAt — see the note in the seed path above.
 
+                        // Provenance travels with the report. Absent stays absent: a
+                        // missing source is recorded as unknown rather than filled in
+                        // with a plausible-looking article URL.
+                        if (req.sourceUrl() != null && !req.sourceUrl().isBlank()) {
+                                report.setSourceUrl(req.sourceUrl());
+                                report.setSourceName(
+                                                req.sourceName() != null && !req.sourceName().isBlank()
+                                                                ? req.sourceName()
+                                                                : "Wikivoyage");
+                        }
+
                         // Gate: keep non-scams (disasters, emergency-info, vague
                         // "general safety") out of the library so a re-import can't
                         // undo the cleanup. A real scam is always allowed through.
@@ -410,9 +421,14 @@ public class SeedController {
                 }
 
                 scamReportRepository.saveAll(entities);
+                // Report the untraceable ones rather than letting them land silently:
+                // an import that has quietly stopped carrying sources is exactly the
+                // regression worth noticing on the run that introduces it.
+                long unsourced = entities.stream().filter(r -> !r.hasSource()).count();
                 return ResponseEntity.ok("Bulk import: " + entities.size() + " new reports imported"
                                 + (skipped > 0 ? ", " + skipped + " already present" : "")
-                                + (rejected > 0 ? ", " + rejected + " non-scam entries rejected" : "") + ".");
+                                + (rejected > 0 ? ", " + rejected + " non-scam entries rejected" : "")
+                                + (unsourced > 0 ? ", " + unsourced + " WITHOUT a source url" : "") + ".");
         }
 
         @PostMapping("/clear")

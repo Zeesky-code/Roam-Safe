@@ -49,8 +49,9 @@ public class GuideController {
         }
 
         User user = (User) session.getAttribute("user");
-        if (!searchQuota.allow(session, user, "guide:" + String.join(",", names))) {
-            return "redirect:/pricing?limit=search";
+        // The multi-stop guide is a Trip Pass feature.
+        if (!searchQuota.hasProAccess(user)) {
+            return "redirect:/pricing?locked=guide";
         }
 
         model.addAttribute("guide", tripGuideService.build(names));
