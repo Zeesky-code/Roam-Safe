@@ -31,6 +31,21 @@ if (!API_KEY) {
   process.exit(1);
 }
 
+/**
+ * Transport selection. Unset (the default) keeps stdio, so every existing
+ * client config keeps working untouched; setting a port switches to stateless
+ * Streamable HTTP.
+ */
+const HTTP_PORT = Number(process.env.ROAMSAFE_MCP_PORT ?? process.env.PORT ?? 0) || 0;
+const MCP_PATH = process.env.ROAMSAFE_MCP_PATH ?? "/mcp";
+
+/**
+ * Key required to call the HTTP endpoint. Defaults to the upstream API key so a
+ * deployment gets authentication without a second secret to manage, and can be
+ * set separately when the MCP endpoint should have its own credential.
+ */
+const MCP_HTTP_KEY = process.env.ROAMSAFE_MCP_KEY ?? process.env.ROAMSAFE_API_KEY ?? "";
+
 type Neighborhood = { name: string; score: number; reports: number; nightIncidents: number };
 type CategoryStat = { category: string; reports: number; avgSeverity: number; riskScore: number };
 type Coverage = {
@@ -127,6 +142,25 @@ const rich = (s: string, structured: Record<string, unknown>) => ({
   structuredContent: structured,
 });
 
+/**
+ * A tool execution error.
+ *
+ * Every failure here previously came back as an ordinary successful result
+ * whose text happened to read like an error, which left the client unable to
+ * tell a Neon outage from an answer - and told the model the call had
+ * succeeded. The spec separates the two for a reason: clients SHOULD hand tool
+ * execution errors back to the model so it can self-correct or report the
+ * outage, and that only happens when the result is flagged.
+ *
+ * Note that "no coverage for this city" is deliberately NOT one of these. It is
+ * a true, useful answer produced from real data, not a failure, and flagging it
+ * would invite a retry loop against a city that will never be covered.
+ */
+const fail = (s: string) => ({
+  content: [{ type: "text" as const, text: s }],
+  isError: true as const,
+});
+
 const apiError = (status: number, what: string) =>
   status === 0
     ? `Cannot reach the RoamSafe API at ${API_URL} (${what}). Is the RoamSafe app running, ` +
@@ -156,7 +190,19 @@ async function suggestAlternatives(city: string): Promise<string> {
   );
 }
 
-const server = new McpServer({ name: "roamsafe", version: "1.1.0" });
+/**
+ * Builds a fully-registered server instance.
+ *
+ * This is a factory rather than a module-level singleton because the stateless
+ * Streamable HTTP transport builds a fresh server and transport per request and
+ * disposes of both when it completes. Sharing one instance across concurrent
+ * requests would let their JSON-RPC message streams interleave on the same
+ * object. stdio keeps a single long-lived instance, which is what that
+ * transport expects, so both callers below get what they need from the same
+ * definitions.
+ */
+export function createServer(): McpServer {
+const server = new McpServer({ name: "roamsafe", version: "2.0.0" });
 
 /* ------------------------------ city safety ------------------------------ */
 
@@ -183,7 +229,7 @@ server.registerTool(
             `Do not infer or estimate one - say coverage is missing.${alts}`
         );
       }
-      return text(apiError(r.status, `looking up "${city}"`));
+      return fail(apiError(r.status, `looking up "${city}"`));
     }
     const d = r.data as CityRisk;
     const cov = d.coverage;
@@ -272,7 +318,7 @@ server.registerTool(
   },
   async ({ country, limit }) => {
     const all = await coveredCities();
-    if (!all.length) return text(apiError(0, "listing covered cities"));
+    if (!all.length) return fail(apiError(0, "listing covered cities"));
     const filtered = country
       ? all.filter((c) => (c.country ?? "").toLowerCase() === country.toLowerCase())
       : all;
@@ -316,7 +362,7 @@ server.registerTool(
         const alts = await suggestAlternatives(city);
         return text(`RoamSafe has no coverage for "${city}", so no neighborhood data exists.${alts}`);
       }
-      return text(apiError(r.status, `loading neighborhoods for "${city}"`));
+      return fail(apiError(r.status, `loading neighborhoods for "${city}"`));
     }
     const d = r.data as CityRisk;
     const hoods = d.neighborhoods ?? [];
@@ -362,7 +408,7 @@ server.registerTool(
     // Pull extra when filtering client-side so the filter still fills the limit.
     const fetchSize = city ? Math.min(50, (limit ?? 10) * 5) : limit ?? 10;
     const r = await api(`/api/v1/alerts/feed?page=0&size=${fetchSize}`);
-    if (!r.ok) return text(apiError(r.status, "loading the alert feed"));
+    if (!r.ok) return fail(apiError(r.status, "loading the alert feed"));
     let rows = r.data as Report[];
     if (city) {
       rows = rows.filter((a) => a.city?.toLowerCase() === city.toLowerCase()).slice(0, limit ?? 10);
@@ -415,7 +461,7 @@ server.registerTool(
     const covered = results.filter((x) => x.r.ok).map((x) => (x.r as { ok: true; data: CityRisk }).data);
     const missing = results.filter((x) => !x.r.ok && (x.r as { status: number }).status === 404).map((x) => x.city);
     const unreachable = results.every((x) => !x.r.ok && (x.r as { status: number }).status === 0);
-    if (unreachable) return text(apiError(0, "comparing cities"));
+    if (unreachable) return fail(apiError(0, "comparing cities"));
 
     // Score for the requested concern; fall back to overall when a city has no
     // reports in that category (never invent a category score).
@@ -524,7 +570,7 @@ server.registerTool(
       (city ? `&city=${encodeURIComponent(city)}` : "");
     const r = await api(path);
 
-    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${place}`));
+    if (!r.ok && r.status !== 404) return fail(apiError(r.status, `looking up ${place}`));
     const d = (r.ok ? r.data : {}) as StreetProfile;
 
     if (!r.ok || !d.covered) {
@@ -586,7 +632,7 @@ server.registerTool(
   },
   async ({ country }) => {
     const r = await api(`/api/v1/emergency/${encodeURIComponent(country)}`);
-    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${country}`));
+    if (!r.ok && r.status !== 404) return fail(apiError(r.status, `looking up ${country}`));
     const d = (r.ok ? r.data : {}) as {
       covered: boolean;
       country: string;
@@ -646,7 +692,7 @@ server.registerTool(
   },
   async ({ city, topic }) => {
     const r = await api(`/api/v1/practical/${encodeURIComponent(city)}`);
-    if (!r.ok && r.status !== 404) return text(apiError(r.status, `looking up ${city}`));
+    if (!r.ok && r.status !== 404) return fail(apiError(r.status, `looking up ${city}`));
     const d = (r.ok ? r.data : {}) as {
       covered: boolean;
       sections?: Array<{ topic: string; label: string; content: string; source: string; sourceUrl: string; licence: string }>;
@@ -695,7 +741,7 @@ server.registerTool(
   },
   async ({ city }) => {
     const r = await api(`/api/v1/incidents${city ? `?city=${encodeURIComponent(city)}` : ""}`);
-    if (!r.ok) return text(apiError(r.status, "listing incidents"));
+    if (!r.ok) return fail(apiError(r.status, "listing incidents"));
     const d = r.data as {
       count: number;
       incidents: Array<{ city: string; headline: string; outlet: string; url: string; publishedAt: string }>;
@@ -721,5 +767,95 @@ server.registerTool(
   }
 );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+  return server;
+}
+
+/* -------------------------------- transports ------------------------------- */
+
+/**
+ * stdio, the default: one long-lived server owned by the client that spawned it.
+ */
+async function runStdio(): Promise<void> {
+  const server = createServer();
+  await server.connect(new StdioServerTransport());
+}
+
+/**
+ * Stateless Streamable HTTP.
+ *
+ * Every request builds its own server and transport, handles the one message
+ * and tears both down, so nothing is carried between requests. That is the
+ * point: RoamSafe's tools are pure reads over the REST API, they hold no
+ * session, cart or cursor, and a server with nothing to remember should not be
+ * paying for sticky sessions. It also means this scales by running more
+ * instances behind a load balancer with no shared session store and no
+ * requirement that a client keep hitting the same one.
+ *
+ * `sessionIdGenerator: undefined` is what puts the SDK transport into stateless
+ * mode - with a generator it would issue Mcp-Session-Id headers and expect them
+ * back on later requests.
+ */
+async function runHttp(port: number): Promise<void> {
+  const { StreamableHTTPServerTransport } = await import(
+    "@modelcontextprotocol/sdk/server/streamableHttp.js"
+  );
+
+  const httpServer = http.createServer(async (req, res) => {
+    if (!req.url) {
+      res.writeHead(400).end();
+      return;
+    }
+    const path = new URL(req.url, `http://${req.headers.host ?? "localhost"}`).pathname;
+
+    // Liveness, so a platform health check doesn't have to speak MCP.
+    if (path === "/health") {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "ok", server: "roamsafe-mcp", transport: "streamable-http" }));
+      return;
+    }
+
+    if (path !== MCP_PATH) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: `Not found. MCP endpoint is ${MCP_PATH}` }));
+      return;
+    }
+
+    // Remote transport means anyone who can reach the port can call the tools,
+    // which is not true of stdio. Require the same key the REST API uses, so a
+    // deployed MCP endpoint isn't a way around /api/v1's authentication.
+    if (MCP_HTTP_KEY && req.headers["x-api-key"] !== MCP_HTTP_KEY) {
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Missing or invalid X-API-KEY." }));
+      return;
+    }
+
+    const server = createServer();
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    // Tear both down with the request, or each call leaks an instance.
+    res.on("close", () => {
+      transport.close().catch(() => {});
+      server.close().catch(() => {});
+    });
+
+    try {
+      await server.connect(transport);
+      await transport.handleRequest(req, res);
+    } catch (err) {
+      console.error("[roamsafe-mcp] request failed:", err);
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Internal server error" }));
+      }
+    }
+  });
+
+  httpServer.listen(port, () => {
+    console.error(`[roamsafe-mcp] stateless Streamable HTTP on :${port}${MCP_PATH}`);
+  });
+}
+
+if (HTTP_PORT) {
+  await runHttp(HTTP_PORT);
+} else {
+  await runStdio();
+}
