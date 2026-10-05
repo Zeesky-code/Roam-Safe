@@ -17,5 +17,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByStripeCustomerId(String stripeCustomerId);
 
-    Optional<User> findByBachsCustomerId(String bachsCustomerId);
 } 

@@ -199,7 +199,7 @@ public class AdvisoryIngestionService {
 
     private JsonNode get(String url) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent", "RoamSafe/1.0 (+https://roamsafe.app)");
+        headers.set("User-Agent", "RoamSafe/1.0 (+https://github.com/Zeesky-code/Roam-Safe)");
         ResponseEntity<JsonNode> resp = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers),
                 JsonNode.class);
         return resp.getBody();

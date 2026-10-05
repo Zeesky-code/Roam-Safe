@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +23,14 @@ public class CompareController {
     private static final int MAX_CITIES = 4;
 
     private final ComparisonService comparisonService;
-    private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
 
-    public CompareController(ComparisonService comparisonService,
-            com.zainab.roamSafe.service.SearchQuotaService searchQuota) {
+    public CompareController(ComparisonService comparisonService) {
         this.comparisonService = comparisonService;
-        this.searchQuota = searchQuota;
     }
 
     @GetMapping("/compare")
     public String compare(@RequestParam(required = false) String cities,
             @RequestParam(required = false) String q,
-            HttpSession session,
             Model model) {
 
         List<String> names = parse(cities != null && !cities.isBlank() ? cities : q);
@@ -44,11 +39,6 @@ public class CompareController {
         if (names.size() < 2) {
             model.addAttribute("needsInput", true);
             return "compare";
-        }
-        var user = (com.zainab.roamSafe.model.User) session.getAttribute("user");
-        // Comparison is a Trip Pass feature.
-        if (!searchQuota.hasProAccess(user)) {
-            return "redirect:/pricing?locked=compare";
         }
         if (names.size() > MAX_CITIES) {
             names = names.subList(0, MAX_CITIES);

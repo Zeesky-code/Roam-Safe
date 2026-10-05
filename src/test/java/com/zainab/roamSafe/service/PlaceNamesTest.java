@@ -65,6 +65,15 @@ class PlaceNamesTest {
     }
 
     @Test
+    void neverSplitsInsideBrackets() {
+        // Live on the Paris page on 2026-10-05 as two half-bracketed tiles.
+        List<String> out = PlaceNames.extract("Airports (Charles de Gaulle, Orly) and train stations");
+        assertTrue(out.stream().noneMatch(p -> p.contains("(") != p.contains(")")), out.toString());
+        assertEquals(List.of("Montmartre (Sacré-Cœur Basilica)", "Pigalle"),
+                PlaceNames.extract("Montmartre (Sacré-Cœur Basilica), Pigalle"));
+    }
+
+    @Test
     void handlesNullAndBlank() {
         assertTrue(PlaceNames.extract(null).isEmpty());
         assertTrue(PlaceNames.extract("   ").isEmpty());

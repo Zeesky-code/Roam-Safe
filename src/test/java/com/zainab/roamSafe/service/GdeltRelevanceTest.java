@@ -1,7 +1,11 @@
 package com.zainab.roamSafe.service;
 
+import com.zainab.roamSafe.model.LiveIncident;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,6 +45,25 @@ class GdeltRelevanceTest {
                 "Paris fashion week draws record crowds"));
         assertFalse(GdeltIngestionService.isRelevant("Tokyo",
                 "Tokyo named world's best city for food"));
+    }
+
+    @Test
+    void rejectsRetrospectives() {
+        // Live on the Mexico City page on 2026-10-05, three times over.
+        assertFalse(GdeltIngestionService.isRelevant("Mexico City",
+                "Today in History : October 2 , hundreds massacred at Mexico City student protest"));
+    }
+
+    @Test
+    void showsASyndicatedStoryOnce() {
+        String headline = "Kashmiri community holds major protest in London over killings in PoJK";
+        var shown = GdeltIngestionService.current(List.of(
+                new LiveIncident("London", headline, "https://a.example/1", "a.example", null),
+                new LiveIncident("London", headline + " ", "https://b.example/1", "b.example", null),
+                new LiveIncident("London", "All train lines CLOSED amid emergency London incident",
+                        "https://c.example/1", "c.example", null)));
+        assertEquals(2, shown.size());
+        assertEquals("a.example", shown.get(0).getSourceDomain());
     }
 
     @Test

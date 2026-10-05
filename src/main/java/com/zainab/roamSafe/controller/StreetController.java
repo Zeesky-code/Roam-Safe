@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -25,14 +24,11 @@ public class StreetController {
     private final CityCountryResolver cityCountryResolver;
     private final AdvisoryRepository advisoryRepository;
     private final EmergencyNumberService emergencyNumberService;
-    private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
 
     public StreetController(StreetIntelligenceService streetService,
             CityCountryResolver cityCountryResolver,
             AdvisoryRepository advisoryRepository,
-            EmergencyNumberService emergencyNumberService,
-            com.zainab.roamSafe.service.SearchQuotaService searchQuota) {
-        this.searchQuota = searchQuota;
+            EmergencyNumberService emergencyNumberService) {
         this.streetService = streetService;
         this.cityCountryResolver = cityCountryResolver;
         this.advisoryRepository = advisoryRepository;
@@ -42,16 +38,9 @@ public class StreetController {
     @GetMapping("/street")
     public String street(@RequestParam(required = false) String q,
             @RequestParam(required = false) String city,
-            HttpSession session,
             Model model) {
 
         model.addAttribute("query", q);
-        var user = (com.zainab.roamSafe.model.User) session.getAttribute("user");
-        // Street intelligence is a Trip Pass feature. The empty form stays
-        // reachable so the page can explain what it does before asking for money.
-        if (q != null && !q.isBlank() && !searchQuota.hasProAccess(user)) {
-            return "redirect:/pricing?locked=street";
-        }
 
         if (q == null || q.isBlank()) {
             model.addAttribute("matches", List.of());

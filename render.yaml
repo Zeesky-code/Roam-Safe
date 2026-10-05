@@ -42,12 +42,6 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
-      - key: BACH_DEMO_KEY
-        sync: false
-      - key: BACHS_TRIP_PASS_PRODUCT
-        sync: false
-      - key: BACHS_NOMAD_PRODUCT
-        sync: false
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD

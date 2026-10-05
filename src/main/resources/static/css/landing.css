@@ -129,6 +129,10 @@
 
 /* ================= BELOW-FOLD (home page) ================= */
 .lp-main { background: var(--lp-ground); color: var(--lp-ink); font-family: var(--lp-sans); }
+/* The shared footer's top margin would show the app-shell gradient as a beige
+   band under the landing page; keep the gap but paint it the landing ground. */
+.lp-main { padding-bottom: var(--section-rhythm); }
+.lp-main + .rs-footer { margin-top: 0; }
 .lp-section { max-width: 1240px; margin: 0 auto; padding: 64px 40px; }
 .lp-sec-eyebrow { color: var(--lp-accent); display: inline-flex; align-items: center; gap: 8px; }
 .lp-h2 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.08; letter-spacing: -.025em; font-weight: 660; margin: 12px 0 0; text-wrap: balance; color: var(--lp-ink); }

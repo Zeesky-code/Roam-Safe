@@ -8,7 +8,7 @@
     <meta name="description"
         th:attr="content='Evidence-backed safety report for ' + ${selectedCity} + ': computed safety score, scam reports and neighborhood risk from real traveler data.'" />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.52.0/dist/umd/lucide.min.js"></script>
 </head>
 
 <body>
@@ -152,7 +152,7 @@
                 <button type="button" class="rs-tab" data-tab="incidents"
                     th:if="${incidents != null}">Happening now</button>
                 <button type="button" class="rs-tab" data-tab="practical"
-                    th:if="${practical != null}">Arriving &amp; getting around</button>
+                    th:if="${practical != null}">Getting there</button>
                 <button type="button" class="rs-tab" data-tab="cowork"
                     th:if="${coworking != null}">Working here</button>
             </div>
@@ -272,18 +272,6 @@
                                 How to stay clear</div>
                             <p th:text="${s.preventionTips}">Tip</p>
                         </div>
-                    </div>
-
-                    <!-- Paywall -->
-                    <div class="rs-paywall" th:if="${showLoginPrompt}">
-                        <h3 th:text="${totalScams - 3} + ' more reports for ' + ${selectedCity}">More reports</h3>
-                        <p>Create a free account to see the full picture for this destination.</p>
-                        <a href="/register" class="rs-btn-cream">Create free account</a>
-                    </div>
-                    <div class="rs-paywall" th:if="${showUpgradePrompt}">
-                        <h3 th:text="${totalScams - 3} + ' more reports for ' + ${selectedCity}">More reports</h3>
-                        <p>Unlock every report for this city with a Trip Pass or subscription.</p>
-                        <a href="/pricing" class="rs-btn-cream">See plans</a>
                     </div>
 
                     <div class="rs-empty" th:if="${scams.isEmpty()}" style="grid-column:1/-1">

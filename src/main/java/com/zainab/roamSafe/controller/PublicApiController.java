@@ -6,6 +6,7 @@ import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.repository.ScamReportRepository;
 import com.zainab.roamSafe.service.CitySummaryService;
+import com.zainab.roamSafe.service.GdeltIngestionService;
 import com.zainab.roamSafe.service.SafetyScoreService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -157,7 +158,8 @@ public class PublicApiController {
         // and explicitly unverified - these are third-party headlines, never a
         // RoamSafe finding, and they do not affect the score. An agent must
         // repeat them as reports to check, not as fact.
-        var incidents = liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+        var incidents = GdeltIngestionService.current(
+                liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city));
         response.put("liveIncidents", incidents.stream().limit(10).map(i -> {
             java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
             m.put("headline", i.getTitle());
@@ -387,9 +389,9 @@ public class PublicApiController {
     @GetMapping("/incidents")
     public ResponseEntity<Map<String, Object>> incidents(
             @RequestParam(required = false) String city) {
-        var rows = city == null || city.isBlank()
+        var rows = GdeltIngestionService.current(city == null || city.isBlank()
                 ? liveIncidentRepository.findTop20ByOrderByPublishedAtDesc()
-                : liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city);
+                : liveIncidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city));
         Map<String, Object> body = new HashMap<>();
         body.put("city", city);
         body.put("count", rows.size());

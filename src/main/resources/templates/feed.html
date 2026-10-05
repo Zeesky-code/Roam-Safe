@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live intelligence feed · RoamSafe</title>
+    <title>Latest reports · RoamSafe</title>
     <meta name="description"
-        content="What's changing right now. A live stream of traveler-reported safety signals, filterable by category and severity." />
+        content="The most recently added scam and safety reports across every covered city, filterable by category and severity." />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.52.0/dist/umd/lucide.min.js"></script>
 </head>
 
 <body>
@@ -20,12 +20,12 @@
 
         <section class="rs-feed-head">
             <div>
-                <div class="rs-eyebrow"><span class="rs-live-dot"></span> Live intelligence feed</div>
-                <h1>What's changing, right now</h1>
+                <div class="rs-eyebrow">Report library</div>
+                <h1>Latest reports, every city</h1>
             </div>
             <div class="rs-feed-count">
                 <b data-count th:text="${signalCount}">0</b>
-                <span>active signals</span>
+                <span>reports shown</span>
             </div>
         </section>
 
@@ -64,7 +64,7 @@
                     <div class="rs-signal-title" th:text="${s.title}">Signal title</div>
                     <div class="rs-signal-desc" th:text="${#strings.abbreviate(s.description, 180)}">Description</div>
                     <div class="rs-signal-foot">
-                        <span>Traveler-reported</span>
+                        <span th:text="${s.source != null} ? 'Source: ' + ${s.source} : ''"></span>
                         <a th:href="@{${s.href}}">View evidence →</a>
                     </div>
                 </div>

@@ -70,14 +70,8 @@ public class SecurityConfig {
                                                                 "/sitemap.xml")
                                                 .permitAll()
                                                 .requestMatchers("/scams", "/submit", "/waitlist", "/register",
-                                                                "/login", "/dashboard/**", "/pricing", "/subscribe",
-                                                                "/map", "/map/signals")
+                                                                "/login", "/dashboard/**")
                                                 .permitAll()
-
-                                                // Payment webhook: authenticated by HMAC signature in
-                                                // PaymentController, not by session or key, so it cannot
-                                                // sit behind an authorization rule.
-                                                .requestMatchers("/api/bachs/webhook").permitAll()
 
                                                 // Public API (Protected by API Key via Filter)
                                                 .requestMatchers("/api/v1/**").authenticated()
@@ -115,8 +109,7 @@ public class SecurityConfig {
                                                 // Only /api/** stays exempt: it is stateless and
                                                 // authenticated by API key rather than a session
                                                 // cookie, so it isn't open to cross-site form
-                                                // submission, and the Bachs payment webhook is a
-                                                // server-to-server call that can't carry a token.
+                                                // submission.
                                                 .ignoringRequestMatchers("/api/**"));
 
                 return http.build();

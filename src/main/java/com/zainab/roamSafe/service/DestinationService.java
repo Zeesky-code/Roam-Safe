@@ -54,7 +54,7 @@ public class DestinationService {
 
     /**
      * Builds the report view for a city from its full approved report list
-     * (pass the complete list, not the paywalled subset, so stats are accurate).
+     * (pass the complete list so stats are accurate).
      */
     public View build(String city, List<ScamReport> allReports) {
         SafetyScore score = safetyScoreService.getScoreForCity(city);

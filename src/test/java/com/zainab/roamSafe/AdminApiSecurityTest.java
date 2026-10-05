@@ -89,15 +89,4 @@ class AdminApiSecurityTest {
                 .header("X-API-KEY", "test-admin-key"))
                 .andExpect(status().isOk());
     }
-
-    /**
-     * The map page reads its markers from a same-origin endpoint, so it no
-     * longer has to ship an API key to every visitor. That endpoint has to stay
-     * open, or the map silently renders empty.
-     */
-    @Test
-    void mapSignalsArePubliclyReadable() throws Exception {
-        mockMvc.perform(get("/map/signals"))
-                .andExpect(status().isOk());
-    }
 }

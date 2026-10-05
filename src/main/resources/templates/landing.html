@@ -9,7 +9,7 @@
         content="Government advisories, local news and traveler reports for exactly where you're going, in one sourced briefing. RoamSafe summarizes what's real and never invents." />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
     <link rel="stylesheet" th:href="@{/css/landing.css}" />
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.52.0/dist/umd/lucide.min.js"></script>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         <nav class="lp-nav">
             <a class="lp-brand" href="/">RoamSafe</a>
             <div class="lp-links">
-                <a href="/scams">Library</a><a href="/street">Streets</a><a href="/compare">Compare</a><a href="/map">Map</a><a href="/guide">Guide</a><a href="/pricing">Pricing</a>
+                <a href="/scams">Library</a><a href="/street">Streets</a><a href="/compare">Compare</a><a href="/guide">Guide</a>
             </div>
             <div class="lp-nav-right">
                 <a th:if="${currentUser == null}" class="lp-btn lp-btn-glass" href="/login">Sign in</a>
@@ -176,7 +176,7 @@
         <!-- CTA -->
         <section class="lp-cta">
             <h2>Travel informed, not afraid.</h2>
-            <p>Start with a free briefing for your next destination. Upgrade only when you need more.</p>
+            <p>Every briefing is free and every claim links to its source. Start with your next destination.</p>
             <div class="lp-cta-btns">
                 <a href="/scams" class="lp-btn-solid">Start a free briefing</a>
                 <button type="button" class="lp-btn-outline2" data-rs-palette-open>Explore destinations</button>

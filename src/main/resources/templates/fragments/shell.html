@@ -13,9 +13,7 @@
                 <a href="/scams" class="rs-nav-link" th:classappend="${active == 'scams'} ? 'active'">Library</a>
                 <a href="/street" class="rs-nav-link" th:classappend="${active == 'street'} ? 'active'">Streets</a>
                 <a href="/compare" class="rs-nav-link" th:classappend="${active == 'compare'} ? 'active'">Compare</a>
-                <a href="/map" class="rs-nav-link" th:classappend="${active == 'map'} ? 'active'">Map</a>
                 <a href="/guide" class="rs-nav-link" th:classappend="${active == 'guide'} ? 'active'">Guide</a>
-                <a href="/pricing" class="rs-nav-link" th:classappend="${active == 'pricing'} ? 'active'">Pricing</a>
             </div>
             <div class="rs-nav-spacer"></div>
             <button type="button" class="rs-search-trigger" data-rs-palette-open aria-label="Search">
@@ -103,10 +101,9 @@
             </div>
             <div class="rs-footer-col">
                 <h4>Product</h4>
-                <a href="/scams">Explore destinations</a>
                 <a href="/scams">Scam library</a>
-                <a href="/map">Live map</a>
-                <a href="/pricing">Pricing</a>
+                <a href="/street">Street check</a>
+                <a href="/trip">Trip briefing</a>
             </div>
             <div class="rs-footer-col">
                 <h4>Platform</h4>
@@ -117,13 +114,13 @@
                 <a th:if="${currentUser != null}" href="/logout">Sign out</a>
             </div>
             <div class="rs-footer-col">
-                <h4>Company</h4>
-                <a href="/">About</a>
-                <a href="/pricing">Plans</a>
+                <h4>Developers</h4>
+                <a href="/developers">REST API &amp; MCP server</a>
+                <a href="https://github.com/Zeesky-code/Roam-Safe" target="_blank" rel="noopener">Source on GitHub</a>
             </div>
         </div>
         <div class="rs-footer-bottom">
-            <span>© 2026 RoamSafe, Inc.</span>
+            <span>© 2026 RoamSafe</span>
             <span>Made for the curious traveler · AI summarizes, evidence decides.</span>
         </div>
     </footer>

@@ -141,7 +141,7 @@ public class LandingService {
 
     /** Up to four live-intel cards from the top-reported cities. */
     public List<Intel> intel() {
-        List<Object[]> top = scamService.getTopCities(4);
+        List<Object[]> top = scamService.getTopCities(3); // one full row of the 3-column grid
         List<Intel> out = new ArrayList<>();
         for (Object[] row : top) {
             String city = (String) row[0];
@@ -180,12 +180,10 @@ public class LandingService {
         for (Object[] row : scamService.getTopCities(6)) {
             String city = (String) row[0];
             long count = ((Number) row[1]).longValue();
-            items.add(new PaletteItem("Cities", city, count + " reports", "/scams?city=" + city));
+            items.add(new PaletteItem("Cities", city, count + " reports", "/scams?city=" + org.springframework.web.util.UriUtils.encodeQueryParam(city, java.nio.charset.StandardCharsets.UTF_8)));
         }
         items.add(new PaletteItem("Actions", "Browse the scam library", "All documented tactics", "/scams"));
-        items.add(new PaletteItem("Actions", "Open the live map", "Global safety at a glance", "/map"));
         items.add(new PaletteItem("Actions", "Submit a report", "Share what you saw", "/submit"));
-        items.add(new PaletteItem("Actions", "See pricing", "Free, Trip Pass or Pro", "/pricing"));
         return items;
     }
 

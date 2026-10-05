@@ -46,7 +46,9 @@ public class User {
 
     private boolean emailVerified = false;
 
-    // Subscription fields
+    // Legacy fields from the paid tiers, retired 2026-10-05 when everything went
+    // free. Nothing reads them any more; they stay mapped so existing rows (and
+    // the non-null is_pro column) keep loading and saving without a migration.
     private boolean pro = false;
 
     private String stripeCustomerId; // legacy, retained for old records

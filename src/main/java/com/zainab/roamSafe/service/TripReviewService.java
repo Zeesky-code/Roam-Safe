@@ -138,7 +138,7 @@ public class TripReviewService {
                         night.nightIncidentShare() + "% of " + city + "'s reports are night-time incidents"
                                 + (night.topNightAreas().isEmpty() ? "."
                                         : ", clustering around " + String.join(", ", night.topNightAreas()) + "."),
-                        line, "See " + city + " report", "/scams?city=" + city, nightReports));
+                        line, "See " + city + " report", "/scams?city=" + queryParam(city), nightReports));
             }
             break;
         }
@@ -162,7 +162,7 @@ public class TripReviewService {
                         matching.size() == 1
                                 ? "One report in " + city + " describes a problem with this."
                                 : matching.size() + "+ reports in " + city + " describe problems with this.",
-                        line, "See " + city + " report", "/scams?city=" + city, matching));
+                        line, "See " + city + " report", "/scams?city=" + queryParam(city), matching));
                 break;
             }
         }
@@ -173,7 +173,7 @@ public class TripReviewService {
                     city + " scores " + score.getOverallScore() + "/100",
                     "Computed from " + reports.size() + " reports, "
                             + (int) Math.round(score.getConfidenceLevel() * 100) + "% confidence.",
-                    null, "Full " + city + " report", "/scams?city=" + city, List.of()));
+                    null, "Full " + city + " report", "/scams?city=" + queryParam(city), List.of()));
         }
         return out;
     }
@@ -198,7 +198,7 @@ public class TripReviewService {
                     return new Finding(severity,
                             "Staying near " + profile.place(),
                             detail, line,
-                            "Street report", "/street?q=" + profile.place() + "&city=" + city,
+                            "Street report", "/street?q=" + queryParam(profile.place()) + "&city=" + queryParam(city),
                             profile.evidence().stream().limit(2).toList());
                 });
     }
@@ -278,5 +278,10 @@ public class TripReviewService {
 
     private static String capitalise(String s) {
         return s.substring(0, 1).toUpperCase(Locale.ROOT) + s.substring(1);
+    }
+
+    /** City and place names carry spaces, accents and the odd "&"; encode them for a link. */
+    private static String queryParam(String value) {
+        return org.springframework.web.util.UriUtils.encodeQueryParam(value, java.nio.charset.StandardCharsets.UTF_8);
     }
 }

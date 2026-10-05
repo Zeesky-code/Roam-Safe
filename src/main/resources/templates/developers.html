@@ -8,7 +8,7 @@
     <meta name="description"
         content="Travel intelligence as an endpoint. Query real safety scores and a live alert feed over a simple JSON API." />
     <link rel="stylesheet" th:href="@{/css/modern-theme.css}" />
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.52.0/dist/umd/lucide.min.js"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
                 <div class="rs-eyebrow">✦ API</div>
                 <h1>Travel intelligence, as an endpoint</h1>
                 <p class="rs-lede">Query the same evidence-backed safety data that powers RoamSafe: city risk
-                    scores, official recorded crime and a live alert feed, over a simple JSON API. Structured,
+                    scores, official recorded crime, current news incidents and a report feed, over a simple JSON API. Structured,
                     not scraped, and it tells you when it has no coverage instead of guessing.</p>
                 <div class="rs-dev-btns">
                     <a href="mailto:zainablaw1012@gmail.com?subject=RoamSafe%20API%20key%20request"
@@ -46,7 +46,7 @@
 <span class="k">import</span> requests
 
 r = requests.get(
-    <span class="s">"https://api.roamsafe.app/api/v1/risk/city/Tokyo"</span>,
+    <span class="s">"https://roam-safe.brimble.app/api/v1/risk/city/Tokyo"</span>,
     headers={<span class="s">"X-API-KEY"</span>: <span class="s">"your_key_here"</span>},
 )
 data = r.json()
@@ -74,7 +74,7 @@ data = r.json()
                 </div>
                 <div class="rs-dev-card">
                     <div class="rs-dev-tile"><i data-lucide="activity"></i></div>
-                    <h4>Live alert feed</h4>
+                    <h4>Report feed</h4>
                     <p>Poll a paginated global feed of the newest approved reports as they land.</p>
                 </div>
                 <div class="rs-dev-card">

@@ -72,11 +72,6 @@ public class AdminAccountBootstrap {
         user.setRole(UserRole.ADMIN);
         user.setEnabled(true);
         user.setEmailVerified(true);
-        // Give the test account the paid experience, so admin sign-in exercises
-        // the same views a Nomad subscriber sees rather than the paywalled ones.
-        user.setPro(true);
-        user.setProPlan("nomad");
-        user.setSubscriptionExpiry(LocalDateTime.now().plusYears(10));
 
         userRepository.save(user);
         System.out.println("[admin] Admin account ready: " + email

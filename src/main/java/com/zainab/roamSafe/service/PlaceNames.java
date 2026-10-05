@@ -79,7 +79,11 @@ public final class PlaceNames {
             return out;
         }
         Set<String> seen = new LinkedHashSet<>();
-        for (String part : raw.split("[,;/]| and (?=[A-Z])")) {
+        // Separators inside brackets belong to the bracket: splitting
+        // "Airports (Charles de Gaulle, Orly) and train stations" on its comma
+        // produced the "places" "Airports (Charles de Gaulle" and "Orly) and
+        // train stations".
+        for (String part : raw.split("(?:[,;/]| and (?=[A-Z]))(?![^()]*\\))")) {
             String name = tidy(part);
             if (name != null && seen.add(name.toLowerCase(Locale.ROOT))) {
                 out.add(name);
@@ -94,6 +98,9 @@ public final class PlaceNames {
         // Trailing punctuation and stray articles left by the split.
         name = name.replaceAll("[.!?]+$", "").trim();
         if (name.length() < 3 || name.length() > 45) {
+            return null;
+        }
+        if (name.chars().filter(c -> c == '(').count() != name.chars().filter(c -> c == ')').count()) {
             return null;
         }
         String lower = name.toLowerCase(Locale.ROOT);

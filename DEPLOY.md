@@ -17,7 +17,7 @@ Internet ──HTTPS──▶ Caddy (:443) ──▶ RoamSafe container (:8080) 
 
 Prerequisites: an Oracle Cloud account (free; a card is required for identity
 verification but Always Free resources never bill), and a domain **or** a free
-DuckDNS subdomain for HTTPS (Bachs webhooks require HTTPS).
+DuckDNS subdomain for HTTPS.
 
 ---
 
@@ -98,13 +98,6 @@ GEMINI_API_KEY=...
 ROAMSAFE_API_KEY=...
 ROAMSAFE_ADMIN_KEY=...
 
-# --- Bachs: LIVE for production ---
-# Do NOT set BACH_DEMO_KEY in prod (that would force sandbox).
-BACH_API_KEY=sk_live_...
-BACHS_TRIP_PASS_PRODUCT=prod_fe6bdaeda81e44f381d3
-BACHS_NOMAD_PRODUCT=prod_e32c1dd954364b7a96a2
-BACHS_WEBHOOK_SECRET=...            # from the live webhook endpoint you create
-
 # --- Optional ---
 GOOGLE_SHEETS_URL=...
 ```
@@ -155,19 +148,9 @@ Caddy fetches a Let's Encrypt certificate automatically. Visit
 
 ---
 
-## Part F — Point Bachs at it & go live
-
-1. In the Bachs dashboard (**live mode**), create a webhook endpoint:
-   `https://your-domain.com/api/bachs/webhook`, events: Customer Subscription
-   Created / Updated / Deleted, Invoice Paid, Collection Succeeded.
-2. Copy its signing secret into `prod.env` as `BACHS_WEBHOOK_SECRET`, then
-   `docker restart roamsafe`.
-3. Confirm live products exist and their ids match `BACHS_*_PRODUCT`.
+## Part F — Go live
 
 Go-live checklist:
-- [ ] `BACH_DEMO_KEY` is **absent** in prod.env (so it runs live, not sandbox)
-- [ ] Live Bachs webhook secret set
-- [ ] A real $3 Trip Pass purchase flips the account to Pro
 - [ ] `ROAMSAFE_API_KEY` set — otherwise every `/api/v1` call (including the
       MCP server) returns 403
 - [ ] `ROAMSAFE_ADMIN_KEY` set, and **different** from the partner key
@@ -194,5 +177,4 @@ docker run -d --name roamsafe --restart unless-stopped \
   `DB_URL` or missing env var.
 - **Out of memory on a 1-OCPU VM:** the Dockerfile already caps the heap
   (`MaxRAMPercentage=70`); a 6 GB VM has plenty of headroom.
-- **Webhook not granting Pro:** confirm the endpoint URL, that the secret
-  matches, and watch `docker logs -f roamsafe` for `[bachs]` lines while testing.
+

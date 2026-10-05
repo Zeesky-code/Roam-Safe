@@ -64,6 +64,14 @@ public class GdeltIngestionService {
                     + "|earthquake|storm|outage|terror\\w*|explosion)\\b",
             Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Retrospectives. "Today in History: hundreds massacred at Mexico City
+     * student protest" names the city and a disruption term, and is about 1968.
+     */
+    private static final Pattern RETROSPECTIVE = Pattern.compile(
+            "\\b(today in history|on this day|anniversary|years ago|years on)\\b",
+            Pattern.CASE_INSENSITIVE);
+
     private final LiveIncidentRepository incidentRepository;
     private final ScamReportRepository reportRepository;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -149,6 +157,10 @@ public class GdeltIngestionService {
         }
 
         int stored = 0;
+        Set<String> seenTitles = new HashSet<>();
+        for (LiveIncident existing : incidentRepository.findByCityNameIgnoreCaseOrderByPublishedAtDesc(city)) {
+            seenTitles.add(titleKey(existing.getTitle()));
+        }
         for (JsonNode article : root.path("articles")) {
             String title = article.path("title").asText("").trim();
             String url = article.path("url").asText("").trim();
@@ -159,6 +171,10 @@ public class GdeltIngestionService {
                 continue;
             }
             if (incidentRepository.findBySourceUrl(url).isPresent()) {
+                continue;
+            }
+            // Syndicated copies of one story arrive under different URLs.
+            if (!seenTitles.add(titleKey(title))) {
                 continue;
             }
             incidentRepository.save(new LiveIncident(city, truncate(title, 500), truncate(url, 900),
@@ -179,7 +195,7 @@ public class GdeltIngestionService {
      */
     private String get(URI uri) {
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.set("User-Agent", "RoamSafe/1.0 (travel safety intelligence; +https://roamsafe.app)");
+        headers.set("User-Agent", "RoamSafe/1.0 (travel safety intelligence; +https://github.com/Zeesky-code/Roam-Safe)");
         headers.set("Accept", "application/json");
         return restTemplate.exchange(uri, org.springframework.http.HttpMethod.GET,
                 new org.springframework.http.HttpEntity<>(headers), String.class).getBody();
@@ -200,7 +216,30 @@ public class GdeltIngestionService {
             return false;
         }
         return title.toLowerCase(Locale.ROOT).contains(city.toLowerCase(Locale.ROOT))
-                && DISRUPTION.matcher(title).find();
+                && DISRUPTION.matcher(title).find()
+                && !RETROSPECTIVE.matcher(title).find();
+    }
+
+    /**
+     * Incidents fit to show: one per story, and none that fail the current
+     * relevance rules. Applied on read as well as on ingest so rows stored
+     * before a rule existed don't keep surfacing, and so the website and the
+     * API (and through it MCP) show the same list. Order is preserved.
+     */
+    public static List<LiveIncident> current(List<LiveIncident> incidents) {
+        Set<String> seen = new HashSet<>();
+        List<LiveIncident> out = new ArrayList<>();
+        for (LiveIncident i : incidents) {
+            if (isRelevant(i.getCityName(), i.getTitle()) && seen.add(titleKey(i.getTitle()))) {
+                out.add(i);
+            }
+        }
+        return out;
+    }
+
+    /** Same story, different outlet: compare headlines on letters and digits only. */
+    static String titleKey(String title) {
+        return title == null ? "" : title.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", "");
     }
 
     /** Drop stories that have aged out: last month's strike isn't current. */

@@ -12,9 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Live intelligence feed — a filterable stream of the most recent approved
+ * Latest reports - a filterable stream of the most recently added approved
  * reports. Real data only: each signal is a genuine report. Filtering is done
  * client-side over the rendered list.
+ *
+ * Not billed as "live": these are evergreen library entries ordered by when they
+ * were ingested, and most carry no incident date. Current events come from GDELT
+ * and appear on each city's "Happening now" tab.
  */
 @Controller
 public class FeedController {
@@ -32,6 +36,7 @@ public class FeedController {
             String title,
             String description,
             String time,
+            String source,
             String href) {
     }
 
@@ -47,7 +52,8 @@ public class FeedController {
                     r.getName(),
                     r.getDescription(),
                     relativeTime(r.getReportedAt()),
-                    "/scams?city=" + r.getCity()));
+                    r.getSourceName() == null || r.getSourceName().isBlank() ? null : r.getSourceName(),
+                    "/scams?city=" + org.springframework.web.util.UriUtils.encodeQueryParam(r.getCity(), java.nio.charset.StandardCharsets.UTF_8)));
         }
         model.addAttribute("signals", signals);
         model.addAttribute("signalCount", signals.size());
@@ -55,50 +61,6 @@ public class FeedController {
         List<String> categories = signals.stream().map(Signal::category).distinct().sorted().toList();
         model.addAttribute("categories", categories);
         return "feed";
-    }
-
-    /**
-     * Markers kept per city. Enough that a big city shows more than a single
-     * pin, few enough that dense cities don't bury the rest of the world.
-     */
-    private static final int MARKERS_PER_CITY = 3;
-
-    /** One plotted marker: only the fields the map actually renders. */
-    public record MapSignal(
-            String city,
-            String name,
-            String neighborhood,
-            String description,
-            String preventionTips,
-            String safetyZone) {
-    }
-
-    /**
-     * Marker data for the map page.
-     *
-     * The map used to read this from /api/v1/alerts/feed, which meant the page
-     * shipped a partner API key in its JavaScript to every visitor - published
-     * on a public page and therefore not a secret at all. The map needs no
-     * privilege the page itself doesn't already have, so it reads from a
-     * same-origin endpoint instead and no key is involved.
-     *
-     * The response carries only the six fields the marker popup renders, rather
-     * than serialising the whole entity as the partner feed does.
-     */
-    @GetMapping("/map/signals")
-    @org.springframework.web.bind.annotation.ResponseBody
-    public List<MapSignal> mapSignals() {
-        List<MapSignal> out = new ArrayList<>();
-        for (ScamReport r : scamService.getMapSpread(MARKERS_PER_CITY)) {
-            out.add(new MapSignal(
-                    r.getCity(),
-                    r.getName(),
-                    r.getNeighborhood(),
-                    r.getDescription(),
-                    r.getPreventionTips(),
-                    r.getSafetyZone() != null ? r.getSafetyZone().name() : "YELLOW"));
-        }
-        return out;
     }
 
     private static String severityOf(Integer sev) {

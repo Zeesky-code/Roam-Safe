@@ -1,9 +1,6 @@
 package com.zainab.roamSafe.controller;
 
-import com.zainab.roamSafe.model.User;
-import com.zainab.roamSafe.service.SearchQuotaService;
 import com.zainab.roamSafe.service.TripGuideService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +21,13 @@ public class GuideController {
     private static final int MAX_STOPS = 8;
 
     private final TripGuideService tripGuideService;
-    private final SearchQuotaService searchQuota;
 
-    public GuideController(TripGuideService tripGuideService, SearchQuotaService searchQuota) {
+    public GuideController(TripGuideService tripGuideService) {
         this.tripGuideService = tripGuideService;
-        this.searchQuota = searchQuota;
     }
 
     @GetMapping("/guide")
-    public String guide(@RequestParam(required = false) String cities,
-            HttpSession session, Model model) {
+    public String guide(@RequestParam(required = false) String cities, Model model) {
 
         model.addAttribute("query", cities);
         if (cities == null || cities.isBlank()) {
@@ -48,11 +42,6 @@ public class GuideController {
             return "guide";
         }
 
-        User user = (User) session.getAttribute("user");
-        // The multi-stop guide is a Trip Pass feature.
-        if (!searchQuota.hasProAccess(user)) {
-            return "redirect:/pricing?locked=guide";
-        }
 
         model.addAttribute("guide", tripGuideService.build(names));
         return "guide";

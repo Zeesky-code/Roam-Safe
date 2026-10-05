@@ -152,7 +152,7 @@ public class OsmCoworkingService {
                 + ");out center tags 60;";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent", "RoamSafe/1.0 (travel safety intelligence; +https://roamsafe.app)");
+        headers.set("User-Agent", "RoamSafe/1.0 (travel safety intelligence; +https://github.com/Zeesky-code/Roam-Safe)");
         String body = restTemplate.exchange(OVERPASS, HttpMethod.POST,
                 new HttpEntity<>("data=" + java.net.URLEncoder.encode(query, java.nio.charset.StandardCharsets.UTF_8),
                         headers),

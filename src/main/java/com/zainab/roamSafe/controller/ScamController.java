@@ -2,18 +2,17 @@ package com.zainab.roamSafe.controller;
 
 import java.util.List;
 import com.zainab.roamSafe.model.ScamReport;
+import com.zainab.roamSafe.service.GdeltIngestionService;
 import com.zainab.roamSafe.service.ScamService;
 import com.zainab.roamSafe.service.DestinationService;
 import com.zainab.roamSafe.service.CountryLookup;
 import com.zainab.roamSafe.repository.AdvisoryRepository;
-import com.zainab.roamSafe.model.User;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/scams")
@@ -25,7 +24,6 @@ public class ScamController {
     private final com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService;
     private final com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver;
     private final com.zainab.roamSafe.service.ScamLookupService scamLookupService;
-    private final com.zainab.roamSafe.service.SearchQuotaService searchQuota;
     private final com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository;
     private final com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository;
     private final com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository;
@@ -35,7 +33,6 @@ public class ScamController {
             com.zainab.roamSafe.service.EmergencyNumberService emergencyNumberService,
             com.zainab.roamSafe.service.CityCountryResolver cityCountryResolver,
             com.zainab.roamSafe.service.ScamLookupService scamLookupService,
-            com.zainab.roamSafe.service.SearchQuotaService searchQuota,
             com.zainab.roamSafe.repository.LiveIncidentRepository liveIncidentRepository,
             com.zainab.roamSafe.repository.PracticalInfoRepository practicalInfoRepository,
             com.zainab.roamSafe.repository.CoworkingSpaceRepository coworkingSpaceRepository) {
@@ -43,7 +40,6 @@ public class ScamController {
         this.practicalInfoRepository = practicalInfoRepository;
         this.liveIncidentRepository = liveIncidentRepository;
         this.scamLookupService = scamLookupService;
-        this.searchQuota = searchQuota;
         this.scamService = scamService;
         this.destinationService = destinationService;
         this.advisoryRepository = advisoryRepository;
@@ -54,33 +50,17 @@ public class ScamController {
     @GetMapping
     public String showScamsPage(@RequestParam(required = false) String city,
             @RequestParam(required = false) String q,
-            Model model,
-            HttpSession session) {
-
-        User user = (User) session.getAttribute("user");
-        boolean isLoggedIn = user != null;
-        boolean isPro = isLoggedIn && user.isPro();
-        model.addAttribute("isLoggedIn", isLoggedIn);
-        model.addAttribute("isPro", isPro);
+            Model model) {
 
         // Named-scam lookup: "bracelet scam Paris". Handled before the city
         // branch so a query mentioning a city still searches the scam, rather
         // than falling through to that city's whole report list.
         if (q != null && !q.isBlank()) {
-            if (!searchQuota.allow(session, user, "scam:" + q)) {
-                return "redirect:/pricing?limit=search";
-            }
             model.addAttribute("lookup", scamLookupService.lookup(q));
-            model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
             return "scam-lookup";
         }
 
         if (city != null && !city.isEmpty()) {
-            if (!searchQuota.allow(session, user, "city:" + city)) {
-                return "redirect:/pricing?limit=search";
-            }
-            model.addAttribute("searchesLeft", searchQuota.remaining(session, user));
-
             // US4: an airport query ("Istanbul Airport") resolves to its city and
             // opens on the arrival tab, where the real airport->city transport,
             // SIM and currency guidance already lives.
@@ -96,7 +76,6 @@ public class ScamController {
             List<ScamReport> allScams = scamService.getReportsByCity(cityName);
             int totalScams = allScams.size();
 
-            // Stats/score use the full list; the card list is paywalled.
             model.addAttribute("destination", destinationService.build(cityName, allScams));
 
             // Country: prefer the value resolved onto the city record, falling back
@@ -124,8 +103,8 @@ public class ScamController {
 
             // Current news mentions for this city. Attributed and unverified -
             // shown as third-party reporting, never as a RoamSafe finding.
-            var incidents = liveIncidentRepository
-                    .findByCityNameIgnoreCaseOrderByPublishedAtDesc(cityName);
+            var incidents = GdeltIngestionService.current(liveIncidentRepository
+                    .findByCityNameIgnoreCaseOrderByPublishedAtDesc(cityName));
             if (!incidents.isEmpty()) {
                 model.addAttribute("incidents", incidents);
             }
@@ -143,12 +122,7 @@ public class ScamController {
                 model.addAttribute("coworking", coworking);
             }
 
-            List<ScamReport> visible = allScams;
-            if (!isPro && totalScams > 3) {
-                visible = allScams.subList(0, 3);
-                model.addAttribute(isLoggedIn ? "showUpgradePrompt" : "showLoginPrompt", true);
-            }
-            model.addAttribute("scams", visible);
+            model.addAttribute("scams", allScams);
             model.addAttribute("totalScams", totalScams);
             model.addAttribute("selectedCity", cityName);
             return "destination";

@@ -32,9 +32,4 @@ public class WebController {
         model.addAttribute("popularCities", List.of("Tokyo", "Bali", "Mexico City", "Lisbon", "Bangkok", "Barcelona"));
         return "landing";
     }
-
-    @GetMapping("/map")
-    public String map() {
-        return "map";
-    }
 }

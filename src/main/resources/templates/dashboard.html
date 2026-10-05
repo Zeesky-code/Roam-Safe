@@ -103,7 +103,7 @@
         <section class="rs-section" th:if="${view.watchedCount > 0}">
             <div class="rs-dash-section-head">
                 <div class="rs-eyebrow">DESTINATIONS YOU'RE WATCHING</div>
-                <a href="/feed" class="rs-dash-link">View all alerts →</a>
+                <a href="/feed" class="rs-dash-link">View latest reports →</a>
             </div>
             <div class="rs-dash-tiles">
                 <div class="rs-dash-tile" th:each="w : ${view.watched}">
@@ -188,8 +188,7 @@
                 <div class="rs-dash-jump">
                     <a href="/scams">Scam library
                         <span th:text="${view.libraryCount} + ' documented reports, all sourced'"></span></a>
-                    <a href="/feed">Live alert feed <span>Global signals</span></a>
-                    <a href="/map">Risk map <span>See everything geographically</span></a>
+                    <a href="/feed">Latest reports <span>Newest additions, every city</span></a>
                     <a href="/trip">Multi-city trip <span>One printable briefing for a whole route</span></a>
                 </div>
             </div>
