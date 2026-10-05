@@ -73,7 +73,10 @@ public class TripGuideService {
             }
             List<ScamReport> reports = reportRepository
                     .findByCityIgnoreCaseAndStatusOrderBySeverityScoreDesc(city, ScamReportStatus.APPROVED);
-            String country = countryResolver.countryFor(city).orElse(null);
+            String country = countryResolver.countryFor(city)
+                    .orElseGet(() -> CountryLookup.forCity(city)
+                            .map(CountryLookup.Country::name)
+                            .orElse(null));
 
             if (reports.isEmpty()) {
                 // Still worth a stop if we can at least give the emergency

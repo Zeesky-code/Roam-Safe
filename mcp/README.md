@@ -2,7 +2,8 @@
 
 Give any MCP-capable AI agent (Claude Desktop, Cursor, …) access to RoamSafe's
 **evidence-backed travel intelligence**: city safety scores computed from real
-traveler reports, plus a live feed of what's being reported right now.
+traveler reports, emergency numbers, arrival information and current news
+incidents.
 
 The point of difference: **it refuses to guess.** Ask about a city RoamSafe
 doesn't cover and the tool says so instead of inventing a plausible-sounding
@@ -21,6 +22,8 @@ agent can reason over the numbers instead of parsing prose.
 | `list_recent_alerts` | Newest traveler-reported signals worldwide; optional `city` filter |
 | `street_intelligence` | **One specific street, square or district**: its own risk score, concerns reported there, prevention tips travelers gave, better-scoring areas nearby, and the country's emergency number. Disambiguates when a name occurs in several cities |
 | `get_emergency_numbers` | Emergency numbers for a country, from structured official data. Refuses to guess — a wrong number costs someone time in a crisis |
+| `get_arrival_info` | Airport-to-city transport, SIM and currency notes for a city, quoted from Wikivoyage with attribution |
+| `list_current_incidents` | Current disruptions (strikes, closures, protests) from GDELT news headlines, stored verbatim and marked unverified |
 | `compare_cities` | Rank up to **10** cities, either overall or by a specific `concern`. Explains *why* the top beats the bottom, and suggests real alternatives for uncovered cities |
 
 ### What it deliberately won't do

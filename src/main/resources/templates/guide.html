@@ -37,14 +37,20 @@
         </section>
 
         <section class="rs-section rs-noprint" th:if="${needsInput}">
-            <div class="rs-card-panel rs-empty">
-                <p>Name your stops, separated by commas. Try
-                    <a href="/guide?cities=Paris,Brussels,Amsterdam,Berlin">Paris, Brussels, Amsterdam, Berlin</a>.
-                </p>
+            <div class="rs-eyebrow" style="margin-bottom:12px">TRY A ROUTE</div>
+            <div class="rs-place-chips">
+                <a href="/guide?cities=Paris,Brussels,Amsterdam,Berlin">Paris → Berlin <span>4 stops</span></a>
+                <a href="/guide?cities=Barcelona,Lisbon,Porto">Iberia loop <span>3 stops</span></a>
+                <a href="/guide?cities=Rome,Florence,Venice">Italy classic <span>3 stops</span></a>
             </div>
         </section>
 
         <th:block th:if="${guide != null}">
+
+            <div class="rs-tip rs-noprint" th:if="${trimmed != null}" style="margin-bottom:18px">
+                <p th:text="'A guide covers up to ' + ${trimmed} + ' stops, so it was built from the first ' + ${trimmed} + '.'">
+                    Trimmed.</p>
+            </div>
 
             <div class="rs-guide-actions rs-noprint">
                 <button type="button" class="rs-btn-primary" onclick="window.print()">Print / save as PDF</button>
