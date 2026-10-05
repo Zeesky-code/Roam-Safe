@@ -7,6 +7,8 @@ import com.zainab.roamSafe.model.ScamReport;
 import com.zainab.roamSafe.model.ScamReportStatus;
 import com.zainab.roamSafe.repository.AdvisoryRepository;
 import com.zainab.roamSafe.repository.ScamReportRepository;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,6 +18,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * Assembles the landing page from real data only.
@@ -43,12 +47,90 @@ public class LandingService {
         this.advisoryRepository = advisoryRepository;
     }
 
+    // --- Cached reads ---------------------------------------------------------
+    //
+    // The landing page and the palette (built for every page by
+    // GlobalModelAdvice) cost 15-25 round trips to Neon per request, which put
+    // "/" at 4-9 seconds and made a fresh deploy fail Brimble's health check.
+    // The underlying data only changes when ingestion runs (daily at most), so
+    // serving it from memory for a few minutes changes nothing a visitor can see.
+
+    private static final Duration TTL = Duration.ofMinutes(10);
+
+    private record Entry(Object value, long expiresAt) {
+    }
+
+    private final Map<String, Entry> cache = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("unchecked")
+    private <T> T cached(String key, Supplier<T> load) {
+        Entry hit = cache.get(key);
+        long now = System.currentTimeMillis();
+        if (hit != null && hit.expiresAt() > now) {
+            return (T) hit.value();
+        }
+        T value = load.get();
+        cache.put(key, new Entry(value, now + TTL.toMillis()));
+        return value;
+    }
+
+    public List<Advisory> activeAdvisories(int limit) {
+        return cached("advisories:" + limit, () -> loadActiveAdvisories(limit));
+    }
+
+    public List<Stat> stats() {
+        return cached("stats", this::loadStats);
+    }
+
+    public Briefing heroBriefing() {
+        return cached("briefing", this::loadHeroBriefing);
+    }
+
+    public List<Intel> intel() {
+        return cached("intel", this::loadIntel);
+    }
+
+    public List<ScamReport> scamPreview(int limit) {
+        return cached("preview:" + limit, () -> loadScamPreview(limit));
+    }
+
+    public List<PaletteItem> paletteItems() {
+        return cached("palette", this::loadPaletteItems);
+    }
+
+    public long approvedReportCount() {
+        return cached("approvedCount", () -> scamReportRepository.countByStatus(ScamReportStatus.APPROVED));
+    }
+
+    /**
+     * Fill the cache in the background once the app is up, so the first visitor
+     * (and the platform's health check, which requests "/") gets a page from
+     * memory instead of paying for a cold Neon wake-up plus every query at once.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void warm() {
+        Thread.ofVirtual().name("landing-warmup").start(() -> {
+            try {
+                paletteItems();
+                stats();
+                heroBriefing();
+                intel();
+                scamPreview(2);
+                activeAdvisories(6);
+                approvedReportCount();
+            } catch (Exception e) {
+                // Not fatal: the page computes on demand instead.
+                System.out.println("[landing] Cache warm-up failed: " + e.getMessage());
+            }
+        });
+    }
+
     /**
      * Countries under an active (high/critical) government advisory, one row per
      * country (most severe kept), for the landing "active advisories" strip.
      * Real, sourced data straight from the advisories table.
      */
-    public List<Advisory> activeAdvisories(int limit) {
+    private List<Advisory> loadActiveAdvisories(int limit) {
         List<Advisory> raw = advisoryRepository.findBySeverityIn(List.of("high", "critical"));
         Map<String, Advisory> byCountry = new LinkedHashMap<>();
         for (Advisory a : raw) {
@@ -69,7 +151,7 @@ public class LandingService {
     }
 
     /** Trust-strip figures, all counted in SQL. */
-    public List<Stat> stats() {
+    private List<Stat> loadStats() {
         long approved = scamReportRepository.countByStatus(ScamReportStatus.APPROVED);
         long cities = scamReportRepository.countDistinctCities();
         long neighborhoods = scamReportRepository.countDistinctNeighborhoods();
@@ -85,7 +167,7 @@ public class LandingService {
     }
 
     /** Hero briefing card for the most-reported city with a computable score. */
-    public Briefing heroBriefing() {
+    private Briefing loadHeroBriefing() {
         List<Object[]> top = scamService.getTopCities(3);
         for (Object[] row : top) {
             String city = (String) row[0];
@@ -140,7 +222,7 @@ public class LandingService {
     }
 
     /** Up to four live-intel cards from the top-reported cities. */
-    public List<Intel> intel() {
+    private List<Intel> loadIntel() {
         List<Object[]> top = scamService.getTopCities(3); // one full row of the 3-column grid
         List<Intel> out = new ArrayList<>();
         for (Object[] row : top) {
@@ -169,13 +251,13 @@ public class LandingService {
     }
 
     /** Scam-library preview: the highest-severity recent tactics. */
-    public List<ScamReport> scamPreview(int limit) {
+    private List<ScamReport> loadScamPreview(int limit) {
         List<ScamReport> recent = scamService.getRecentReports(limit);
         return recent.size() > limit ? recent.subList(0, limit) : recent;
     }
 
     /** Command-palette seed: real cities + top-level actions. */
-    public List<PaletteItem> paletteItems() {
+    private List<PaletteItem> loadPaletteItems() {
         List<PaletteItem> items = new ArrayList<>();
         for (Object[] row : scamService.getTopCities(6)) {
             String city = (String) row[0];
